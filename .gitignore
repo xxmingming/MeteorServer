@@ -38,3 +38,5 @@
 *.bsc
 *.pdb
 *.log
+Mir3server/_Obj_Debug/GameSvr/GameSvr.res
+Mir3server/_Obj_Debug/GameGate/GameGate.res
