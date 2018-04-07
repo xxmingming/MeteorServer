@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+*.sbr
+*.tlog
+*.aps
+*.db
+*.opendb
+*.bsc
+*.pdb
+*.log

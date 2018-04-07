@@ -1,0 +1,302 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_NOTWINNT            "此程序只有在WIN2000以上版本中才能运行的"
+    IDS_LVS_LABEL1          "日期"
+    IDS_LVS_LABEL2          "时间"
+    IDS_LVS_LABEL3          "邮件"
+    IDS_STARTSERVICE        "启动服务"
+    IDS_STOPSERVICE         "停止服务"
+    IDS_FETCH_MAGICDATA     "取得魔法数据"
+    IDS_DISCONNECT_LOGINSERVER "与登陆服断开链接"
+    IDS_PROGRAM_QUIT        "退出吗？"
+    IDS_PROGRAM_TITLE       "流星服务端"
+    IDS_LOAD_ADMINCOMMAND   "管理员命令 :  (%d) "
+    IDS_CONFLVS_LABEL1      "???"
+    IDS_CONFLVS_LABEL2      "???"
+    IDS_CONFLVS_LABEL3      "??? ??? ?? IP ??"
+    IDS_CONFLVS_LABEL4      "??? ??? ?? IP ??"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CONFLVS_LABEL5      "?? ??? ?? IP ??"
+    IDS_TAB_LABEL1          "?? ??"
+    IDS_ACCEPT_GATESERVER   "INFO : 接收到游戏网关(%s)"
+    IDS_OPEN_USER           "????? (%s) ? ??? ?? ????. "
+    IDS_CLOSE_USER          "????? (%s) ? ??? ?? ????."
+    IDS_OPEN_GATE           "%d ? ???? ?? ?????."
+    IDS_CLOSE_GATE          "%d ? ???? ??? ?? ?????."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CONNECT_DBSERVER    "INFO : ?????? ??? ?? ?????."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOADMAPFILE_GOOD    "? ?? (%s) ??? ?????."
+    IDS_LOADMAPFILE_FAIL    "ERROR : 地图 (%s) 加载失败."
+    IDS_DISCONNECT_DBSERVER "ERROR : 无法链接到数据库服务器."
+    IDS_APPLY_RECONNECT     "INFO : 重新连接."
+    IDS_CANT_CONNECT        "ERROR : 无法连接."
+    IDS_FETCH_MONSTER       "??? ?? (%d ?)? ?????."
+    IDS_FETCH_MONGEN        "??? ?? ?? (%d ?)? ?????."
+    IDS_FETCH_STDITEMWEAPON "?? ??? ?? (%d ?)? ?????."
+    IDS_FETCH_STDITEMARMOR  "??? ??? ?? (%d ?)? ?????."
+    IDS_FETCH_MERCHANT      "?? ?? (%d ?)? ?????."
+    IDS_FETCH_MOVEMAPEVENT  "? ?? ?? (%d ?)? ?????."
+    IDS_ALLOW_LONGHIT       "???? ?????."
+    IDS_NOTALLOW_LONGHIT    "???? ???? ????."
+    IDS_ALLOW_WIDEHIT       "????? ?????."
+    IDS_NOTALLOW_WIDEHIT    "????? ???? ????."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ALLOW_FIREHIT       "??? ??? ?? ???? ???????."
+    IDS_NOTALLOW_FIREHIT    "?? ???? ???????."
+    IDS_TIMEOUT_FIREHIT     "?? ??? ??????."
+    IDS_ATTACKMODE_ALL      "[?? ?? ?? : ?? ?? ??]"
+    IDS_ATTACKMODE_PEACE    "[?? ?? ?? : ?? ??]"
+    IDS_ATTACKMODE_GROUP    "[?? ?? ?? : ?? ?? ??]"
+    IDS_ATTACKMODE_GUILD    "[?? ?? ?? : ?? ?? ??]"
+    IDS_ATTACKMODE_PKATTACK "[?? ?? ?? : ?? ?? ??]"
+    IDS_ATTACKMODE_CHGMODE  "?? ?? ?? ?? : CTRL-H"
+    IDS_FETCH_STDITEMETC    "INFO : ?? ??? ?? (%d ?)? ?????."
+    IDS_FETCH_STDITEMACCESSORY "INFO : ?? ??? ?? (%d ?)? ?????."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_JOBNAME_W           "??"
+    IDS_JOBNAME_S           "??"
+    IDS_JOBNAME_T           "??"
+    IDS_INSPECTOR_ON        "??? ??"
+    IDS_INSPECTOR_OFF       "??? ?? ??"
+    IDS_NOTENOUGHLEVEL_CRY  "???? ?? 8 ???? ??? ? ????."
+    IDS_CANTFIND_HUMAN      "?? ?? ? ????."
+    IDS_SKIL_LEVELUP        "%s ?? ?? %d ?? ??"
+    IDS_USERCMD_NOWHISPER1  "?????"
+    IDS_USERCMD_NOWHISPER2  "?????"
+    IDS_USERCMD_YESWHISPER1 "?????"
+    IDS_USERCMD_YESWHISPER2 "?????"
+    IDS_USERCMD_NOWHISPER_SOMEBODY "??"
+    IDS_USERCMD_DONTCRY1    "?????"
+    IDS_USERCMD_DONTCRY2    "?????"
+    IDS_USERCMD_DONTEXNG    "????"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_USERCMD_ACPTGUILD   "????"
+    IDS_USERCMD_ALOWPARTY   "????"
+    IDS_USERCMD_DOPARTY     "??"
+    IDS_USERCMD_BROKEPARTY  "????"
+    IDS_USERCMD_OUTGUILD    "????"
+    IDS_USERCMD_NOGUILDCRY1 "??????"
+    IDS_USERCMD_NOGUILDCRY2 "??????"
+    IDS_USERCMD_ATTACKMODE  "????"
+    IDS_USERCMD_REST        "??"
+    IDS_USERCMD_SABUKDOOR   "????"
+    IDS_LOAD_USERCOMMAND    "??? ??? (%d ?)? ?????."
+    IDS_DEFENCEUP           "??? ?? %d ?"
+    IDS_MAGDEFENCEUP        "??? ?? %d ?"
+    IDS_MALE_WEAR           "?? ????."
+    IDS_FEMALE_WEAR         "?? ????."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_NOTENOUGH_VALUE     "??? ? ????."
+    IDS_NOTENOUGH_WEIGHT    "?? ?????. "
+    IDS_GOLD                "Gold"
+    IDS_NEVERDIE_ON         "????"
+    IDS_NEVERDIE_OFF        "????"
+    IDS_CAPTURE_ON          "??? ??"
+    IDS_CAPTURE_OFF         "??? ?"
+END
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 朝鲜语(韩国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TOOLBAR             BITMAP                  ".\\Res\\toolbar.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MIR2                ICON                    ".\\Res\\MIR2.ICO"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINMENU MENU
+BEGIN
+    POPUP "&Service"
+    BEGIN
+        MENUITEM "&Start Service",              IDM_STARTSERVICE
+        MENUITEM "S&top Service",               IDM_STOPSERVICE, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Configuration",              IDM_CONFIG
+        MENUITEM "&Font Color",                 IDM_SETFONTCOLOR
+        MENUITEM "&Background Color",           IDM_SETBKGCOLOR
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONFIGDLG DIALOGEX 0, 0, 198, 316
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Game Server Configuration"
+FONT 9, "奔覆", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,43,288,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,100,288,50,14
+    EDITTEXT        IDC_DBSRV_PORT,73,120,91,16,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Address :",IDC_STATIC,29,106,35,8
+    GROUPBOX        "Database Server Information",IDC_STATIC,14,88,158,52
+    LTEXT           "Port :",IDC_STATIC,29,123,21,9
+    GROUPBOX        "Server Information",IDC_STATIC,14,15,158,68
+    LTEXT           "Start Level :",IDC_STATIC,26,33,39,8
+    LTEXT           "Start Gold :",IDC_STATIC,26,51,37,8
+    EDITTEXT        IDC_STARTLEVEL,73,31,91,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STARTGOLD,73,49,91,14,ES_AUTOHSCROLL
+    CONTROL         "Test Server",IDC_CHECK_TESTSRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,66,53,10
+    GROUPBOX        "File Location Information",IDC_STATIC,16,248,157,32
+    LTEXT           "Map :",IDC_STATIC,30,261,20,8
+    EDITTEXT        IDC_MAPFILE_LOC,56,259,91,16,ES_AUTOHSCROLL
+    GROUPBOX        "DBMS Information",IDC_STATIC,15,144,158,82
+    LTEXT           "Account : ",IDC_STATIC,29,181,34,8
+    EDITTEXT        IDC_DBMS_ID,73,181,91,16,ES_AUTOHSCROLL
+    LTEXT           "Password :",IDC_STATIC,29,200,38,8
+    EDITTEXT        IDC_DBMS_PASSWORD,73,202,91,16,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "DSName :",IDC_STATIC,29,162,34,8
+    EDITTEXT        IDC_DBMS_DEVICE,73,160,91,16,ES_AUTOHSCROLL
+    EDITTEXT        IDC_DBSVR_IP,73,101,91,16,ES_AUTOHSCROLL
+    PUSHBUTTON      "TestDsn",IDC_BUTTON1,123,231,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONFIGDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 309
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CONFIGDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 朝鲜语(韩国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,233 @@
+message MeteorMsg {
+  required MsgType cmd = 1;
+    enum MsgType{
+        GetRoomReq = 100;
+        GetRoomRsp = 101;
+        CreateRoomReq = 102;
+        CreateRoomRsp = 103;//建立房间其他人必须刷新，不会给其他人发有房间建立的消息.
+        JoinRoomReq = 104;
+        JoinRoomRsp = 105;
+        OnJoinRoomRsp = 106;//当我进入房间时下发给其他人.
+        EnterLevelReq = 107;//请求地图上全部角色的位置，旋转，以及地图物件等全部信息做一次同步
+        EnterLevelRsp = 108;//下发此消息给请求者，下发其他消息告知某人正式进入场景了.
+        OnEnterLevelRsp = 109;//取得了新进入玩家角色信息给与其他全部玩家
+        LeaveRoomReq = 110;//某角色要离开房间.
+        //LeaveRoomRsp = 111;//不给离开房间者回消息.
+        OnLeaveRoomRsp = 111;//某人离开时，发送给其他玩家
+        InputReq = 112;//用户更新自己的输入.
+        SyncInput = 113;//服务器下发场景内全部角色的输入.
+        KeyFrameReq = 114;//用户上传所有自身属性到服务器做同步，
+        SyncKeyFrame = 115;//关键帧同步操作，同步全部属性到客户端
+    }
+}
+
+//房间规则是，不限时间，等最后一个人离开后，关闭
+message RoomInfo
+{
+    required uint32 roomId = 1;
+    required string roomName = 2;
+    //required RoomPattern pattern = 1;
+    required RoomRule rule = 3;
+    required uint32 levelIdx = 4;
+    //required int password = 0;//0不要密码 1要密码
+    //required string version = "";//版本号1.07 1.08 9.07
+    //required int pingTick = 0;
+    required uint32 Group1 = 5;
+    required uint32 Group2 = 6;
+    required uint32 playerCount = 7;
+    required uint32 maxPlayer = 8;
+    enum RoomPattern
+    {
+        Normal = 1;//普通
+        Replay = 2;//转播
+    }
+    enum RoomRule
+    {
+        SinglePlayer = 1;//盟主
+        AllDead = 2;//死斗
+        LeaderMustDead = 3;//暗杀，带团队
+        DefenceBase = 4;//护卫城池
+        Loot = 5;//劫镖
+    }
+}
+
+//玩家退出房间，或者断线，断线会关闭套接字，与其绑定的任意资源会全部注销
+//退出房间，则还保持心跳,返回到大厅.套接字不关闭，但是房间里的角色会销毁
+//message PlayerLeaveReq
+//{
+//    required MeteorMsg head = 1;
+//}
+
+message OnLeaveRoomRsp
+{
+    //required MeteorMsg head = 1;
+    required uint32 playerId = 2;
+}
+
+//message GetRoomReq
+//{
+//    required MeteorMsg head = 1;
+//}
+
+message GetRoomRsp
+{
+    //required MeteorMsg head = 1;
+    repeated RoomInfo RoomInLobby = 2;
+}
+
+message CreateRoomReq
+{
+    //required MeteorMsg head = 1;
+    required uint32 maxPlayer = 2;
+    required uint32 levelIdx = 3;
+    required uint32 rule = 4;
+    required string roomName = 5;//房间名称.
+    required uint32 hpMax = 6;//最大血值.
+}
+
+message CreateRoomRsp
+{
+    //required MeteorMsg head = 1;
+    required uint32 result = 2;//1确认成功，其他失败,0服务器无法容纳更多房间请换服务器
+    required uint32 roomId = 3;//得到房间信息.
+    required uint32 levelId = 4;//得到房间使用的关卡信息，从这个关卡回复房间
+}
+
+message JoinRoomReq
+{
+    //required MeteorMsg head = 1;
+    required uint32 roomId = 2;
+    required string userNick = 3;
+}
+
+message JoinRoomRsp
+{
+    //required MeteorMsg head = 1;
+    required uint32 result = 2;//1成功，其他失败
+    required uint32 reason = 3;//失败为原因编号:1人数达到最大数量 2 没找到
+    required uint32 levelIdx = 4;//成功返回房间关卡编号
+    required uint32 roomId = 5;//哪个房间.
+    required uint32 playerId = 6;//你的角色在服务器的编号.
+}
+
+message EnterLevelReq
+{
+    //required MeteorMsg head = 1;
+    required uint32 camp = 2;
+    required uint32 model = 3;
+    required uint32 weapon = 4;
+}
+
+message EnterLevelRsp
+{
+    //required MeteorMsg head = 1;
+    optional SceneInfo scene = 2;//场景信息
+}
+
+//当其他人进入房间
+message OnEnterRoomRsp
+{
+    //required MeteorMsg head = 1;
+    required string playerNick = 2;
+}
+
+//当其他人进入场景
+message OnEnterLevelRsp
+{
+    //required MeteorMsg head = 1;
+    required Player_ player = 2;
+}
+
+//定点数，3位小数.
+message Vector2_
+{
+    required int32 x = 1;
+    required int32 y = 2;
+}
+
+message Vector3_
+{
+    required int32 x = 1;
+    required int32 y = 2;
+    required int32 z = 3;
+}
+
+message Quaternion_
+{
+    required int32 x = 1;
+    required int32 y = 2;
+    required int32 z = 3;
+    required int32 w = 4;
+}
+
+message SceneInfo
+{
+    repeated SceneItem_ items = 1;//场景里所有箱子，可破坏物件，机关
+    repeated Player_ players = 2;//场景里所有角色
+    //repeated SceneEffect_ effects;//场景里所有特效,客户端都只是显示.
+}
+
+message SceneItem_
+{
+    required string model = 1;
+    required Vector3_ pos = 2;
+    required Quaternion_ rotation = 3;
+    required int32 frame = 4;//有动画的，必须带帧数
+    //repetaed SceneItem_ child;
+}
+
+message Player_
+{
+    required uint32 id = 1;
+    required string name = 2;
+    required uint32 weapon1 = 3;
+    required uint32 weapon2 = 4;
+    required uint32 weapon = 5;
+    required uint32 weapon_pos = 6;//乾坤刀等武器有第二个pos
+    required Vector3_ pos = 7;//根的位置
+    required Quaternion_ rotation = 8;//根的旋转
+    required int32 model = 9;
+    required int32 aniSource = 10;//当前使用哪个动作源
+    required int32 frame = 11;//当前动画帧序号
+    required int32 hpMax = 12;
+    required int32 hp = 13;
+    required int32 angry = 14;
+    required int32 Camp = 15;//阵营.
+    required int32 SpawnPoint = 16;//出生点.只有初始化使用
+}
+
+//InputReq和SyncInput都用这个消息体
+message InputReq
+{
+    //required MeteorMsg head = 1;
+    repeated Input_ input = 1;
+}
+
+message Input_
+{
+    required uint32 playerId = 1;
+    required Vector2_ JoyStick = 2;//IOS有
+    required Vector2_ MouseDelta = 3;//鼠标偏移
+    required bytes w = 4;
+    required bytes s = 5;
+    required bytes a = 6;
+    required bytes d = 7;
+    required bytes jump = 8;//跳跃
+    required bytes break = 9;//爆气
+    required bytes attack = 10;//攻击
+    required bytes e = 11;//切换装备
+    required bytes r = 12;//挑衅
+    required bytes y = 13;//装死
+    required bytes space = 14;//防御
+    required bytes c = 15;//蹲下
+}
+
+
+//KeyFrameReq和SyncKeyFrameReq
+message KeyFrame
+{
+    //required MeteorMsg head = 1;
+    required uint32 frameIndex = 1;
+    repeated Input_ Inputs = 2;
+    repeated Player_ Players = 3;
+}
