@@ -57,7 +57,6 @@
     <ClCompile Include="..\Def\setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Def\protocol.pb.cc" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameGate.rc">
@@ -96,9 +95,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Def\_OrzEx\syncobj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Def\protocol.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

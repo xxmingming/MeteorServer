@@ -396,7 +396,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
 					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
 					//给房间其他人发.
-					OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, pJoinRoomReq.usernick().c_str());
+					OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
 				}
 			}
 

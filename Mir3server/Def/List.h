@@ -118,7 +118,7 @@ template<class T> PLISTNODE CWHList<T>::RemoveNode(LPLINKEDLIST lpList)
 template <class T>PLISTNODE CWHList<T>::RemoveNodeByData(T lpData)
 {
 
-    LPLINKEDLIST	prev	= NULL, next;
+    LPLINKEDLIST	prev	= NULL, next = NULL;
 	LPLINKEDLIST	lpNode	= m_lpHead;
 
 	while (lpNode)

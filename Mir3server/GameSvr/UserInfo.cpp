@@ -216,7 +216,7 @@ void CUserInfo::DoClientCertification(char *pszPacket)
 void CUserInfo::CopyTo(Player_ * player)
 {
 	player->set_id(m_nUserServerIndex);
-	player->set_name(m_pxPlayerObject->m_szName);
+	player->set_name(GBK2UTF8(string(m_pxPlayerObject->m_szName)).c_str());
 	player->set_angry(m_pxPlayerObject->m_Ability.MP);
 	player->set_hp(m_pxPlayerObject->m_Ability.HP);
 	player->set_hpmax(m_pxPlayerObject->m_Ability.MaxHP);
@@ -229,4 +229,15 @@ void CUserInfo::CopyTo(Player_ * player)
 	player->set_model(m_pxPlayerObject->m_Ability.Model);
 	player->set_anisource(m_pxPlayerObject->m_Ability.AniSource);
 	player->set_frame(m_pxPlayerObject->m_Ability.Frame);
+	Vector3_ * v = new Vector3_();
+	v->set_x(0);
+	v->set_y(0);
+	v->set_z(0);
+	Quaternion_ * q = new Quaternion_();
+	q->set_w(0);
+	q->set_x(0);
+	q->set_y(0);
+	q->set_z(0);
+	player->set_allocated_pos(v);
+	player->set_allocated_rotation(q);
 }

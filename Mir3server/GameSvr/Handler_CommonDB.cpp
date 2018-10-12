@@ -6,10 +6,10 @@ void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData
 CMapInfo* InitMapInfo()
 {
 	//string s = "sn";
-	g_nNumOfMapInfo = 1;
+	g_nNumOfMapInfo = 30;
 	CMapInfo* pMapInfo = new CMapInfo[g_nNumOfMapInfo];
 	char * s = (char*)malloc(14);
-	strcpy(s, "炎硫岛");
+	strcpy(s, "01");
 
 	//s[1] = "钟乳洞";
 	//s[2] = "一线天";
@@ -19,9 +19,10 @@ CMapInfo* InitMapInfo()
 		sprintf(buff, "sn%02d.des", i + 1);
 		strcpy(pMapInfo[i].szMapFileName, buff);//地图文件名称=sn14.des
 		ChangeSpaceToNull(pMapInfo[i].szMapFileName);
-		strcpy(pMapInfo[i].szMapName, s);//地图名称=炎硫岛
+		sprintf(buff, "%02d", i + 1);
+		strcpy(pMapInfo[i].szMapName, buff);//地图名称=01
 		ChangeSpaceToNull(pMapInfo[i].szMapName);
-		pMapInfo[i].m_nLevelIdx = 1;//地图ID
+		pMapInfo[i].m_nLevelIdx = i + 1;//地图ID
 	}
 	return pMapInfo;
 }

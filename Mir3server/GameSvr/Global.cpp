@@ -44,8 +44,8 @@ BOOL							g_fInitMerchant = FALSE;
 CWHList<CUserInfo*>				g_xReadyList;
 
 CWHList<CGateInfo*>				g_xGateList;//网关列表.多网关，与多游戏服之间的互通.
-CStaticArray<CUserInfo>			g_xUserInfoArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//16*16
-CStaticArray<CPlayerObject>		g_xPlayerObjectArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//16*16
+CStaticArray<CUserInfo>			g_xUserInfoArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
+CStaticArray<CPlayerObject>		g_xPlayerObjectArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
 CStaticArray<CRoomInfo>			g_xRoom(_NUM_OF_MAXROOM);//最大16个房间
 CWHList<CUserInfo*>				g_xUserInfoList;
 
