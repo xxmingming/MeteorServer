@@ -252,26 +252,26 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			pGate->OpenNewUser(pBytes);
 			break;
 		case GM_CLOSE://某个客户端断开，网关发给游戏服，游戏服注销此对象，离开房间不注销对象
-		{
-			//在房间先从房间删除.给同房间其他对象发送离开消息
-			CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-			if (pUserInfo->m_pRoom != NULL)
 			{
-				pGate->OnLeaveRoom(pUserInfo);
-				pUserInfo->m_pRoom = NULL;
+				//在房间先从房间删除.给同房间其他对象发送离开消息
+				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+				if (pUserInfo->m_pRoom != NULL)
+				{
+					pGate->OnLeaveRoom(pUserInfo);
+					pUserInfo->m_pRoom = NULL;
+				}
+				if (pUserInfo->m_pxPlayerObject != NULL)
+				{
+					pUserInfo->CloseUserHuman();
+					pUserInfo->Lock();
+					pUserInfo->m_bEmpty = TRUE;
+					pUserInfo->Unlock();
+				}
+				//从全局删除.
+				g_xUserInfoList.Lock();
+				g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
+				g_xUserInfoList.Unlock();
 			}
-			if (pUserInfo->m_pxPlayerObject != NULL)
-			{
-				pUserInfo->CloseUserHuman();
-				pUserInfo->Lock();
-				pUserInfo->m_bEmpty = TRUE;
-				pUserInfo->Unlock();
-			}
-			//从全局删除.
-			g_xUserInfoList.Lock();
-			g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
-			g_xUserInfoList.Unlock();
-		}
 			break;
 		//无参数，仅仅取得房间列表.
 		case MeteorMsg_MsgType_GetRoomReq:
@@ -395,7 +395,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pJoinRoomRsp.set_levelidx(pRoom->m_pMap->m_nLevelIdx);
 					pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
 					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
-					//给房间其他人发.
+					//给房间其他人发,不发给自己.
 					OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
 				}
 			}
@@ -411,10 +411,6 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			break;
 		case MeteorMsg_MsgType_EnterLevelReq:
 		{
-			if (pMsgHeader->wUserListIndex == 0)
-			{
-				
-			}
 			EnterLevelReq pEnterLevelReq;
 			pEnterLevelReq.ParseFromArray(data, pMsgHeader->nLength);
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
@@ -465,51 +461,49 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 		pUser->m_pxPlayerObject->Unlock();
 	}
 	pRoom->Lock();
-	//其他人进入房间，告知房间内已存在的所有人.
+	//其他人进入房间内的战场，告知房间内已存在的所有人.除了该角色自己.
 	OnEnterLevelRsp pOnEnterLevelRsp;
 	if (pRoom->m_nCount != 0)
 	{
 		Player_ * player = pOnEnterLevelRsp.mutable_player();
 		pUser->CopyTo(player);
-		//player->set_id(pUser->m_nUserServerIndex);
-		//player->set_name(pUser->m_pxPlayerObject->m_szName);
-		//player->set_angry(0);
-		//player->set_hp(pUser->m_pxPlayerObject->m_Ability.HP);
-		//player->set_hpmax(pUser->m_pxPlayerObject->m_Ability.MaxHP);
-		//player->set_camp(pUser->m_pxPlayerObject->m_Ability.Camp);
-		//player->set_weapon(pUser->m_pxPlayerObject->m_Ability.Weapon);
-		//player->set_weapon1(pUser->m_pxPlayerObject->m_Ability.Weapon1);
-		//player->set_weapon2(pUser->m_pxPlayerObject->m_Ability.Weapon2);
-		//player->set_weapon_pos(pUser->m_pxPlayerObject->m_Ability.WeaponPos);
-		//player->set_spawnpoint(spawnPoint);
-		//player->set_model(pUser->m_pxPlayerObject->m_Ability.Model);
-		//player->set_anisource(0);
-		//player->set_frame(0);
+		
 	}
+
+	//自己的属性也发给自己，在单独对自己回复的封包内.
 	EnterLevelRsp pEnterLevelRsp;
+	Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
+	pUser->CopyTo(pInsertPlayer);
+
 	PLISTNODE no = pRoom->m_pUserList.GetHead();
 	while (no != NULL)
 	{
 		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
 		if (pUserNode)
 		{
-			CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
-			if (pPlayer != NULL)
+			//进入战场的角色不往自己发.
+			if (pUserNode->m_nUserServerIndex != pUser->m_nUserServerIndex)
 			{
-				Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
-				pUserNode->CopyTo(pInsertPlayer);
-				tag_TMSGHEADER Msg;
-				Msg.nLength = pOnEnterLevelRsp.ByteSize();
-				Msg.nSocket = pUserNode->m_sock;
-				Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;//当其他人进入场景.
-				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
-				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+				CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
+				if (pPlayer != NULL)
+				{
+					//往后发给进战场角色的，已在战场的其他角色的属性
+					Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
+					pUserNode->CopyTo(pInsertPlayer);
 
-				_LPTSENDBUFF pBuffer = new _TSENDBUFF;
-				pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSize();
-				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
-				pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
+					tag_TMSGHEADER Msg;
+					Msg.nLength = pOnEnterLevelRsp.ByteSize();
+					Msg.nSocket = pUserNode->m_sock;
+					Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;//当其他人进入场景.
+					Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+					Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+
+					_LPTSENDBUFF pBuffer = new _TSENDBUFF;
+					pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSize();
+					memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+					pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
+					pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
+				}
 			}
 		}
 		no = pRoom->m_pUserList.GetNext(no);
@@ -532,47 +526,36 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 //当进入房间，并且选择角色和武器进入场景时，创建游戏角色.
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName)
 {
-	//int nIndex = g_xPlayerObjectArr.GetFreeKey();
-	//if (nIndex >= 0)
-	//{
-		//pUserInfo->m_pxPlayerObject = &g_xPlayerObjectArr[nIndex];
-		//pUserInfo->m_pxPlayerObject->Lock();
-		//pUserInfo->m_pxPlayerObject->m_bEmpty = false;
-		//pUserInfo->m_pxPlayerObject->m_nArrIndex = nIndex;
-		//pUserInfo->m_pxPlayerObject->m_pUserInfo = pUserInfo;
-		//pUserInfo->m_pxPlayerObject->SetCharName(szName);
-		//pUserInfo->m_pxPlayerObject->Unlock();
-		//pUserInfo->Lock();
-		pUserInfo->SetName(szName);
-		pUserInfo->m_pRoom = pRoom;
-		//pUserInfo->Unlock();
-		pRoom->Lock();
+	pUserInfo->SetName(szName);
+	pUserInfo->m_pRoom = pRoom;
+	pRoom->Lock();
 		
-		PLISTNODE no = pRoom->m_pUserList.GetHead();
-		while (no != NULL)
+	PLISTNODE no = pRoom->m_pUserList.GetHead();
+	while (no != NULL)
+	{
+		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+		if (pUserNode)
 		{
-			CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
-			if (pUserNode)
-			{
-				tag_TMSGHEADER Msg;
-				Msg.nLength = strlen(szName);
-				Msg.nSocket = pUserNode->m_sock;
-				Msg.wIdent = MeteorMsg_MsgType_OnJoinRoomRsp;//其他人进入房间
-				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
-				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
-
-				_LPTSENDBUFF pBuffer = new _TSENDBUFF;
-				pBuffer->nLen = sizeof(_TMSGHEADER) + strlen(szName);
-				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
-				memmove(pBuffer->szData + sizeof(_TMSGHEADER), szName, strlen(szName));
-				no = pRoom->m_pUserList.GetNext(no);
-			}
+			tag_TMSGHEADER Msg;
+			OnEnterRoomRsp rsp;
+			rsp.set_playernick(GBK2UTF8(string(szName)).c_str());
+			Msg.nLength = rsp.ByteSize();
+			Msg.nSocket = pUserNode->m_sock;
+			Msg.wIdent = MeteorMsg_MsgType_OnJoinRoomRsp;//其他人进入房间
+			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+			_LPTSENDBUFF pBuffer = new _TSENDBUFF;
+			pBuffer->nLen = sizeof(_TMSGHEADER) + rsp.ByteSize();
+			memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+			rsp.SerializeToArray(pBuffer->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+			pGate->m_xSendBuffQ.PushQ((BYTE*)pBuffer);
+			no = pRoom->m_pUserList.GetNext(no);
 		}
-		//针对房间里每一个对象都返回一个通知，告知有人进去了房间.
-		pRoom->m_nCount++;
-		pRoom->m_pUserList.AddNewNode(pUserInfo);
-		pRoom->Unlock();
-	//}
+	}
+	//针对房间里每一个对象都返回一个通知，告知有人进去了房间.
+	pRoom->m_nCount++;
+	pRoom->m_pUserList.AddNewNode(pUserInfo);
+	pRoom->Unlock();
 }
 
 CMirMap * FindMap(int levelIdx)
