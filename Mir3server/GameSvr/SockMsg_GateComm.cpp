@@ -438,6 +438,14 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 
 			break;
 		case MeteorMsg_MsgType_KeyFrameReq://MeteorMsg_MsgType_SyncKeyFrame消息在房间线程处理.
+			CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			KeyFrame pKeyFrame;
+			pKeyFrame.ParseFromArray(data, pMsgHeader->nLength);
+			if (pUserInfo->m_pRoom != NULL)
+			{
+				//收到角色发的当前最新状态.
+				pUserInfo->m_pRoom->OnUserKeyFrame(pKeyFrame);//设置角色最新的状态，在下一个服务器周期下发到
+			}
 			break;
 	}
 
@@ -467,7 +475,6 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 	{
 		Player_ * player = pOnEnterLevelRsp.mutable_player();
 		pUser->CopyTo(player);
-		
 	}
 
 	//自己的属性也发给自己，在单独对自己回复的封包内.

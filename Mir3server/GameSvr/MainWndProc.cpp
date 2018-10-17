@@ -3,6 +3,7 @@
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam);
 LPARAM OnLogSvrSockMsg(WPARAM wParam, LPARAM lParam);
 UINT WINAPI ProcessUserHuman(LPVOID lpParameter);
+UINT WINAPI ProcessRoom(LPVOID lpParameter);
 //BOOL	jRegSetKey(LPCTSTR pSubKeyName, LPCTSTR pValueName, DWORD dwFlags, LPBYTE pValue, DWORD nValueSize);
 //BOOL	jRegGetKey(LPCTSTR pSubKeyName, LPCTSTR pValueName, LPBYTE pValue);
 
@@ -98,8 +99,8 @@ UINT WINAPI InitializingServer(LPVOID lpParameter)
 	unsigned long	hThreadForMsg = 0;
 	//if (hThreadForMsg = _beginthreadex(NULL, 0, ProcessLogin, NULL, 0, &dwThreadIDForMsg))
 	//{
-	hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
-	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessMonster, NULL, 0, &dwThreadIDForMsg);
+	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
+	hThreadForMsg = _beginthreadex(NULL, 0, ProcessRoom, NULL, 0, &dwThreadIDForMsg);
 	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
 	//}
 

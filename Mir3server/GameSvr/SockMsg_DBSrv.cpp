@@ -269,7 +269,7 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 
 VOID WINAPI OnProcessUserHuman(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
-//游戏服处理数据库服发来的消息
+//游戏服处理数据库服发来的消息，当连接数据库服务器成功时.
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 {
 	switch (WSAGETSELECTEVENT(lParam))

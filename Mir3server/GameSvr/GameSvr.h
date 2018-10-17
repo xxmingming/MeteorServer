@@ -70,8 +70,9 @@ public:
 class CUserInfo	: public CIntLock, CStaticArray< CUserInfo >::IArrayData
 {
 public:
+	static int KeyMax;
 	bool							m_bEmpty;
-
+	bool							m_bDirty;//数据还未由客户端同步初始化。需要等待
 	int								m_sock;
 
 	char							m_szUserID[20];//ID
@@ -87,16 +88,25 @@ public:
 	CGateInfo*						m_pGateInfo;
 	CRoomInfo*						m_pRoom;
 	BYTE							m_btCurrentMode;
+	//按键输入
+	byte*							m_pKeys;
+	//摇杆
+	float							Jx;
+	float							Jy;
+	//触屏
+	float							Mx;//触摸屏x delta
+	float							My;//触摸屏y delta
 public:
 	CUserInfo();
 	bool IsEmpty();
 	void							CloseAccount(char *pszName, int nCertification);
 	void							CloseUserHuman();
 	void							DoClientCertification(char *pszPacket);
-	void							Operate();
+	void							Operate(Input_ * pInput);
 	void							ProcessUserMessage(char *pszPacket);
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
+	void							Update(Player_ * pPlayer);
 };
 
 void InsertLogMsg(UINT nID);

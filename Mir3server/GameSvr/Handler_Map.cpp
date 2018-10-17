@@ -60,6 +60,8 @@ BOOL CRoomInfo::RemovePlayer(CUserInfo * pRemoveObject)
 	{
 		m_pUserList.Lock();
 		m_pUserList.RemoveNodeByData(pRemoveObject);
+		if (m_pUserList.GetCount() == 0)
+			m_totalTime = 0;
 		m_pUserList.Unlock();
 	}
 
@@ -80,9 +82,102 @@ void CRoomInfo::CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int roomIdx)
 	m_szName[19] = 0;
 }
 
-void CRoomInfo::Update()
+
+void CRoomInfo::OnUserKeyFrame(KeyFrame k)
+{
+	static KeyFrame req;
+	req.Clear();
+	_TMSGHEADER MsgHeader;
+	ZeroMemory(&MsgHeader, sizeof(MsgHeader));
+	PLISTNODE pListNode = NULL;
+	if (m_pUserList.GetCount())
+	{
+		//第一次遍历填充所有角色的输入信息到整个消息
+		pListNode = m_pUserList.GetHead();
+		while (pListNode)
+		{
+			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+			if (pUserInfo && pUserInfo->m_nUserServerIndex == k.players[0].id)
+			{
+				pUserInfo->Update(k.players[0]);
+				break;
+			}
+			pListNode = g_xUserInfoList.GetNext(pListNode);
+		}
+
+		pListNode = m_pUserList.GetHead();
+		while (pListNode)
+		{
+			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+			if (pUserInfo)
+			{
+				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+				req.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + req.ByteSize();
+				MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncInput;
+				MsgHeader.nLength = req.ByteSize();
+				MsgHeader.nSocket = pUserInfo->m_sock;
+				MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
+				MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
+				memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
+				pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			}
+			pListNode = g_xUserInfoList.GetNext(pListNode);
+		} // while
+
+	} // if g_xReadyUserInfoList.GetCount()
+}
+
+void CRoomInfo::Update(float delta)
 {
 	//处理全部角色间的输入同步.
+	m_totalTime += delta;
+	if (m_totalTime > syncDelta)
+	{
+		static InputReq req;
+		req.Clear();
+		_TMSGHEADER MsgHeader;
+		ZeroMemory(&MsgHeader, sizeof(MsgHeader));
+		PLISTNODE pListNode = NULL;
+		if (m_pUserList.GetCount())
+		{
+			//第一次遍历填充所有角色的输入信息到整个消息
+			pListNode = m_pUserList.GetHead();
+			while (pListNode)
+			{
+				CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+				if (pUserInfo)
+				{
+					Input_ * input = req.mutable_input()->Add();
+					//向每个玩家广播其他玩家的输入.
+					pUserInfo->Operate(input);
+				}
+				pListNode = g_xUserInfoList.GetNext(pListNode);
+			} // while
+
+			pListNode = m_pUserList.GetHead();
+			while (pListNode)
+			{
+				CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+				if (pUserInfo)
+				{
+					_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+					req.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + req.ByteSize();
+					MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncInput;
+					MsgHeader.nLength = req.ByteSize();
+					MsgHeader.nSocket = pUserInfo->m_sock;
+					MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
+					MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
+					memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
+					pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				}
+				pListNode = g_xUserInfoList.GetNext(pListNode);
+			} // while
+
+		} // if g_xReadyUserInfoList.GetCount()
+		m_totalTime = 0;
+	}
 }
 
 /* **************************************************************************************

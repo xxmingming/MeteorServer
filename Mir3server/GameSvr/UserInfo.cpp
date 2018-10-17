@@ -3,12 +3,18 @@
 void UpdateStatusBarUsers(BOOL fGrow);
 void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
 
+int CUserInfo::KeyMax = 20;
 CUserInfo::CUserInfo()
 {
 	m_bEmpty					= true;
-
+	m_bDirty					= true;
 	m_pxPlayerObject			= NULL;
 	m_pGateInfo					= NULL;
+	m_pKeys = new byte[KeyMax];//0 up 1 down
+	for (int i = 0; i < KeyMax; i++)
+	{
+		m_pKeys[i] = false;
+	}
 	m_pRoom = NULL;
 }
 
@@ -97,15 +103,21 @@ void CUserInfo::ProcessUserMessage(char *pszPacket)
 	//}
 }
 
-void CUserInfo::Operate()
+void CUserInfo::Operate(Input_ * pInput)
 {
-	//if (GetTickCount() - m_pxPlayerObject->m_dwSearchTime >= m_pxPlayerObject->m_dwSearchTick)
-	//{
-	//	m_pxPlayerObject->m_dwSearchTime = GetTickCount();
-	//	m_pxPlayerObject->SearchViewRange();
-	//}
+	//把角色的输入同步到数据，广播到此房间的所有玩家
+	for (int i = 0; i < KeyMax; i++)
+	{
+		//pInput->set_c(m_pKeys[i]);
+	}
+	pInput->set_playerid(m_nUserServerIndex);
+	Vector2_ J = pInput->joystick(); 
+	J.set_x(Jx);
+	J.set_y(Jy);
+	Vector2_ d = pInput->mousedelta();
+	d.set_x(Mx);
+	d.set_y(My);
 
-	//m_pxPlayerObject->Operate();
 }
 
 void CUserInfo::CloseUserHuman()
@@ -211,6 +223,27 @@ void CUserInfo::DoClientCertification(char *pszPacket)
 			}
 		}
 	}
+}
+
+void CUserInfo::Update(Player_ * pPlayer)
+{
+	m_pxPlayerObject->m_Ability.MP = pPlayer->angry();
+	m_pxPlayerObject->m_Ability.HP = pPlayer->hp();
+	m_pxPlayerObject->m_Ability.Weapon = pPlayer->weapon();
+	m_pxPlayerObject->m_Ability.Weapon1 = m_pxPlayerObject->m_Ability.Weapon;
+	m_pxPlayerObject->m_Ability.Weapon2 = pPlayer->weapon2();
+	m_pxPlayerObject->m_Ability.WeaponPos = pPlayer->weapon_pos();
+	m_pxPlayerObject->m_Ability.Model = pPlayer->model();
+	m_pxPlayerObject->m_Ability.AniSource = pPlayer->anisource();
+	m_pxPlayerObject->m_Ability.Frame = pPlayer->frame();
+	m_pxPlayerObject->m_Pos.x = pPlayer->pos().x();
+	m_pxPlayerObject->m_Pos.y = pPlayer->pos().y();
+	m_pxPlayerObject->m_Pos.z = pPlayer->pos().z();
+	m_pxPlayerObject->m_nRotation.w = pPlayer->rotation().w();
+	m_pxPlayerObject->m_nRotation.x = pPlayer->rotation().x();
+	m_pxPlayerObject->m_nRotation.y = pPlayer->rotation().y();
+	m_pxPlayerObject->m_nRotation.z = pPlayer->rotation().z();
+	m_bDirty = false;
 }
 
 void CUserInfo::CopyTo(Player_ * player)

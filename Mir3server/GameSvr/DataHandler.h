@@ -23,6 +23,7 @@ typedef struct tag_TOSOBJECT
 class CRoomInfo:public CIntLock
 {
 public:
+	const int syncDelta = 50;//同步的帧率为50毫秒一次
 	CHAR						m_chFlag;
 	BOOL						m_bEmpty;
 	uint32_t					m_nRoomIndex;//房间编号
@@ -38,9 +39,14 @@ public:
 	uint32_t					m_nHpMax;//血值上限标准.
 	uint32_t					m_nCount;//当前人数
 	BOOL						RemovePlayer(CUserInfo * pUser);
-	void						Update();
+	int							m_totalTime;//当前轮次运行时长为多久.当房间内无人时，这个时间凝固.
+	void						Update(float delta);
+	void						OnUserKeyFrame(KeyFrame k);
 	BOOL						IsEmpty() { return m_bEmpty; }
 	void						CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int roomIdx);
+	void						Close() {
+		//m_chFlag &= 'c';
+	}
 	CRoomInfo();
 	~CRoomInfo();
 };
