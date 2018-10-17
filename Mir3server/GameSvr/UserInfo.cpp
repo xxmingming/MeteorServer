@@ -262,15 +262,13 @@ void CUserInfo::CopyTo(Player_ * player)
 	player->set_model(m_pxPlayerObject->m_Ability.Model);
 	player->set_anisource(m_pxPlayerObject->m_Ability.AniSource);
 	player->set_frame(m_pxPlayerObject->m_Ability.Frame);
-	Vector3_ * v = new Vector3_();
-	v->set_x(0);
-	v->set_y(0);
-	v->set_z(0);
-	Quaternion_ * q = new Quaternion_();
-	q->set_w(0);
-	q->set_x(0);
-	q->set_y(0);
-	q->set_z(0);
-	player->set_allocated_pos(v);
-	player->set_allocated_rotation(q);
+	Vector3_ * v = player->mutable_pos();
+	v->set_x(m_pxPlayerObject->m_Pos.x());
+	v->set_y(m_pxPlayerObject->m_Pos.y());
+	v->set_z(m_pxPlayerObject->m_Pos.z());
+	Quaternion_ * q = player->mutable_rotation();
+	q->set_w(m_pxPlayerObject->m_nRotation.w());
+	q->set_x(m_pxPlayerObject->m_nRotation.x());
+	q->set_y(m_pxPlayerObject->m_nRotation.y());
+	q->set_z(m_pxPlayerObject->m_nRotation.z());
 }

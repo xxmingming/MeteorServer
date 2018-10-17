@@ -85,8 +85,8 @@ void CRoomInfo::CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int roomIdx)
 
 void CRoomInfo::OnUserKeyFrame(KeyFrame k)
 {
-	static KeyFrame req;
-	req.Clear();
+	static KeyFrame rsp;
+	rsp.Clear();
 	_TMSGHEADER MsgHeader;
 	ZeroMemory(&MsgHeader, sizeof(MsgHeader));
 	PLISTNODE pListNode = NULL;
@@ -99,7 +99,17 @@ void CRoomInfo::OnUserKeyFrame(KeyFrame k)
 			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
 			if (pUserInfo)
 			{
-				pUserInfo->Update(k.players[0]);
+				if (pUserInfo->m_nUserServerIndex == k.players[0].id)
+				{
+					pUserInfo->Update(k.players[0]);
+					Player_* p = rsp.add_players();
+					p->CopyFrom(k.players[0]);
+				}
+				else
+				{
+					Player_ * p = rsp.add_players();
+					pUserInfo->CopyTo(p);
+				}
 			}
 			pListNode = g_xUserInfoList.GetNext(pListNode);
 		}
@@ -111,10 +121,10 @@ void CRoomInfo::OnUserKeyFrame(KeyFrame k)
 			if (pUserInfo)
 			{
 				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-				req.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + req.ByteSize();
-				MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncInput;
-				MsgHeader.nLength = req.ByteSize();
+				rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSize();
+				MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncKeyFrame;
+				MsgHeader.nLength = rsp.ByteSize();
 				MsgHeader.nSocket = pUserInfo->m_sock;
 				MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
 				MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
