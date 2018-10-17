@@ -97,10 +97,9 @@ void CRoomInfo::OnUserKeyFrame(KeyFrame k)
 		while (pListNode)
 		{
 			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-			if (pUserInfo && pUserInfo->m_nUserServerIndex == k.players[0].id)
+			if (pUserInfo)
 			{
 				pUserInfo->Update(k.players[0]);
-				break;
 			}
 			pListNode = g_xUserInfoList.GetNext(pListNode);
 		}
