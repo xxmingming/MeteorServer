@@ -444,7 +444,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			if (pUserInfo->m_pRoom != NULL)
 			{
 				//收到角色发的当前最新状态.
-				pUserInfo->m_pRoom->OnUserKeyFrame(pKeyFrame);//设置角色最新的状态，在下一个服务器周期下发到
+				pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);//设置角色最新的状态，在下一个服务器周期下发到
 			}
 			break;
 	}
@@ -559,7 +559,9 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 			no = pRoom->m_pUserList.GetNext(no);
 		}
 	}
-	//针对房间里每一个对象都返回一个通知，告知有人进去了房间.
+	//针对房间里每一个对象都返回一个通知，告知有人进去了房间.但是还未进入战场.已经开始计时，
+	if (pRoom->m_nCount == 0)
+		pRoom->OnNewTurn();
 	pRoom->m_nCount++;
 	pRoom->m_pUserList.AddNewNode(pUserInfo);
 	pRoom->Unlock();

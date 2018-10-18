@@ -72,7 +72,7 @@ void InitRoom()
 		if (RoomIdx >= 0)
 		{
 			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
-			pRoom->CreateRoom(pMap, 16, 2000, RoomIdx);
+			pRoom->CreateRoom(pMap, 16, 2000, 30 * 60 * 1000, RoomIdx);
 			g_xRoomList.AddNewNode(pRoom);
 		}
 		p = g_xMirMapList.GetNext(p);

@@ -236,14 +236,15 @@ void CUserInfo::Update(Player_ * pPlayer)
 	m_pxPlayerObject->m_Ability.Model = pPlayer->model();
 	m_pxPlayerObject->m_Ability.AniSource = pPlayer->anisource();
 	m_pxPlayerObject->m_Ability.Frame = pPlayer->frame();
-	m_pxPlayerObject->m_Pos.x = pPlayer->pos().x();
-	m_pxPlayerObject->m_Pos.y = pPlayer->pos().y();
-	m_pxPlayerObject->m_Pos.z = pPlayer->pos().z();
-	m_pxPlayerObject->m_nRotation.w = pPlayer->rotation().w();
-	m_pxPlayerObject->m_nRotation.x = pPlayer->rotation().x();
-	m_pxPlayerObject->m_nRotation.y = pPlayer->rotation().y();
-	m_pxPlayerObject->m_nRotation.z = pPlayer->rotation().z();
-	m_bDirty = false;
+	m_pxPlayerObject->m_Pos.set_x(pPlayer->pos().x());
+	m_pxPlayerObject->m_Pos.set_y(pPlayer->pos().y());
+	m_pxPlayerObject->m_Pos.set_z(pPlayer->pos().z());
+	m_pxPlayerObject->m_nRotation.set_w(pPlayer->rotation().w());
+	m_pxPlayerObject->m_nRotation.set_x(pPlayer->rotation().x());
+	m_pxPlayerObject->m_nRotation.set_y(pPlayer->rotation().y());
+	m_pxPlayerObject->m_nRotation.set_z(pPlayer->rotation().z());
+	if (m_bDirty)
+		m_bDirty = false;
 }
 
 void CUserInfo::CopyTo(Player_ * player)

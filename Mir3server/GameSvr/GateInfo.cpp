@@ -45,7 +45,7 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 			CUserInfo * pRoomUser = pUser->m_pRoom->m_pUserList.GetData(no);
 			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
 			OnLeaveRoomRsp pOnLeaveRoomRsp;
-			pOnLeaveRoomRsp.set_playerid(pRoomUser->m_nUserServerIndex);
+			pOnLeaveRoomRsp.set_playerid(pUser->m_nUserServerIndex);
 			if (lpSendBuff)
 			{
 				_TMSGHEADER	MsgHdr;
@@ -61,6 +61,10 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 			}
 			no = pUser->m_pRoom->m_pUserList.GetNext(no);
 		}
+	}
+	else
+	{
+		pUser->m_pRoom->OnAllPlayerLeaved();
 	}
 }
 

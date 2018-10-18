@@ -32,7 +32,6 @@ CPlayerObject* GetUserHuman(char *pszCharName)
 UINT WINAPI ProcessRoom(LPVOID lpParameter)
 {
 	PLISTNODE pListNode = NULL;
-	float t = ::GetTickCount();
 	while (TRUE)
 	{
 		if (g_fTerminated)
@@ -63,10 +62,9 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 			{
 				CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
 
-				if (pRoomInfo)
+				if (pRoomInfo && !pRoomInfo->IsEmpty())
 				{
-					pRoomInfo->Update(::GetTickCount() - t);//第一次是0，第二次开始
-					t = ::GetTickCount();
+					pRoomInfo->Update();//第一次是0，第二次开始
 				}
 
 				pListNode = g_xRoomList.GetNext(pListNode);
