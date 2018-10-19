@@ -4,6 +4,62 @@
 #include "stdafx.h"
 #include <DbgHelp.h>
 #include <strsafe.h>
+#include <windows.h>
+#include <tchar.h>
+#include <stdio.h>
+
+#ifndef _M_IX86
+#error "The following code only works for x86!"
+#endif
+LPTOP_LEVEL_EXCEPTION_FILTER WINAPI MyDummySetUnhandledExceptionFilter(
+	LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
+{
+	return NULL;
+}
+
+BOOL PreventSetUnhandledExceptionFilter()
+{
+	HMODULE hKernel32 = LoadLibrary(_T("kernel32.dll"));
+	if (hKernel32 == NULL)
+	{
+		::MessageBoxA(0, "Cannot find kernel32.dll", "?", MB_OK);
+		return FALSE;
+	}
+	void *pOrgEntry = GetProcAddress(hKernel32, "SetUnhandledExceptionFilter");
+	if (pOrgEntry == NULL) return FALSE;
+	unsigned char newJump[100];
+	DWORD dwOrgEntryAddr = (DWORD)pOrgEntry;
+	dwOrgEntryAddr += 5; // add 5 for 5 op-codes for jmp far
+	void *pNewFunc = &MyDummySetUnhandledExceptionFilter;
+	DWORD dwNewEntryAddr = (DWORD)pNewFunc;
+	DWORD dwRelativeAddr = dwNewEntryAddr - dwOrgEntryAddr;
+
+	newJump[0] = 0xE9;  // JMP absolute
+	memcpy(&newJump[1], &dwRelativeAddr, sizeof(pNewFunc));
+	SIZE_T bytesWritten;
+	BOOL bRet = WriteProcessMemory(GetCurrentProcess(),
+		pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten);
+	return bRet;
+}
+
+//LONG WINAPI MyUnhandledExceptionFilter(
+//	struct _EXCEPTION_POINTERS *lpTopLevelExceptionFilter)
+//{
+//	// TODO: MiniDumpWriteDump
+//	FatalAppExit(0, _T("Unhandled Exception occured!"));
+//	return EXCEPTION_CONTINUE_SEARCH;
+//}
+
+//int _tmain()
+//{
+//	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+//	BOOL bRet = PreventSetUnhandledExceptionFilter();
+//	_tprintf(_T("Prevented: %d"), bRet);
+//
+//	abort();  // force Dr.Watson in release!
+//}
+
+
 #define _BMP_CX						16
 #define _BMP_CY						16
 
@@ -69,6 +125,7 @@ LPARAM APIENTRY LogMsgWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 //生产DUMP文件
 int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHAR pwAppName)
 {
+	//::MessageBoxA(0, "a", "b", MB_OK);
 	BOOL bOwnDumpFile = FALSE;
 	HANDLE hDumpFile = hFile;
 	MINIDUMP_EXCEPTION_INFORMATION ExpParam;
@@ -87,7 +144,8 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 	HMODULE hDbgHelp = LoadLibrary(L"DbgHelp.dll");
 	if (hDbgHelp)
 		pfnMiniDumpWriteDump = (MiniDumpWriteDumpT)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-
+	//else
+	//	::MessageBoxA(0, "a", "c", MB_OK);
 	if (pfnMiniDumpWriteDump)
 	{
 		if (hDumpFile == NULL || hDumpFile == INVALID_HANDLE_VALUE)
@@ -99,13 +157,10 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 			TCHAR dwBufferSize = MAX_PATH;
 			SYSTEMTIME stLocalTime;
 
+			GetModuleFileName(NULL, szPath, MAX_PATH);
+			(_tcsrchr(szPath, _T('\\')))[1] = 0; // 删除文件名，只获得路径字串
 			GetLocalTime(&stLocalTime);
-			GetTempPath(dwBufferSize, szPath);
-
-			StringCchPrintf(szFileName, MAX_PATH, L"%s%s", szPath, szAppName);
-			CreateDirectory(szFileName, NULL);
-
-			StringCchPrintf(szFileName, MAX_PATH, L"%s%s//%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
+			StringCchPrintf(szFileName, MAX_PATH, L"%s%s_%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
 				szPath, szAppName, szVersion,
 				stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay,
 				stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond,
@@ -114,6 +169,7 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 				FILE_SHARE_WRITE | FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
 
 			bOwnDumpFile = TRUE;
+			//MessageBoxW(0, szFileName, L"aaa", MB_OK);
 			OutputDebugString(szFileName);
 		}
 
@@ -145,13 +201,18 @@ LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS lpExceptionInfo)
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	return GenerateMiniDump(NULL, lpExceptionInfo, L"test");
+	return GenerateMiniDump(NULL, lpExceptionInfo, L"GameSvr");
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG msg;
 	SetUnhandledExceptionFilter(ExceptionFilter);
+	BOOL bRet = PreventSetUnhandledExceptionFilter();
+
+	//SetUnhandledExceptionFilter(ExceptionFilter);
+	//int* p = 0;
+	//*p = 0;
 	LoadConfig();
 //	if (CheckAvailableIOCP())
 //	{
