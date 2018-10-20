@@ -116,7 +116,7 @@ void CRoomInfo::OnUserKeyFrame(KeyFrame * pk)
 		while (pListNode)
 		{
 			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-			if (pUserInfo)
+			if (pUserInfo != NULL && pUserInfo->m_pxPlayerObject != NULL)
 			{
 				if (pUserInfo->m_nUserServerIndex == pk->mutable_players(0)->id())
 				{

@@ -227,6 +227,8 @@ void CUserInfo::DoClientCertification(char *pszPacket)
 
 void CUserInfo::Update(Player_ * pPlayer)
 {
+	if (pPlayer == NULL)
+		return;
 	m_pxPlayerObject->m_Ability.MP = pPlayer->angry();
 	m_pxPlayerObject->m_Ability.HP = pPlayer->hp();
 	m_pxPlayerObject->m_Ability.Weapon = pPlayer->weapon();

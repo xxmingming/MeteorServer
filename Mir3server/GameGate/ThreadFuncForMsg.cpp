@@ -60,9 +60,9 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 			pSessionInfo = g_UserInfoArray.GetData(nLoop);
 			if (pSessionInfo)
 			{
+				pSessionInfo->SendBuffLock.Lock();
 				if (pSessionInfo->nSendBufferLen)
 				{
-					pSessionInfo->SendBuffLock.Lock();
 					WSABUF	Buf;
 					Buf.len = pSessionInfo->nSendBufferLen;
 					Buf.buf = pSessionInfo->SendBuffer;
@@ -70,8 +70,8 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 					//if (dwBytesSends < Buf.len)
 					//	_RPT2(_CRT_WARN, "%d:%s\n", memlen(pSessionInfo->SendBuffer) - 1, pSessionInfo->SendBuffer);
 					pSessionInfo->nSendBufferLen = 0;
-					pSessionInfo->SendBuffLock.Unlock();
 				}
+				pSessionInfo->SendBuffLock.Unlock();
 			}
 		}
 

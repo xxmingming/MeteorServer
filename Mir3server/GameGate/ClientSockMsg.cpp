@@ -37,20 +37,26 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
 
 	CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);
-	
+
 	if (!pSessionInfo)
 	{
-		__asm int 3;
 		return;
 	}
 
-	//如果缓冲不够了.
-	if (pSessionInfo->nSendBufferLen + sizeof(CMsg) + lpMsgHeader->nLength > DATA_BUFSIZE)
+	pSessionInfo->SendBuffLock.Lock();
+	if (pSessionInfo->nSendBufferLen >= DATA_BUFSIZE)
 	{
-		__asm int 3;
+		pSessionInfo->nSendBufferLen = 0;
+		pSessionInfo->SendBuffLock.Unlock();
 		return;
 	}
-	pSessionInfo->SendBuffLock.Lock();
+	
+	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + sizeof(CMsg)) >= DATA_BUFSIZE)
+	{
+		pSessionInfo->SendBuffLock.Unlock();
+		return;
+	}
+
 	char * pszData = &pSessionInfo->SendBuffer[pSessionInfo->nSendBufferLen];
 	CMsg msg;
 	msg.Size = htonl(lpMsgHeader->nLength + sizeof(CMsg));
@@ -206,6 +212,8 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 		{
 			char szPacket[1024];
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
+			if (nRecv <= 0)
+				break;
 			ProcReceiveBuffer(szPacket, nRecv);
 			break;
 		}

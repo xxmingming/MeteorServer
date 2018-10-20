@@ -414,9 +414,10 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			EnterLevelReq pEnterLevelReq;
 			pEnterLevelReq.ParseFromArray(data, pMsgHeader->nLength);
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-			if (pUser->m_pxPlayerObject != NULL || pUser->m_pRoom == NULL)
+			if (pUser == NULL || pUser->m_pxPlayerObject != NULL || pUser->m_pRoom == NULL)
 			{
-				//???已经在此关卡内
+				//已经存在角色/还未进入房间
+				return TRUE;
 			}
 			//在服务器初始化这个玩家的所有属性数据.包括生命值，怒气，初始武器，阵营，模型编号。
 			OnUserEnterLevel(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pEnterLevelReq);

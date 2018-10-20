@@ -85,6 +85,8 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 				pListNode = g_xUserInfoList.GetNext(pListNode);
 			} // while
 		}
+
+		SleepEx(1, TRUE);
 	}
 }
 
