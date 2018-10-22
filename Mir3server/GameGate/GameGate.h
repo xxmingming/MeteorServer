@@ -8,7 +8,7 @@ class CSessionInfo
 public:
 	SOCKET			sock;
 	WORD			nServerUserIndex;//游戏服，该客户端对应的用户下标
-	WORD			nSessionIndex;//单个网关服下的序号，[0-5000)
+	WORD			nSessionIndex;//单个网关服下的序号，[0-500)
 	CIntLock		SendBuffLock;
 	CHAR			SendBuffer[DATA_BUFSIZE];
 	int				nSendBufferLen;
@@ -23,6 +23,11 @@ public:
 	CSessionInfo()
 	{
 		bufLen	= 0;
+	}
+
+	void Reset()
+	{
+		bufLen = 0;
 	}
 
 	int  Recv()
@@ -51,19 +56,14 @@ public:
 	{
 		int packetLen = ntohl(*(int*)Buffer);
 		message = ntohl(*(int*)(Buffer + 4));
-		if (packetLen - 8 > 1024)
+		if (packetLen < 8 || packetLen > DATA_BUFSIZE)
 		{
-			//忽略掉包
-			printf("packet size > 1024 message = %d packet size = %d", message, packetLen);
-			memmove(Buffer, Buffer + packetLen, DATA_BUFSIZE - packetLen);
-			bufLen -= packetLen;
+			//包非法，断开连接
+			return -1;
 		}
-		else
-		{
-			memcpy(pPacket, Buffer + 8, packetLen - 8);
-			memmove(Buffer, Buffer + packetLen, DATA_BUFSIZE - packetLen);
-			bufLen -= packetLen;
-		}
+		memcpy(pPacket, Buffer + 8, packetLen - 8);
+		memmove(Buffer, Buffer + packetLen, DATA_BUFSIZE - packetLen);
+		bufLen -= packetLen;
 		return packetLen - 8;
 	}
 };
@@ -74,7 +74,7 @@ typedef struct tag_TSENDBUFF
 	int				nSessionIndex;
 	int				nMessage;
 	int				nLength;//szData的有效区域.
-	char			szData[1024];
+	char			szData[DATA_BUFSIZE];
 }_TSENDBUFF, *_LPTSENDBUFF;
 
 #define LOGPARAM_STR						1

@@ -101,6 +101,8 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			pNewSessionInfo->nServerUserIndex = 0;
 			// Initializing Session Information
 			pNewSessionInfo->nSendBufferLen	= 0;
+			pNewSessionInfo->bufLen = 0;
+
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
 			UpdateStatusBar(TRUE);
@@ -118,6 +120,9 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 void CloseSession(CSessionInfo* pSessionInfo)
 {
+	//对象池要重复使用前需要重置
+	if (pSessionInfo != NULL)
+		pSessionInfo->Reset();
 	g_UserInfoArray.SetEmptyElement(pSessionInfo->nSessionIndex, pSessionInfo);
 
 	closesocket(pSessionInfo->sock);
@@ -164,16 +169,24 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 				pSendData->sock				= pSessionInfo->sock;
 				pSendData->nSessionIndex	= pSessionInfo->nSessionIndex;
 				pSendData->nLength			= pSessionInfo->ExtractPacket(pSendData->szData, pSendData->nMessage);
-				g_SendToServerQ.Lock();
-				if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
+				if (pSendData->nLength < 0)
 				{
-					InsertLogMsg( _TEXT("PushQ() failed") );
-					delete pSendData;
+					CloseSession(pSessionInfo);
+					continue;
 				}
-				g_SendToServerQ.Unlock();
+				else
+				{
+					g_SendToServerQ.Lock();
+					if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
+					{
+						InsertLogMsg(_TEXT("PushQ() failed"));
+						delete pSendData;
+					}
+					g_SendToServerQ.Unlock();
+				}
 			}
 
-			if (pSessionInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING )
+			if (pSessionInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 			{
 				InsertLogMsg(_TEXT("WSARecv() failed"));
 				CloseSession(pSessionInfo);

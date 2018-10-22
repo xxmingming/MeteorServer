@@ -109,6 +109,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 					{
 						pUserInfo->Lock();
 						pUserInfo->m_bEmpty = true;
+						pUserInfo->m_pGateInfo = NULL;
 						//当玩家处于房间内(玩家可以仅仅链接服务器，但是不进入游戏)，且房间已经开始游戏了.
 						//if (pUserInfo->m_pxPlayerObject != NULL && pUserInfo->m_pRoom != NULL && pUserInfo->m_pRoom->m_bReady)
 						//	pUserInfo->m_pRoom->RemovePlayer(pUserInfo->m_pxPlayerObject);
@@ -265,12 +266,14 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pUserInfo->CloseUserHuman();
 					pUserInfo->Lock();
 					pUserInfo->m_bEmpty = TRUE;
+					pUserInfo->m_pGateInfo = NULL;
 					pUserInfo->Unlock();
 				}
 				//从全局删除.
 				g_xUserInfoList.Lock();
 				g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
 				g_xUserInfoList.Unlock();
+				UpdateStatusBarUsers(FALSE);
 			}
 			break;
 		//无参数，仅仅取得房间列表.

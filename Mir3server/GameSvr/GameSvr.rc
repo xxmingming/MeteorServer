@@ -13,11 +13,153 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// 朝鲜语(韩国) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
-#pragma code_page(936)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TOOLBAR             BITMAP                  ".\\Res\\toolbar.bmp"
+
+#endif    // 朝鲜语(韩国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(繁体，中国台湾) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
+#pragma code_page(950)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MIR2                ICON                    ".\\Res\\MIR2.ICO"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINMENU MENU
+BEGIN
+    POPUP "&Service"
+    BEGIN
+        MENUITEM "&Start Service",              IDM_STARTSERVICE
+        MENUITEM "S&top Service",               IDM_STOPSERVICE, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Configuration",              IDM_CONFIG
+        MENUITEM "&Font Color",                 IDM_SETFONTCOLOR
+        MENUITEM "&Background Color",           IDM_SETBKGCOLOR
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONFIGDLG DIALOGEX 0, 0, 198, 316
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Game Server Configuration"
+FONT 9, "??", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,43,288,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,100,288,50,14
+    EDITTEXT        IDC_DBSRV_PORT,73,120,91,16,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Address :",IDC_STATIC,29,106,35,8
+    GROUPBOX        "Database Server Information",IDC_STATIC,14,88,158,52
+    LTEXT           "Port :",IDC_STATIC,29,123,21,9
+    GROUPBOX        "Server Information",IDC_STATIC,14,15,158,68
+    LTEXT           "Start Level :",IDC_STATIC,26,33,39,8
+    LTEXT           "Start Gold :",IDC_STATIC,26,51,37,8
+    EDITTEXT        IDC_STARTLEVEL,73,31,91,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STARTGOLD,73,49,91,14,ES_AUTOHSCROLL
+    CONTROL         "Test Server",IDC_CHECK_TESTSRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,66,53,10
+    GROUPBOX        "File Location Information",IDC_STATIC,16,248,157,32
+    LTEXT           "Map :",IDC_STATIC,30,261,20,8
+    EDITTEXT        IDC_MAPFILE_LOC,56,259,91,16,ES_AUTOHSCROLL
+    GROUPBOX        "DBMS Information",IDC_STATIC,15,144,158,82
+    LTEXT           "Account : ",IDC_STATIC,29,181,34,8
+    EDITTEXT        IDC_DBMS_ID,73,181,91,16,ES_AUTOHSCROLL
+    LTEXT           "Password :",IDC_STATIC,29,200,38,8
+    EDITTEXT        IDC_DBMS_PASSWORD,73,202,91,16,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "DSName :",IDC_STATIC,29,162,34,8
+    EDITTEXT        IDC_DBMS_DEVICE,73,160,91,16,ES_AUTOHSCROLL
+    EDITTEXT        IDC_DBSVR_IP,73,101,91,16,ES_AUTOHSCROLL
+    PUSHBUTTON      "TestDsn",IDC_BUTTON1,123,231,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONFIGDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 309
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CONFIGDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -26,17 +168,17 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 STRINGTABLE
 BEGIN
-    IDS_NOTWINNT            "此程序只有在WIN2000以上版本中才能运行的"
-    IDS_LVS_LABEL1          "日期"
-    IDS_LVS_LABEL2          "时间"
-    IDS_LVS_LABEL3          "邮件"
-    IDS_STARTSERVICE        "启动服务"
-    IDS_STOPSERVICE         "停止服务"
-    IDS_FETCH_MAGICDATA     "取得魔法数据"
-    IDS_DISCONNECT_LOGINSERVER "与登陆服断开链接"
-    IDS_PROGRAM_QUIT        "退出吗？"
-    IDS_PROGRAM_TITLE       "流星服务端"
-    IDS_LOAD_ADMINCOMMAND   "管理员命令 :  (%d) "
+    IDS_NOTWINNT            "祘ΤWIN2000セい?︽"
+    IDS_LVS_LABEL1          "ら戳"
+    IDS_LVS_LABEL2          "??"
+    IDS_LVS_LABEL3          "?ン"
+    IDS_STARTSERVICE        "??狝?"
+    IDS_STOPSERVICE         "氨ゎ狝?"
+    IDS_FETCH_MAGICDATA     "眔臸猭?誹"
+    IDS_DISCONNECT_LOGINSERVER "蒓祅?狝???钡"
+    IDS_PROGRAM_QUIT        "癶?"
+    IDS_PROGRAM_TITLE       "瑈琍狝?狠"
+    IDS_LOAD_ADMINCOMMAND   "恨瞶?㏑ :  (%d) "
     IDS_CONFLVS_LABEL1      "???"
     IDS_CONFLVS_LABEL2      "???"
     IDS_CONFLVS_LABEL3      "??? ??? ?? IP ??"
@@ -47,11 +189,11 @@ STRINGTABLE
 BEGIN
     IDS_CONFLVS_LABEL5      "?? ??? ?? IP ??"
     IDS_TAB_LABEL1          "?? ??"
-    IDS_ACCEPT_GATESERVER   "提示 : 游戏网关连接OK(%s)"
-    IDS_OPEN_USER           "????? (%s) ? ??? ?? ????. "
-    IDS_CLOSE_USER          "????? (%s) ? ??? ?? ????."
-    IDS_OPEN_GATE           "%d ? ???? ?? ?????."
-    IDS_CLOSE_GATE          "%d ? ???? ??? ?? ?????."
+    IDS_ACCEPT_GATESERVER   "矗ボ : 村?蔍??钡OK(%s)"
+    IDS_OPEN_USER           "????? (%s) ノ??钡. "
+    IDS_CLOSE_USER          "????? (%s) ノ???."
+    IDS_OPEN_GATE           "%d 蔍?ゴ?."
+    IDS_CLOSE_GATE          "%d 蔍???."
 END
 
 STRINGTABLE
@@ -62,10 +204,10 @@ END
 STRINGTABLE
 BEGIN
     IDS_LOADMAPFILE_GOOD    "? ?? (%s) ??? ?????."
-    IDS_LOADMAPFILE_FAIL    "ERROR : 地图 (%s) 加载失败."
-    IDS_DISCONNECT_DBSERVER "ERROR : 无法链接到数据库服务器."
-    IDS_APPLY_RECONNECT     "INFO : 重新连接."
-    IDS_CANT_CONNECT        "ERROR : 无法连接."
+    IDS_LOADMAPFILE_FAIL    "ERROR : ? (%s) ?ア?."
+    IDS_DISCONNECT_DBSERVER "ERROR : ?猭?钡?誹?狝?竟."
+    IDS_APPLY_RECONNECT     "INFO : 穝?钡."
+    IDS_CANT_CONNECT        "ERROR : ?猭?钡."
     IDS_FETCH_MONSTER       "??? ?? (%d ?)? ?????."
     IDS_FETCH_MONGEN        "??? ?? ?? (%d ?)? ?????."
     IDS_FETCH_STDITEMWEAPON "?? ??? ?? (%d ?)? ?????."
@@ -143,149 +285,7 @@ BEGIN
     IDS_CAPTURE_OFF         "??? ?"
 END
 
-#endif    // 中文(简体，中国) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// 朝鲜语(韩国) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
-LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
-#pragma code_page(949)
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""winres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_TOOLBAR             BITMAP                  ".\\Res\\toolbar.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_MIR2                ICON                    ".\\Res\\MIR2.ICO"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_MAINMENU MENU
-BEGIN
-    POPUP "&Service"
-    BEGIN
-        MENUITEM "&Start Service",              IDM_STARTSERVICE
-        MENUITEM "S&top Service",               IDM_STOPSERVICE, GRAYED
-        MENUITEM SEPARATOR
-        MENUITEM "&Configuration",              IDM_CONFIG
-        MENUITEM "&Font Color",                 IDM_SETFONTCOLOR
-        MENUITEM "&Background Color",           IDM_SETBKGCOLOR
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       IDM_EXIT
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_CONFIGDLG DIALOGEX 0, 0, 198, 316
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Game Server Configuration"
-FONT 9, "奔覆", 0, 0, 0x0
-BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,43,288,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,100,288,50,14
-    EDITTEXT        IDC_DBSRV_PORT,73,120,91,16,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Address :",IDC_STATIC,29,106,35,8
-    GROUPBOX        "Database Server Information",IDC_STATIC,14,88,158,52
-    LTEXT           "Port :",IDC_STATIC,29,123,21,9
-    GROUPBOX        "Server Information",IDC_STATIC,14,15,158,68
-    LTEXT           "Start Level :",IDC_STATIC,26,33,39,8
-    LTEXT           "Start Gold :",IDC_STATIC,26,51,37,8
-    EDITTEXT        IDC_STARTLEVEL,73,31,91,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_STARTGOLD,73,49,91,14,ES_AUTOHSCROLL
-    CONTROL         "Test Server",IDC_CHECK_TESTSRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,66,53,10
-    GROUPBOX        "File Location Information",IDC_STATIC,16,248,157,32
-    LTEXT           "Map :",IDC_STATIC,30,261,20,8
-    EDITTEXT        IDC_MAPFILE_LOC,56,259,91,16,ES_AUTOHSCROLL
-    GROUPBOX        "DBMS Information",IDC_STATIC,15,144,158,82
-    LTEXT           "Account : ",IDC_STATIC,29,181,34,8
-    EDITTEXT        IDC_DBMS_ID,73,181,91,16,ES_AUTOHSCROLL
-    LTEXT           "Password :",IDC_STATIC,29,200,38,8
-    EDITTEXT        IDC_DBMS_PASSWORD,73,202,91,16,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "DSName :",IDC_STATIC,29,162,34,8
-    EDITTEXT        IDC_DBMS_DEVICE,73,160,91,16,ES_AUTOHSCROLL
-    EDITTEXT        IDC_DBSVR_IP,73,101,91,16,ES_AUTOHSCROLL
-    PUSHBUTTON      "TestDsn",IDC_BUTTON1,123,231,50,14
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_CONFIGDLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 191
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 309
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_CONFIGDLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-#endif    // 朝鲜语(韩国) resources
+#endif    // 中文(繁体，中国台湾) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

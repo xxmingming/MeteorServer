@@ -130,7 +130,7 @@ void CGateInfo::xSend()
 			delete lpSendBuff;
 			lpSendBuff = NULL;
 
-			if (nPos >= 8192)
+			if (nPos >= DATA_BUFSIZE)
 				break;
 
 			lpSendBuff = (_LPTSENDBUFF)m_xSendBuffQ.PopQ();

@@ -68,7 +68,7 @@ void OnCommand(WPARAM wParam, LPARAM lParam)
 
 			SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_TEXT("Ready"));
 
-			g_xAbusive.LoadAbusiveList();
+			//g_xAbusive.LoadAbusiveList();
 
 			return;
 		}

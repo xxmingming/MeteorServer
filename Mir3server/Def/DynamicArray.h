@@ -84,9 +84,7 @@ template <class T> T* CWHDynamicArray<T>::GetEmptyElement(int nIndex)
 	{
 		if (!m_Elements[nIndex])
 			m_Elements[nIndex] = new T;
-
 		m_IsAvElements[nIndex] = TRUE;
-
 		return m_Elements[nIndex];
 	}
 
