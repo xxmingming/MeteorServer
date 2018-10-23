@@ -54,7 +54,12 @@ BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, int nPort, long
 		addr->sin_addr.s_addr	= htonl(INADDR_ANY);
 
 		if ((bind(s, (const struct sockaddr FAR*)addr, sizeof(SOCKADDR_IN))) == SOCKET_ERROR)
+		{
+			char buff[256];
+			sprintf(buff, "套接字绑定出错，可能是端口复用导致 错误码:%d 端口:%d", WSAGetLastError(), nPort);
+			::MessageBoxA(NULL, buff, "错误", MB_OK);
 			return FALSE;
+		}
 
 		if ((listen(s, 5)) == SOCKET_ERROR)
 			return FALSE;

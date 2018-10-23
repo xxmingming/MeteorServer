@@ -75,6 +75,7 @@
       <ObjectFileName>.\../_Obj_Debug/GameSvr\</ObjectFileName>
       <ProgramDataBaseFileName>.\../_Obj_Debug/GameSvr\</ProgramDataBaseFileName>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>

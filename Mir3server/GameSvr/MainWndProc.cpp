@@ -104,9 +104,11 @@ UINT WINAPI InitializingServer(LPVOID lpParameter)
 	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
 	//}
 
-	InitServerSocket(g_ssock, &g_saddr, _IDM_SERVERSOCK_MSG, g_nLocalPort, 1);
-	InsertLogMsg(IDS_STARTSERVICE);
-	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_T("Ready"));
+	if (InitServerSocket(g_ssock, &g_saddr, _IDM_SERVERSOCK_MSG, g_nLocalPort, 1))
+	{
+		InsertLogMsg(IDS_STARTSERVICE);
+		SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_T("Ready"));
+	}
 	//InitAdminCommandList();
 	//连接到数据库服务器 端口6000
 	//ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strDBSvrIP, NULL, g_nDBSrvPort, FD_CONNECT|FD_READ|FD_CLOSE);

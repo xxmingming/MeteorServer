@@ -213,16 +213,21 @@ void CRoomInfo::Update()
 					CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
 					if (pUserInfo)
 					{
-						_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-						rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-						lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSize();
-						MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncKeyFrame;
-						MsgHeader.nLength = rsp.ByteSize();
-						MsgHeader.nSocket = pUserInfo->m_sock;
-						MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
-						MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
-						memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
-						pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+						pUserInfo->Lock();
+						if (!pUserInfo->IsEmpty())
+						{
+							_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+							rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+							lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSize();
+							MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncKeyFrame;
+							MsgHeader.nLength = rsp.ByteSize();
+							MsgHeader.nSocket = pUserInfo->m_sock;
+							MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
+							MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
+							memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
+							pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+						}
+						pUserInfo->Unlock();
 					}
 					pListNode = g_xUserInfoList.GetNext(pListNode);
 				} // while

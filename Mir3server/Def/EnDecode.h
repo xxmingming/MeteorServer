@@ -4,13 +4,14 @@
 
 #define _DEFBLOCKSIZE		16
 
+//包头
 typedef struct tag_TMSGHEADER
 {
-	int		nSocket;
-	int		nLength;
-	int		wIdent;
-	WORD	wSessionIndex;
-	WORD	wUserListIndex;
+	int		nSocket;//套接字
+	int		nLength;//序列化信息长度
+	int		wIdent;//消息号
+	WORD	wSessionIndex;//连接序号
+	WORD	wUserListIndex;//在服务器的用户序号
 } _TMSGHEADER, *_LPTMSGHEADER;
 
 //void WINAPI fnMakeDefMessage(_LPTDEFAULTMESSAGE lptdm, WORD wIdent, int nRecog, WORD wParam, WORD wTag, WORD wSeries);

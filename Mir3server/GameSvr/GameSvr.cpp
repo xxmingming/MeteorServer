@@ -180,7 +180,7 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 			ExpParam.ClientPointers = FALSE;
 
 			pfnMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),
-				hDumpFile, MiniDumpWithDataSegs, (pExceptionPointers ? &ExpParam : NULL), NULL, NULL);
+				hDumpFile, MiniDumpWithFullMemory, (pExceptionPointers ? &ExpParam : NULL), NULL, NULL);
 
 			if (bOwnDumpFile)
 				CloseHandle(hDumpFile);
@@ -200,7 +200,8 @@ LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS lpExceptionInfo)
 	{
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
-
+	ClearSocket(g_ssock);
+	WSACleanup();
 	return GenerateMiniDump(NULL, lpExceptionInfo, L"GameSvr");
 }
 

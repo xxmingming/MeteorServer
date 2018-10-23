@@ -70,9 +70,12 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 //处理游戏服发来的消息.
 void ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
+	int limit = nRecv + g_nRemainBuffLen;
+	if (limit > 2 * DATA_BUFSIZE)
+		return;
 	int				nLen = nRecv;
 	int				nNext = 0;
-	BYTE			szBuff[DATA_BUFSIZE];
+	BYTE			szBuff[2 * DATA_BUFSIZE];
 	BYTE			*pszData = &szBuff[0];
 	_LPTMSGHEADER	lpMsgHeader;
 
@@ -259,8 +262,8 @@ UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 
 		if (dwBytesTransferred == 0)
 			break;
-		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred);
 
+		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred);
 		dwFlags = 0;
 
 		ZeroMemory(&(ClientOverlapped.Overlapped), sizeof(OVERLAPPED));

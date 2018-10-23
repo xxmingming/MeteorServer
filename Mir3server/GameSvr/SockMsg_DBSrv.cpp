@@ -315,7 +315,7 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case FD_READ:
 		{
-			char	szPacket[8096];
+			char	szPacket[8192];
 	
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
 
