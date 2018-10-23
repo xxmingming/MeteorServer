@@ -256,24 +256,27 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			{
 				//在房间先从房间删除.给同房间其他对象发送离开消息
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-				if (pUserInfo->m_pRoom != NULL)
+				if (pUserInfo != NULL)
 				{
-					pGate->OnLeaveRoom(pUserInfo);
-					pUserInfo->m_pRoom = NULL;
+					if (pUserInfo->m_pRoom != NULL)
+					{
+						pGate->OnLeaveRoom(pUserInfo);
+						pUserInfo->m_pRoom = NULL;
+					}
+					if (pUserInfo->m_pxPlayerObject != NULL)
+					{
+						pUserInfo->CloseUserHuman();
+						pUserInfo->Lock();
+						pUserInfo->m_bEmpty = TRUE;
+						pUserInfo->m_pGateInfo = NULL;
+						pUserInfo->Unlock();
+					}
+					//从全局删除.
+					g_xUserInfoList.Lock();
+					g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
+					g_xUserInfoList.Unlock();
+					UpdateStatusBarUsers(FALSE);
 				}
-				if (pUserInfo->m_pxPlayerObject != NULL)
-				{
-					pUserInfo->CloseUserHuman();
-					pUserInfo->Lock();
-					pUserInfo->m_bEmpty = TRUE;
-					pUserInfo->m_pGateInfo = NULL;
-					pUserInfo->Unlock();
-				}
-				//从全局删除.
-				g_xUserInfoList.Lock();
-				g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
-				g_xUserInfoList.Unlock();
-				UpdateStatusBarUsers(FALSE);
 			}
 			break;
 		//无参数，仅仅取得房间列表.

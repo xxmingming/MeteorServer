@@ -33,7 +33,7 @@ struct CMsg
 
 void ProcessGameSvrPacket(BYTE *lpMsg)
 {
-	_LPTSENDBUFF	lpSendUserData = new _TSENDBUFF;
+	//_LPTSENDBUFF	lpSendUserData = new _TSENDBUFF;
 	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
 
 	CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);

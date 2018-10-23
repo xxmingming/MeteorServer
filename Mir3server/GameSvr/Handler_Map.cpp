@@ -211,7 +211,7 @@ void CRoomInfo::Update()
 				while (pListNode)
 				{
 					CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-					if (pUserInfo)
+					if (pUserInfo != NULL)
 					{
 						pUserInfo->Lock();
 						if (!pUserInfo->IsEmpty())
