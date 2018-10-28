@@ -48,6 +48,22 @@ void CPlayerObject::SetPosition(float x, float y, float z)
 	m_Pos.set_z(roundl((double)1000 * z));
 }
 
+void CPlayerObject::Reborn()
+{
+	if (!m_pUserInfo) return;
+	if (!m_pUserInfo->m_pRoom)return;
+	m_Ability.HP = m_Ability.MaxHP = m_pUserInfo->m_pRoom->m_nHpMax;
+	m_Ability.MP = m_Ability.MaxMP = 0;
+	//m_Ability.Weapon = m_Ability.Weapon1 = weapon;
+	//m_Ability.Weapon2 = 0;
+	//m_Ability.WeaponPos = 0;
+	m_Ability.StartPoint = rand() % 16;
+	m_Ability.AniSource = 0;
+	m_Ability.Frame = 0;
+	m_bWaitReborn = false;
+	m_fIsDead = false;
+}
+
 void CPlayerObject::Spawn(int startPoint, int camp, int model, int weapon)
 {
 	if (!m_pUserInfo) return;

@@ -18,6 +18,9 @@ message MeteorMsg {
         SyncInput = 113;//服务器下发场景内全部角色的输入.
         KeyFrameReq = 114;//用户上传所有自身属性到服务器做同步，
         SyncKeyFrame = 115;//关键帧同步操作，同步全部属性到客户端
+        UserDeadSB2C = 116;//角色死亡清理尸体-服务器向客户端发，房间发向房间内的所有角色，在角色死亡5秒后发送
+        UserRebornReq = 117;//死亡者-申请复活,在清理尸体后 ,无消息体
+        UserRebornSB2C = 118;//其他客户端复活该死亡角色.类似玩家进场 
     }
 }
 
@@ -230,4 +233,10 @@ message KeyFrame
     required uint32 frameIndex = 1;
     repeated Input_ Inputs = 2;
     repeated Player_ Players = 3;
+}
+
+//角色死亡服务器向全体客户端通知，清理该死亡角色
+message UserId
+{
+    repeated uint32 Player = 1;//死亡和复活时的ID列表    
 }

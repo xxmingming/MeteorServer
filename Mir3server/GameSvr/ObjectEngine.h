@@ -116,19 +116,19 @@ class CObjectAbility
 {
 public:
 	//BYTE	Level;
-	WORD	HP;//气血
-	WORD	MP;//怒气
-    WORD	MaxHP;//气血上限
-    WORD	MaxMP;//怒气上限
-	WORD	Weapon1;//1号位武器
-	WORD	Weapon2;//2号位武器
-	WORD	Weapon;//当前主武器
-	WORD	WeaponPos;//武器姿势
-	WORD	Model;//模型ID
-	WORD	Camp;//阵营0流星，1蝴蝶
-	WORD	StartPoint;//地图随机出生点.每结束，每死亡刷新
-	WORD	Frame;//动画帧
-	WORD	AniSource;//动画源
+	int	HP;//气血
+	int	MP;//怒气
+	int	MaxHP;//气血上限
+	int	MaxMP;//怒气上限
+	int	Weapon1;//1号位武器
+	int	Weapon2;//2号位武器
+	int	Weapon;//当前主武器
+	int	WeaponPos;//武器姿势
+	int	Model;//模型ID
+	int	Camp;//阵营0流星，1蝴蝶
+	int	StartPoint;//地图随机出生点.每结束，每死亡刷新
+	int	Frame;//动画帧
+	int	AniSource;//动画源
 };
 
 class CObjectAddAbility	// 酒捞袍 馒侩栏肺 疵绢唱绰 瓷仿摹
@@ -171,7 +171,23 @@ public:
 	UINT						m_nCharStatus;
 	WORD						m_wStatusArr[MAX_STATUS_ATTRIBUTE];
 	DWORD						m_dwStatusTime[MAX_STATUS_ATTRIBUTE];
+	void						Reset(CUserInfo*pUserInfo)
+	{
+		m_fDeadTick = 0;
+		m_pUserInfo = pUserInfo;
+		//ZeroMemory(m_szName, sizeof(m_szName));
+		m_nCharStatusEx = 0;
+		m_nCharStatus = 0;
+		m_fIsDead = FALSE;
+		ZeroMemory(m_wStatusArr, sizeof(m_wStatusArr));
+		ZeroMemory(m_szName, sizeof(m_szName));
+		m_bWaitReborn = false;
+		m_bNeedSend = false;
+	}
 	BOOL						m_fIsDead;
+	float						m_fDeadTick;
+	BOOL						m_bWaitReborn;//等待客户端清理尸体，并复活.
+	BOOL						m_bNeedSend;//是否已向客户端发送清理尸体封包
 public:
 	CCharObject(CUserInfo*	pUserInfo);
 	virtual ~CCharObject();

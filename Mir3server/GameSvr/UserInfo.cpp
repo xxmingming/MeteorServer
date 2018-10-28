@@ -131,6 +131,7 @@ void CUserInfo::CloseUserHuman()
 		m_pxPlayerObject->Unlock();
 		m_pxPlayerObject = NULL;
 	}
+	m_bEmpty = TRUE;
 	Unlock();
 	//UpdateStatusBarUsers(FALSE);
 }
@@ -225,10 +226,38 @@ void CUserInfo::DoClientCertification(char *pszPacket)
 	}
 }
 
+#define REBORN_DELAY 5000
+
+BOOL CUserInfo::NeedReborn(float delta)
+{
+	if (m_pxPlayerObject != NULL && m_pxPlayerObject->m_fIsDead)
+	{
+		if (!m_pxPlayerObject->m_bWaitReborn)
+		{
+			m_pxPlayerObject->m_fDeadTick += delta;
+			if (m_pxPlayerObject->m_fDeadTick >= REBORN_DELAY)
+			{
+				m_pxPlayerObject->m_bWaitReborn = TRUE;
+				m_pxPlayerObject->m_fDeadTick = 0;
+			}
+			else
+			{
+				//print("deadtick not enough");
+			}
+		}
+	}
+	return m_pxPlayerObject->m_bWaitReborn;
+}
+
 void CUserInfo::Update(Player_ * pPlayer)
 {
 	if (pPlayer == NULL)
+	{
+		//print("pPlayer == null");
 		return;
+	}
+
+	int hp = m_pxPlayerObject->m_AddAbility.HP;
 	m_pxPlayerObject->m_Ability.MP = pPlayer->angry();
 	m_pxPlayerObject->m_Ability.HP = pPlayer->hp();
 	m_pxPlayerObject->m_Ability.Weapon = pPlayer->weapon();
@@ -247,6 +276,25 @@ void CUserInfo::Update(Player_ * pPlayer)
 	m_pxPlayerObject->m_nRotation.set_z(pPlayer->rotation().z());
 	if (m_bDirty)
 		m_bDirty = false;
+	//char a[40];
+	//sprintf(a, "hp:%d", m_pxPlayerObject->m_Ability.HP);
+	//print(a);
+	if (m_pxPlayerObject->m_Ability.HP <= 0 && !m_pxPlayerObject->m_fIsDead)
+	{
+		//print("died");
+		m_pxPlayerObject->Die();// = true;
+	}
+	else
+	{
+		//if (m_pxPlayerObject->m_Ability.HP <= 0)
+		//	print(" hp <= 0");
+		//else
+		//	print("hp > 0");
+		//if (m_pxPlayerObject->m_fIsDead)
+		//	print("already dead");
+		//else
+		//	print("not dead");
+	}
 }
 
 void CUserInfo::CopyTo(Player_ * player)

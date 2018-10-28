@@ -13,12 +13,7 @@ CMirMap*		GetMap(char *pszMapName);
 
 CCharObject::CCharObject(CUserInfo*	pUserInfo)
 { 
-	m_pUserInfo					= pUserInfo;
-	//ZeroMemory(m_szName, sizeof(m_szName));
-	m_nCharStatusEx				= 0;
-	m_nCharStatus				= 0;
-	ZeroMemory(m_wStatusArr, sizeof(m_wStatusArr));
-	ZeroMemory(m_szName, sizeof(m_szName));
+	Reset(pUserInfo);
 }
 
 CCharObject::~CCharObject()
@@ -41,7 +36,10 @@ UINT CCharObject::GetCharStatus()
 
 void CCharObject::Die()
 {
-	m_fIsDead		= TRUE;
+	//print("some one died");
+	m_fIsDead = TRUE;
+	m_bNeedSend = TRUE;
+	m_fDeadTick = 0;
 }
 
 void CCharObject::SendSocket(char *pszPacket)

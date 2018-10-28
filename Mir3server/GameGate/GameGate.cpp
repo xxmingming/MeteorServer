@@ -159,8 +159,33 @@ LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS lpExceptionInfo)
 	return GenerateMiniDump(NULL, lpExceptionInfo, L"GameGate");
 }
 
+
+#if defined (_LOG4CPP)
+log4cpp::Category* main_log = &log4cpp::Category::getInstance("log");
+void LogInit()
+{
+	//1. 初始化Layout对象
+	log4cpp::PatternLayout* pLayout = new log4cpp::PatternLayout();
+	pLayout->setConversionPattern("%d: %p %c %x: %m%n");
+	// 2. 初始化一个appender 对象    
+	log4cpp::Appender* appender = new log4cpp::FileAppender("FileAppender", "./gamegate.log");
+	// 3. 把layout对象附着在appender对象上    
+	appender->setLayout(pLayout);
+	// 5. 设置additivity为false，替换已有的appender           
+	main_log->setAdditivity(false);
+	// 5. 把appender对象附到category上    
+	main_log->setAppender(appender);
+	// 6. 设置category的优先级，低于此优先级的日志不被记录    
+	main_log->setPriority(log4cpp::Priority::DEBUG);
+}
+#endif
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+#if defined(_LOG4CPP)
+	LogInit();
+#endif
+	print("gamegate start");
     MSG msg;
 	//加入崩溃dump文件功能
 	SetUnhandledExceptionFilter(ExceptionFilter);

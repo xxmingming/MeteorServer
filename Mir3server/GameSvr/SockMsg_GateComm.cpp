@@ -5,6 +5,7 @@ CRoomInfo * FindRoom(int roomIdx);
 BOOL ProcessMessage(CGateInfo * pGate, char * pBytes);
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName);
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq);
+void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
 void UpdateStatusBarSession(BOOL fGrow)
 {
 	static long	nNumOfCurrSession = 0;
@@ -92,7 +93,25 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 	{
 		GetQueuedCompletionStatus((HANDLE)CompletionPortID, &dwBytesTransferred, (LPDWORD)&pGateInfo, (LPOVERLAPPED *)&lpOverlapped, INFINITE);
 		
-		if (g_fTerminated) return 0L;
+		if (g_fTerminated)
+		{
+			//关闭时,对房间的清理.
+			if (g_xRoomList.GetCount())
+			{
+				PLISTNODE pListNode = g_xRoomList.GetHead();
+
+				while (pListNode)
+				{
+					CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
+					if (pRoomInfo)
+					{
+						pRoomInfo->Close();
+					}
+					pListNode = g_xRoomList.RemoveNode(pListNode);
+				}
+			}
+			return 0L;
+		}
 		//游戏网关和游戏服断开了.通知已开始游戏的房间清理
 		if (dwBytesTransferred == 0)
 		{
@@ -282,6 +301,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 		//无参数，仅仅取得房间列表.
 		case MeteorMsg_MsgType_GetRoomReq:
 		{
+			//print("get room req");
 			GetRoomRsp pGetRoomRsp;
 			g_xRoomList.Lock();
 			PLISTNODE pNode = g_xRoomList.GetHead();
@@ -310,6 +330,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			pMsgHeader->nLength = pGetRoomRsp.ByteSize();
 			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
 			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			//print("get room rsp");
 		}
 			break;
 		case MeteorMsg_MsgType_CreateRoomReq:
@@ -415,6 +436,20 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 		}
 			break;
+		case MeteorMsg_MsgType_UserRebornReq://用户请求复活.
+		{
+			UserId pRebornReq;
+			pRebornReq.ParseFromArray(data, pMsgHeader->nLength);
+			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			if (pUser == NULL || pUser->m_pxPlayerObject == NULL || pUser->m_pRoom == NULL)
+			{
+				//已经存在角色/还未进入房间
+				return TRUE;
+			}
+			OnUserReborn(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pRebornReq);
+		}
+			break;
+				
 		case MeteorMsg_MsgType_EnterLevelReq:
 		{
 			EnterLevelReq pEnterLevelReq;
@@ -451,12 +486,56 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			if (pUserInfo->m_pRoom != NULL)
 			{
 				//收到角色发的当前最新状态.
+				//print("user key frame req");
 				pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);//设置角色最新的状态，在下一个服务器周期下发到
 			}
 			break;
 	}
 
 	return TRUE;
+}
+
+void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq)
+{
+	pRoom->Lock();
+	OnEnterLevelRsp pOnEnterLevelRsp;
+	if (pRoom->m_nCount != 0)
+	{
+		Player_ * player = pOnEnterLevelRsp.mutable_player();
+		pUser->m_pxPlayerObject->Reborn();
+		pUser->CopyTo(player);
+	}
+	//其他人进入房间内的战场，告知房间内已存在的所有人.除了该角色自己.
+	//自己的属性也发给自己，在单独对自己回复的封包内.
+	PLISTNODE no = pRoom->m_pUserList.GetHead();
+	while (no != NULL)
+	{
+		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+		if (pUserNode)
+		{
+			//进入战场的角色不往自己发.
+			CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
+			if (pPlayer != NULL)
+			{
+				//往后发给进战场角色的，已在战场的其他角色的属性
+				tag_TMSGHEADER Msg;
+				Msg.nLength = pOnEnterLevelRsp.ByteSize();
+				Msg.nSocket = pUserNode->m_sock;
+				Msg.wIdent = MeteorMsg_MsgType_UserRebornSB2C;//当其他人进入场景.
+				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+
+				_LPTSENDBUFF pBuffer = new _TSENDBUFF;
+				pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSize();
+				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+				pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
+				pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
+			}
+		}
+		no = pRoom->m_pUserList.GetNext(no);
+	}
+
+	pRoom->Unlock();
 }
 
 //进入房间成功时
@@ -468,12 +547,16 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 	{
 		pUser->m_pxPlayerObject = &g_xPlayerObjectArr[nIndex];
 		pUser->m_pxPlayerObject->Lock();
+		pUser->m_pxPlayerObject->Reset(pUser);
 		pUser->m_pxPlayerObject->m_bEmpty = false;
 		pUser->m_pxPlayerObject->m_nArrIndex = nIndex;
-		pUser->m_pxPlayerObject->m_pUserInfo = pUser;
 		pUser->m_pxPlayerObject->SetCharName(pUser->m_szCharName);
 		pUser->m_pxPlayerObject->Spawn(spawnPoint, pEnterLevelReq->camp(), pEnterLevelReq->model(), pEnterLevelReq->weapon());
 		pUser->m_pxPlayerObject->Unlock();
+	}
+	else
+	{
+		//print("nIndex < 0");
 	}
 	pRoom->Lock();
 	//其他人进入房间内的战场，告知房间内已存在的所有人.除了该角色自己.

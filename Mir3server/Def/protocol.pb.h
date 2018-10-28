@@ -37,7 +37,7 @@ namespace protobuf_protocol_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[21];
+  static const ::google::protobuf::internal::ParseTable schema[22];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -85,6 +85,8 @@ void InitDefaultsInput_Impl();
 void InitDefaultsInput_();
 void InitDefaultsKeyFrameImpl();
 void InitDefaultsKeyFrame();
+void InitDefaultsUserIdImpl();
+void InitDefaultsUserId();
 inline void InitDefaults() {
   InitDefaultsMeteorMsg();
   InitDefaultsRoomInfo();
@@ -107,6 +109,7 @@ inline void InitDefaults() {
   InitDefaultsInputReq();
   InitDefaultsInput_();
   InitDefaultsKeyFrame();
+  InitDefaultsUserId();
 }
 }  // namespace protobuf_protocol_2eproto
 class CreateRoomReq;
@@ -166,6 +169,9 @@ extern SceneInfoDefaultTypeInternal _SceneInfo_default_instance_;
 class SceneItem_;
 class SceneItem_DefaultTypeInternal;
 extern SceneItem_DefaultTypeInternal _SceneItem__default_instance_;
+class UserId;
+class UserIdDefaultTypeInternal;
+extern UserIdDefaultTypeInternal _UserId_default_instance_;
 class Vector2_;
 class Vector2_DefaultTypeInternal;
 extern Vector2_DefaultTypeInternal _Vector2__default_instance_;
@@ -189,11 +195,14 @@ enum MeteorMsg_MsgType {
   MeteorMsg_MsgType_InputReq = 112,
   MeteorMsg_MsgType_SyncInput = 113,
   MeteorMsg_MsgType_KeyFrameReq = 114,
-  MeteorMsg_MsgType_SyncKeyFrame = 115
+  MeteorMsg_MsgType_SyncKeyFrame = 115,
+  MeteorMsg_MsgType_UserDeadSB2C = 116,
+  MeteorMsg_MsgType_UserRebornReq = 117,
+  MeteorMsg_MsgType_UserRebornSB2C = 118
 };
 bool MeteorMsg_MsgType_IsValid(int value);
 const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MIN = MeteorMsg_MsgType_GetRoomReq;
-const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MAX = MeteorMsg_MsgType_SyncKeyFrame;
+const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MAX = MeteorMsg_MsgType_UserRebornSB2C;
 const int MeteorMsg_MsgType_MsgType_ARRAYSIZE = MeteorMsg_MsgType_MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MeteorMsg_MsgType_descriptor();
@@ -369,6 +378,12 @@ class MeteorMsg : public ::google::protobuf::Message /* @@protoc_insertion_point
     MeteorMsg_MsgType_KeyFrameReq;
   static const MsgType SyncKeyFrame =
     MeteorMsg_MsgType_SyncKeyFrame;
+  static const MsgType UserDeadSB2C =
+    MeteorMsg_MsgType_UserDeadSB2C;
+  static const MsgType UserRebornReq =
+    MeteorMsg_MsgType_UserRebornReq;
+  static const MsgType UserRebornSB2C =
+    MeteorMsg_MsgType_UserRebornSB2C;
   static inline bool MsgType_IsValid(int value) {
     return MeteorMsg_MsgType_IsValid(value);
   }
@@ -3493,6 +3508,119 @@ class KeyFrame : public ::google::protobuf::Message /* @@protoc_insertion_point(
   friend struct ::protobuf_protocol_2eproto::TableStruct;
   friend void ::protobuf_protocol_2eproto::InitDefaultsKeyFrameImpl();
 };
+// -------------------------------------------------------------------
+
+class UserId : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:UserId) */ {
+ public:
+  UserId();
+  virtual ~UserId();
+
+  UserId(const UserId& from);
+
+  inline UserId& operator=(const UserId& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  UserId(UserId&& from) noexcept
+    : UserId() {
+    *this = ::std::move(from);
+  }
+
+  inline UserId& operator=(UserId&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const UserId& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const UserId* internal_default_instance() {
+    return reinterpret_cast<const UserId*>(
+               &_UserId_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    21;
+
+  void Swap(UserId* other);
+  friend void swap(UserId& a, UserId& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UserId* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  UserId* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const UserId& from);
+  void MergeFrom(const UserId& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(UserId* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated uint32 Player = 1;
+  int player_size() const;
+  void clear_player();
+  static const int kPlayerFieldNumber = 1;
+  ::google::protobuf::uint32 player(int index) const;
+  void set_player(int index, ::google::protobuf::uint32 value);
+  void add_player(::google::protobuf::uint32 value);
+  const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      player() const;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_player();
+
+  // @@protoc_insertion_point(class_scope:UserId)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > player_;
+  friend struct ::protobuf_protocol_2eproto::TableStruct;
+  friend void ::protobuf_protocol_2eproto::InitDefaultsUserIdImpl();
+};
 // ===================================================================
 
 
@@ -6532,9 +6660,45 @@ KeyFrame::players() const {
   return players_;
 }
 
+// -------------------------------------------------------------------
+
+// UserId
+
+// repeated uint32 Player = 1;
+inline int UserId::player_size() const {
+  return player_.size();
+}
+inline void UserId::clear_player() {
+  player_.Clear();
+}
+inline ::google::protobuf::uint32 UserId::player(int index) const {
+  // @@protoc_insertion_point(field_get:UserId.Player)
+  return player_.Get(index);
+}
+inline void UserId::set_player(int index, ::google::protobuf::uint32 value) {
+  player_.Set(index, value);
+  // @@protoc_insertion_point(field_set:UserId.Player)
+}
+inline void UserId::add_player(::google::protobuf::uint32 value) {
+  player_.Add(value);
+  // @@protoc_insertion_point(field_add:UserId.Player)
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+UserId::player() const {
+  // @@protoc_insertion_point(field_list:UserId.Player)
+  return player_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+UserId::mutable_player() {
+  // @@protoc_insertion_point(field_mutable_list:UserId.Player)
+  return &player_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

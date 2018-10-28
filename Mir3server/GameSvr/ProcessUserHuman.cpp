@@ -35,24 +35,7 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 	while (TRUE)
 	{
 		if (g_fTerminated)
-		{
-			//关闭时,对房间的清理.
-			if (g_xRoomList.GetCount())
-			{
-				pListNode = g_xRoomList.GetHead();
-
-				while (pListNode)
-				{
-					CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
-					if (pRoomInfo)
-					{
-						pRoomInfo->Close();
-					}
-					pListNode = g_xRoomList.RemoveNode(pListNode);
-				}
-			}
 			return 0L;
-		}
 
 		if (g_xRoomList.GetCount())
 		{
@@ -106,12 +89,7 @@ UINT WINAPI ProcessUserHuman(LPVOID lpParameter)
 				{
 					CUserInfo *pUserInfo = g_xUserInfoList.GetData(pListNode);
 					if (pUserInfo)
-					{
 						pUserInfo->CloseUserHuman();
-						pUserInfo->Lock();
-						pUserInfo->m_bEmpty = TRUE;
-						pUserInfo->Unlock();
-					}
 					pListNode = g_xUserInfoList.RemoveNode(pListNode);
 				}
 			}

@@ -21,6 +21,7 @@ public:
 	CPlayerObject(CUserInfo* pUserInfo);
 
 	void		Spawn(int startPoint, int camp, int model, int weapon);
+	void		Reborn();
 	void		SetPosition(float x, float y, float z);
 	void		SetRotation(float w, float x, float y, float z);
 	//virtual void		Operate();

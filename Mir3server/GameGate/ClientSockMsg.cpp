@@ -40,12 +40,14 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 
 	if (!pSessionInfo)
 	{
+		//print("pSessionInfo == null");
 		return;
 	}
 
 	pSessionInfo->SendBuffLock.Lock();
 	if (pSessionInfo->nSendBufferLen >= DATA_BUFSIZE)
 	{
+		//print("pSessionInfo->nSendBufferLen >= DATA_BUFSIZE");
 		pSessionInfo->nSendBufferLen = 0;
 		pSessionInfo->SendBuffLock.Unlock();
 		return;
@@ -53,6 +55,7 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 	
 	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + sizeof(CMsg)) >= DATA_BUFSIZE)
 	{
+		//print("pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + sizeof(CMsg)) >= DATA_BUFSIZE");
 		pSessionInfo->SendBuffLock.Unlock();
 		return;
 	}
@@ -72,7 +75,10 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 	int limit = nRecv + g_nRemainBuffLen;
 	if (limit > 2 * DATA_BUFSIZE)
+	{
+		//print("limit > 2 * DATA_BUFSIZE");
 		return;
+	}
 	int				nLen = nRecv;
 	int				nNext = 0;
 	BYTE			szBuff[2 * DATA_BUFSIZE];
@@ -89,7 +95,11 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 	while (nLen >= sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
-		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength)) break;
+		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
+		{
+			//print("nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength)");
+			break;
+		}
 		//if ((int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength) > DATA_BUFSIZE)
 		//{
 		//	//极端情况，单个包大于8192;
@@ -213,7 +223,7 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case FD_READ:
 		{
-			char szPacket[1024];
+			char szPacket[DATA_BUFSIZE];
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
 			if (nRecv <= 0)
 				break;

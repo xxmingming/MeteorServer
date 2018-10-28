@@ -107,6 +107,7 @@ public:
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
 	void							Update(Player_ * pPlayer);
+	BOOL							NeedReborn(float delta);
 };
 
 void InsertLogMsg(UINT nID);
