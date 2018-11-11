@@ -13,6 +13,7 @@ public:
 		ClearAll();
 	}
 
+	//只允许存储堆上的，否则在析构时，清理内存会delete栈上内存
 	bool PushQ( BYTE *lpbtQ )
 	{
 		Lock();

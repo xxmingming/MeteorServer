@@ -71,13 +71,15 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 }
 
 //处理游戏服发来的消息.
-void ProcReceiveBuffer(char *pszPacket, int nRecv)
+//处理成功-返回True
+//处理失败-返回FALSE，上一级断开套接字
+bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 	int limit = nRecv + g_nRemainBuffLen;
 	if (limit > 2 * DATA_BUFSIZE)
 	{
-		//print("limit > 2 * DATA_BUFSIZE");
-		return;
+		print("limit > 2 * DATA_BUFSIZE");
+		return FALSE;
 	}
 	int				nLen = nRecv;
 	int				nNext = 0;
@@ -92,7 +94,7 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 
 	nLen += g_nRemainBuffLen;
 
-	while (nLen >= sizeof(_TMSGHEADER))
+	while (nLen >= (int)sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
 		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
@@ -123,16 +125,29 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 
 		pszData += sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
 		nLen -= sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
+		if (nLen < 0)
+		{
+			char buff[64];
+			sprintf(buff, "message id:%d nLen < 0", lpMsgHeader->wIdent);
+			print(buff);
+		}
 	} // while
 
 	if (nLen > 0)
 	{
 		memmove(g_szRemainBuff, pszData, nLen);
 		g_nRemainBuffLen = nLen;
+		return TRUE;
 	}
-	else
+	else if (nLen == 0)
 	{
 		g_nRemainBuffLen = 0;
+		return TRUE;
+	}
+	else if (nLen < 0)
+	{
+		g_nRemainBuffLen = 0;
+		return FALSE;
 	}
 }
 
@@ -227,7 +242,7 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
 			if (nRecv <= 0)
 				break;
-			ProcReceiveBuffer(szPacket, nRecv);
+			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
 			break;
 		}
 	}

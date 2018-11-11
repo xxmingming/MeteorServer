@@ -147,7 +147,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			g_xGateList.Lock();
 			g_xGateList.RemoveNodeByData(pGateInfo);
 			g_xGateList.Unlock();
-			if (pGateInfo) delete pGateInfo;
+			//if (pGateInfo) delete pGateInfo;
 			continue;
 		}
 
