@@ -133,7 +133,6 @@ void CUserInfo::CloseUserHuman()
 	}
 	m_bEmpty = TRUE;
 	Unlock();
-	//UpdateStatusBarUsers(FALSE);
 }
 
 void CUserInfo::CloseAccount(char *pszName, int nCertification)
