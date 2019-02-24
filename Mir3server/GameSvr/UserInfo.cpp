@@ -16,6 +16,7 @@ CUserInfo::CUserInfo()
 		m_pKeys[i] = false;
 	}
 	m_pRoom = NULL;
+	m_nCertification = 0;
 }
 
 bool CUserInfo::IsEmpty()
@@ -155,74 +156,10 @@ void CUserInfo::CloseAccount(char *pszName, int nCertification)
 	send(g_clsock, szMsg, memlen(szMsg) - 1, 0);
 }
 
-void CUserInfo::DoClientCertification(char *pszPacket)
+void CUserInfo::DoClientCertification(UINT32 clientV)
 {
-	char szDecodePacket[64];
-	char *pszDecodePacket = &szDecodePacket[0];
-	char *pszPos;
-
-	if (m_btCurrentMode == USERMODE_NOTICE)
-	{
-		int nLen = memlen(pszPacket);
-
-		if (pszPos = (char *)memchr(pszPacket, '!', nLen))
-		{
-			*pszPos = '\0';
-
-			//             uid  chr	 cer  ver  startnew
-			// pszPacket **SSSS/SSSS/SSSS/SSSS/1
-			nLen = fnDecode6BitBufA(pszPacket + 2, szDecodePacket, sizeof(szDecodePacket));
-			szDecodePacket[nLen] = '\0';
-
-			if (*pszDecodePacket == '*' && *(pszDecodePacket + 1) == '*')
-			{
-				pszDecodePacket += 2;
-
-				if (!(pszPos = (char *)memchr(pszDecodePacket, '/', nLen))) return;
-
-				*pszPos++ = '\0';
-				nLen -= (pszPos - pszDecodePacket);
-				memmove(m_szUserID, pszDecodePacket, (pszPos - pszDecodePacket));
-				pszDecodePacket = pszPos;
-
-				if (!(pszPos = (char *)memchr(pszDecodePacket, '/', nLen))) return;
-
-				*pszPos++ = '\0';
-				nLen -= (pszPos - pszDecodePacket);
-				memmove(m_szCharName, pszDecodePacket, (pszPos - pszDecodePacket));
-				pszDecodePacket = pszPos;
-
-				if (!(pszPos = (char *)memchr(pszDecodePacket, '/', nLen))) return;
-
-				*pszPos++ = '\0';
-				nLen -= (pszPos - pszDecodePacket);
-				m_nCertification = AnsiStrToVal(pszDecodePacket);
-				pszDecodePacket = pszPos;
-
-				if (!(pszPos = (char *)memchr(pszDecodePacket, '/', nLen))) return;
-
-				*pszPos++ = '\0';
-				nLen -= (pszPos - pszDecodePacket);
-				m_nClientVersion = AnsiStrToVal(pszDecodePacket);
-				pszDecodePacket = pszPos;
-
-				m_btCurrentMode = USERMODE_LOGIN;
-//				(*pszDecodePacket == '0' ? StartNew = TRUE : StartNew = FALSE);
-
-				// INSERT:Check pay bill.
-
-//				if (pUserInfo->m_nCertification >= 30)
-//				{
-
-//					LoadPlayer(pUserInfo);
-//				}
-	/*				else
-				{
-					// INSERT:Close User
-				} */
-			}
-		}
-	}
+	m_nCertification = 1;
+	m_nClientVersion = clientV;
 }
 
 #define REBORN_DELAY 5000

@@ -101,39 +101,39 @@ void CRoomInfo::OnNewTurn()
 	m_bTurnStart = true;
 }
 
-void CRoomInfo::OnUserKeyFrame(KeyFrame * pk)
+void CRoomInfo::OnUserKeyFrame(TurnFrames * pk)
 {
 	//收到玩家的帧同步信息.
-	PLISTNODE pListNode = NULL;
-	if (m_pUserList.GetCount())
-	{
-		//第一次遍历填充所有角色的输入信息到整个消息
-		pListNode = m_pUserList.GetHead();
-		while (pListNode)
-		{
-			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-			if (pUserInfo != NULL)
-			{
-				pUserInfo->Lock();
-				if (pUserInfo->m_pxPlayerObject != NULL)
-				{
-					if (pUserInfo->m_nUserServerIndex == pk->mutable_players(0)->id())
-					{
-						//print("pUserInfo->Update");
-						pUserInfo->Update(pk->mutable_players(0));
-						pUserInfo->Unlock();
-						break;
-					}
-					else
-					{
-						//print("pUserInfo->m_nUserServerIndex != pk->mutable_players(0)->id()");
-					}
-				}
-				pUserInfo->Unlock();
-			}
-			pListNode = g_xUserInfoList.GetNext(pListNode);
-		}
-	}
+	//PLISTNODE pListNode = NULL;
+	//if (m_pUserList.GetCount())
+	//{
+	//	//第一次遍历填充所有角色的输入信息到整个消息
+	//	pListNode = m_pUserList.GetHead();
+	//	while (pListNode)
+	//	{
+	//		CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+	//		if (pUserInfo != NULL)
+	//		{
+	//			pUserInfo->Lock();
+	//			if (pUserInfo->m_pxPlayerObject != NULL)
+	//			{
+	//				if (pUserInfo->m_nUserServerIndex == pk->mutable_players(0)->id())
+	//				{
+	//					//print("pUserInfo->Update");
+	//					pUserInfo->Update(pk->mutable_players(0));
+	//					pUserInfo->Unlock();
+	//					break;
+	//				}
+	//				else
+	//				{
+	//					//print("pUserInfo->m_nUserServerIndex != pk->mutable_players(0)->id()");
+	//				}
+	//			}
+	//			pUserInfo->Unlock();
+	//		}
+	//		pListNode = g_xUserInfoList.GetNext(pListNode);
+	//	}
+	//}
 }
 
 void CRoomInfo::NewTurn()
@@ -245,84 +245,11 @@ void CRoomInfo::Update()
 	if (m_delta > syncDelta)
 	{
 		//收到玩家的帧同步信息.
-		static KeyFrame rsp;
+		static TurnFrames rsp;
 		rsp.Clear();
-		rsp.set_frameindex(m_totalTime);
+		rsp.set_turnindex(m_totalTime);
 		ZeroMemory(&MsgHeader, sizeof(MsgHeader));
 		PLISTNODE pListNode = NULL;
-		if (m_pUserList.GetCount())
-		{
-			//第一次遍历填充所有角色的输入信息到整个消息
-			pListNode = m_pUserList.GetHead();
-			while (pListNode)
-			{
-				CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-				if (pUserInfo)
-				{
-					pUserInfo->Lock();
-					//若玩家还未进场/或玩家在房间的角色注销.
-					if (!pUserInfo->m_bDirty)
-					{
-						if (pUserInfo->m_pxPlayerObject != NULL)
-						{
-							Player_* p = rsp.add_players();
-							pUserInfo->CopyTo(p);
-						}
-						else
-						{
-							//print("pUserInfo->m_pxPlayerObject == NULL");
-						}
-					}
-					else
-					{
-						//////print("pUserInfo->m_bDirty");
-					}
-					pUserInfo->Unlock();
-				}
-				pListNode = g_xUserInfoList.GetNext(pListNode);
-			}
-
-			//要同步的角色数量不为0,
-			if (rsp.players_size() != 0)
-			{
-				pListNode = m_pUserList.GetHead();
-				while (pListNode)
-				{
-					CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-					if (pUserInfo != NULL)
-					{
-						pUserInfo->Lock();
-						if (!pUserInfo->IsEmpty() && pUserInfo->m_pxPlayerObject != NULL)
-						{
-							_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-							rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-							lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSize();
-							MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncKeyFrame;
-							//print("sync key frame");
-							MsgHeader.nLength = rsp.ByteSize();
-							MsgHeader.nSocket = pUserInfo->m_sock;
-							MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
-							MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
-							memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
-							pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
-						}
-						pUserInfo->Unlock();
-					}
-					pListNode = g_xUserInfoList.GetNext(pListNode);
-				} // while
-			}
-			else
-			{
-				//print("rsp.players_size() == 0");
-			}
-
-		} // if g_xReadyUserInfoList.GetCount()
-
-		//static InputReq req;
-		//req.Clear();
-		//_TMSGHEADER MsgHeader;
-		//ZeroMemory(&MsgHeader, sizeof(MsgHeader));
-		//PLISTNODE pListNode = NULL;
 		//if (m_pUserList.GetCount())
 		//{
 		//	//第一次遍历填充所有角色的输入信息到整个消息
@@ -332,34 +259,64 @@ void CRoomInfo::Update()
 		//		CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
 		//		if (pUserInfo)
 		//		{
-		//			Input_ * input = req.mutable_input()->Add();
-		//			//向每个玩家广播其他玩家的输入.
-		//			pUserInfo->Operate(input);
+		//			pUserInfo->Lock();
+		//			//若玩家还未进场/或玩家在房间的角色注销.
+		//			if (!pUserInfo->m_bDirty)
+		//			{
+		//				if (pUserInfo->m_pxPlayerObject != NULL)
+		//				{
+		//					Player_* p = rsp.add_players();
+		//					pUserInfo->CopyTo(p);
+		//				}
+		//				else
+		//				{
+		//					//print("pUserInfo->m_pxPlayerObject == NULL");
+		//				}
+		//			}
+		//			else
+		//			{
+		//				//////print("pUserInfo->m_bDirty");
+		//			}
+		//			pUserInfo->Unlock();
 		//		}
 		//		pListNode = g_xUserInfoList.GetNext(pListNode);
-		//	} // while
+		//	}
 
-		//	pListNode = m_pUserList.GetHead();
-		//	while (pListNode)
+		//	//要同步的角色数量不为0,
+		//	if (rsp.players_size() != 0)
 		//	{
-		//		CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-		//		if (pUserInfo)
+		//		pListNode = m_pUserList.GetHead();
+		//		while (pListNode)
 		//		{
-		//			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-		//			req.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-		//			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + req.ByteSize();
-		//			MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncInput;
-		//			MsgHeader.nLength = req.ByteSize();
-		//			MsgHeader.nSocket = pUserInfo->m_sock;
-		//			MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
-		//			MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
-		//			memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
-		//			pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
-		//		}
-		//		pListNode = g_xUserInfoList.GetNext(pListNode);
-		//	} // while
+		//			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+		//			if (pUserInfo != NULL)
+		//			{
+		//				pUserInfo->Lock();
+		//				if (!pUserInfo->IsEmpty() && pUserInfo->m_pxPlayerObject != NULL)
+		//				{
+		//					_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+		//					rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+		//					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSize();
+		//					MsgHeader.wIdent = (WORD)MeteorMsg_MsgType_SyncKeyFrame;
+		//					//print("sync key frame");
+		//					MsgHeader.nLength = rsp.ByteSize();
+		//					MsgHeader.nSocket = pUserInfo->m_sock;
+		//					MsgHeader.wSessionIndex = pUserInfo->m_nUserGateIndex;
+		//					MsgHeader.wUserListIndex = pUserInfo->m_nUserServerIndex;
+		//					memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
+		//					pUserInfo->m_pGateInfo->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+		//				}
+		//				pUserInfo->Unlock();
+		//			}
+		//			pListNode = g_xUserInfoList.GetNext(pListNode);
+		//		} // while
+		//	}
+		//	else
+		//	{
+		//		//print("rsp.players_size() == 0");
+		//	}
 
-		//} // if g_xReadyUserInfoList.GetCount()
+		//}
 		m_delta = 0;
 	}
 	m_currentTick = GetTickCount();

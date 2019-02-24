@@ -55,8 +55,8 @@
             OnPlayerReStart = 147;//某玩家断线后重新开启客户端
             OnPlayerFetchInput = 148;//玩家重连时不断拉取服务器保存的操作序列
             OnPlayerReConnect = 149;//断线重连开始-服务器下发时期内所有玩家的全部操作
+            AudioChat = 150;//音频包,房间内的.
         }
-        
     }
 
     message EnterQueueRsp
@@ -355,4 +355,11 @@
         required uint32 playerId = 1;//玩家
         required uint32 channelType = 2;//频道类型 1-大厅 2-战场
         required string chatMessage = 3;//max 256
+    }
+
+    message AudioChatMsg
+    {
+        required uint32 playerId = 1;//玩家
+        required uint32 type = 2;//帧类型  1 单帧即为语音消息 2 语音消息开始帧 3 语音消息结束帧
+        repeated float audio_data = 3;//音频数据
     }

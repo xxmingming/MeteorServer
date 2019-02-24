@@ -37,7 +37,7 @@ namespace protobuf_protocol_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[38];
+  static const ::google::protobuf::internal::ParseTable schema[39];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -119,6 +119,8 @@ void InitDefaultsInputFrameImpl();
 void InitDefaultsInputFrame();
 void InitDefaultsChatMsgImpl();
 void InitDefaultsChatMsg();
+void InitDefaultsAudioChatMsgImpl();
+void InitDefaultsAudioChatMsg();
 inline void InitDefaults() {
   InitDefaultsMeteorMsg();
   InitDefaultsEnterQueueRsp();
@@ -158,8 +160,12 @@ inline void InitDefaults() {
   InitDefaultsUserId();
   InitDefaultsInputFrame();
   InitDefaultsChatMsg();
+  InitDefaultsAudioChatMsg();
 }
 }  // namespace protobuf_protocol_2eproto
+class AudioChatMsg;
+class AudioChatMsgDefaultTypeInternal;
+extern AudioChatMsgDefaultTypeInternal _AudioChatMsg_default_instance_;
 class ChatMsg;
 class ChatMsgDefaultTypeInternal;
 extern ChatMsgDefaultTypeInternal _ChatMsg_default_instance_;
@@ -326,11 +332,12 @@ enum MeteorMsg_MsgType {
   MeteorMsg_MsgType_OnPlayerQuit = 146,
   MeteorMsg_MsgType_OnPlayerReStart = 147,
   MeteorMsg_MsgType_OnPlayerFetchInput = 148,
-  MeteorMsg_MsgType_OnPlayerReConnect = 149
+  MeteorMsg_MsgType_OnPlayerReConnect = 149,
+  MeteorMsg_MsgType_AudioChat = 150
 };
 bool MeteorMsg_MsgType_IsValid(int value);
 const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MIN = MeteorMsg_MsgType_ProtocolVerify;
-const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MAX = MeteorMsg_MsgType_OnPlayerReConnect;
+const MeteorMsg_MsgType MeteorMsg_MsgType_MsgType_MAX = MeteorMsg_MsgType_AudioChat;
 const int MeteorMsg_MsgType_MsgType_ARRAYSIZE = MeteorMsg_MsgType_MsgType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MeteorMsg_MsgType_descriptor();
@@ -579,6 +586,8 @@ class MeteorMsg : public ::google::protobuf::Message /* @@protoc_insertion_point
     MeteorMsg_MsgType_OnPlayerFetchInput;
   static const MsgType OnPlayerReConnect =
     MeteorMsg_MsgType_OnPlayerReConnect;
+  static const MsgType AudioChat =
+    MeteorMsg_MsgType_AudioChat;
   static inline bool MsgType_IsValid(int value) {
     return MeteorMsg_MsgType_IsValid(value);
   }
@@ -5886,6 +5895,142 @@ class ChatMsg : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   friend struct ::protobuf_protocol_2eproto::TableStruct;
   friend void ::protobuf_protocol_2eproto::InitDefaultsChatMsgImpl();
 };
+// -------------------------------------------------------------------
+
+class AudioChatMsg : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:AudioChatMsg) */ {
+ public:
+  AudioChatMsg();
+  virtual ~AudioChatMsg();
+
+  AudioChatMsg(const AudioChatMsg& from);
+
+  inline AudioChatMsg& operator=(const AudioChatMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AudioChatMsg(AudioChatMsg&& from) noexcept
+    : AudioChatMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline AudioChatMsg& operator=(AudioChatMsg&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const AudioChatMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AudioChatMsg* internal_default_instance() {
+    return reinterpret_cast<const AudioChatMsg*>(
+               &_AudioChatMsg_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    38;
+
+  void Swap(AudioChatMsg* other);
+  friend void swap(AudioChatMsg& a, AudioChatMsg& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AudioChatMsg* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  AudioChatMsg* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const AudioChatMsg& from);
+  void MergeFrom(const AudioChatMsg& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(AudioChatMsg* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated float audio_data = 3;
+  int audio_data_size() const;
+  void clear_audio_data();
+  static const int kAudioDataFieldNumber = 3;
+  float audio_data(int index) const;
+  void set_audio_data(int index, float value);
+  void add_audio_data(float value);
+  const ::google::protobuf::RepeatedField< float >&
+      audio_data() const;
+  ::google::protobuf::RepeatedField< float >*
+      mutable_audio_data();
+
+  // required uint32 playerId = 1;
+  bool has_playerid() const;
+  void clear_playerid();
+  static const int kPlayerIdFieldNumber = 1;
+  ::google::protobuf::uint32 playerid() const;
+  void set_playerid(::google::protobuf::uint32 value);
+
+  // required uint32 type = 2;
+  bool has_type() const;
+  void clear_type();
+  static const int kTypeFieldNumber = 2;
+  ::google::protobuf::uint32 type() const;
+  void set_type(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:AudioChatMsg)
+ private:
+  void set_has_playerid();
+  void clear_has_playerid();
+  void set_has_type();
+  void clear_has_type();
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable int _cached_size_;
+  ::google::protobuf::RepeatedField< float > audio_data_;
+  ::google::protobuf::uint32 playerid_;
+  ::google::protobuf::uint32 type_;
+  friend struct ::protobuf_protocol_2eproto::TableStruct;
+  friend void ::protobuf_protocol_2eproto::InitDefaultsAudioChatMsgImpl();
+};
 // ===================================================================
 
 
@@ -10232,9 +10377,93 @@ inline void ChatMsg::set_allocated_chatmessage(::std::string* chatmessage) {
   // @@protoc_insertion_point(field_set_allocated:ChatMsg.chatMessage)
 }
 
+// -------------------------------------------------------------------
+
+// AudioChatMsg
+
+// required uint32 playerId = 1;
+inline bool AudioChatMsg::has_playerid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void AudioChatMsg::set_has_playerid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void AudioChatMsg::clear_has_playerid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void AudioChatMsg::clear_playerid() {
+  playerid_ = 0u;
+  clear_has_playerid();
+}
+inline ::google::protobuf::uint32 AudioChatMsg::playerid() const {
+  // @@protoc_insertion_point(field_get:AudioChatMsg.playerId)
+  return playerid_;
+}
+inline void AudioChatMsg::set_playerid(::google::protobuf::uint32 value) {
+  set_has_playerid();
+  playerid_ = value;
+  // @@protoc_insertion_point(field_set:AudioChatMsg.playerId)
+}
+
+// required uint32 type = 2;
+inline bool AudioChatMsg::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void AudioChatMsg::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void AudioChatMsg::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void AudioChatMsg::clear_type() {
+  type_ = 0u;
+  clear_has_type();
+}
+inline ::google::protobuf::uint32 AudioChatMsg::type() const {
+  // @@protoc_insertion_point(field_get:AudioChatMsg.type)
+  return type_;
+}
+inline void AudioChatMsg::set_type(::google::protobuf::uint32 value) {
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:AudioChatMsg.type)
+}
+
+// repeated float audio_data = 3;
+inline int AudioChatMsg::audio_data_size() const {
+  return audio_data_.size();
+}
+inline void AudioChatMsg::clear_audio_data() {
+  audio_data_.Clear();
+}
+inline float AudioChatMsg::audio_data(int index) const {
+  // @@protoc_insertion_point(field_get:AudioChatMsg.audio_data)
+  return audio_data_.Get(index);
+}
+inline void AudioChatMsg::set_audio_data(int index, float value) {
+  audio_data_.Set(index, value);
+  // @@protoc_insertion_point(field_set:AudioChatMsg.audio_data)
+}
+inline void AudioChatMsg::add_audio_data(float value) {
+  audio_data_.Add(value);
+  // @@protoc_insertion_point(field_add:AudioChatMsg.audio_data)
+}
+inline const ::google::protobuf::RepeatedField< float >&
+AudioChatMsg::audio_data() const {
+  // @@protoc_insertion_point(field_list:AudioChatMsg.audio_data)
+  return audio_data_;
+}
+inline ::google::protobuf::RepeatedField< float >*
+AudioChatMsg::mutable_audio_data() {
+  // @@protoc_insertion_point(field_mutable_list:AudioChatMsg.audio_data)
+  return &audio_data_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

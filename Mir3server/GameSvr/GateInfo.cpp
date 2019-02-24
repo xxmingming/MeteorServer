@@ -88,8 +88,8 @@ void CGateInfo::OpenNewUser(char *pszPacket)
 		ZeroMemory(pUserInfo->m_szUserID, sizeof(pUserInfo->m_szUserID));
 		ZeroMemory(pUserInfo->m_szCharName, sizeof(pUserInfo->m_szCharName));
 
-		pUserInfo->m_nCertification		= 0;
-		pUserInfo->m_nClientVersion		= 0;
+		pUserInfo->m_nCertification		= 0;//未验证是否是合法客户端的
+		pUserInfo->m_nClientVersion		= 0;//未设置版本号的.
 		pUserInfo->m_nUserGateIndex		= lpMsgHeader->wSessionIndex;
 		pUserInfo->m_nUserServerIndex	= nIndex;
 		

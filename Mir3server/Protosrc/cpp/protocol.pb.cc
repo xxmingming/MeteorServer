@@ -209,6 +209,11 @@ class ChatMsgDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<ChatMsg>
       _instance;
 } _ChatMsg_default_instance_;
+class AudioChatMsgDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<AudioChatMsg>
+      _instance;
+} _AudioChatMsg_default_instance_;
 namespace protobuf_protocol_2eproto {
 void InitDefaultsMeteorMsgImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -1022,7 +1027,28 @@ void InitDefaultsChatMsg() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsChatMsgImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[38];
+void InitDefaultsAudioChatMsgImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  {
+    void* ptr = &::_AudioChatMsg_default_instance_;
+    new (ptr) ::AudioChatMsg();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::AudioChatMsg::InitAsDefaultInstance();
+}
+
+void InitDefaultsAudioChatMsg() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAudioChatMsgImpl);
+}
+
+::google::protobuf::Metadata file_level_metadata[39];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[3];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -1450,6 +1476,17 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   1,
   2,
   0,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::AudioChatMsg, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::AudioChatMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::AudioChatMsg, playerid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::AudioChatMsg, type_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::AudioChatMsg, audio_data_),
+  0,
+  1,
+  ~0u,
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 6, sizeof(::MeteorMsg)},
@@ -1490,6 +1527,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 373, 379, sizeof(::UserId)},
   { 380, 399, sizeof(::InputFrame)},
   { 413, 421, sizeof(::ChatMsg)},
+  { 424, 432, sizeof(::AudioChatMsg)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1531,6 +1569,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::_UserId_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_InputFrame_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_ChatMsg_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::_AudioChatMsg_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -1549,14 +1588,14 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 38);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 39);
 }
 
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\016protocol.proto\"\273\010\n\tMeteorMsg\022\037\n\003cmd\030\001 "
-      "\002(\0162\022.MeteorMsg.MsgType\"\214\010\n\007MsgType\022\022\n\016P"
+      "\n\016protocol.proto\"\313\010\n\tMeteorMsg\022\037\n\003cmd\030\001 "
+      "\002(\0162\022.MeteorMsg.MsgType\"\234\010\n\007MsgType\022\022\n\016P"
       "rotocolVerify\020\n\022\016\n\nGetRoomReq\020d\022\016\n\nGetRo"
       "omRsp\020e\022\021\n\rCreateRoomReq\020f\022\021\n\rCreateRoom"
       "Rsp\020g\022\017\n\013JoinRoomReq\020h\022\017\n\013JoinRoomRsp\020i\022"
@@ -1582,80 +1621,82 @@ void AddDescriptorsImpl() {
       "tail\020\217\001\022\025\n\020OnPlayerSellItem\020\220\001\022\024\n\017OnPlay"
       "erBuyItem\020\221\001\022\021\n\014OnPlayerQuit\020\222\001\022\024\n\017OnPla"
       "yerReStart\020\223\001\022\027\n\022OnPlayerFetchInput\020\224\001\022\026"
-      "\n\021OnPlayerReConnect\020\225\001\"H\n\rEnterQueueRsp\022"
-      "\016\n\006result\030\001 \002(\r\022\020\n\010playerId\030\002 \002(\r\022\025\n\rpla"
-      "yerInQueue\030\003 \002(\r\"g\n\rOnBattleBegin\022\025\n\rTea"
-      "mMemberAId\030\001 \003(\r\022\025\n\rTeamMemberBId\030\002 \003(\r\022"
-      "\023\n\013TeamMemberA\030\003 \003(\t\022\023\n\013TeamMemberB\030\004 \003("
-      "\t\"2\n\016UserSelectRole\022\020\n\010playerId\030\001 \002(\r\022\016\n"
-      "\006HeroId\030\002 \002(\r\"4\n\017UserSelectSkill\022\020\n\010play"
-      "erId\030\001 \002(\r\022\017\n\007SkillId\030\002 \002(\r\"0\n\016UserSelec"
-      "tSkin\022\020\n\010playerId\030\001 \002(\r\022\014\n\004Skin\030\002 \002(\r\"\"\n"
-      "\020OnBattleCanceled\022\016\n\006reason\030\001 \002(\r\"4\n\017OnB"
-      "attleLoading\022\020\n\010playerId\030\001 \003(\r\022\017\n\007percen"
-      "t\030\002 \003(\r\" \n\016OnBattleResult\022\016\n\006result\030\001 \002("
-      "\r\"\026\n\024OnBattleResultDetail\"2\n\016PlayerSellI"
-      "tem\022\020\n\010playerId\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"1\n"
-      "\rPlayerBuyItem\022\020\n\010playerId\030\001 \002(\r\022\016\n\006item"
-      "Id\030\002 \002(\r\"1\n\022OnPlayerFetchInput\022\033\n\006frames"
-      "\030\001 \003(\0132\013.TurnFrames\"3\n\021ProtocolVerifyReq"
-      "\022\020\n\010protocol\030\001 \002(\r\022\014\n\004data\030\002 \002(\t\"D\n\021Prot"
-      "ocolVerifyRsp\022\016\n\006result\030\001 \002(\r\022\017\n\007message"
-      "\030\002 \002(\t\022\016\n\006Secret\030\003 \002(\t\"\271\002\n\010RoomInfo\022\016\n\006r"
-      "oomId\030\001 \002(\r\022\020\n\010roomName\030\002 \002(\t\022 \n\004rule\030\003 "
-      "\002(\0162\022.RoomInfo.RoomRule\022\020\n\010levelIdx\030\004 \002("
-      "\r\022\016\n\006Group1\030\005 \002(\r\022\016\n\006Group2\030\006 \002(\r\022\023\n\013pla"
-      "yerCount\030\007 \002(\r\022\021\n\tmaxPlayer\030\010 \002(\r\"f\n\010Roo"
-      "mRule\022\006\n\002MZ\020\001\022\007\n\003ROB\020\002\022\013\n\007Defence\020\003\022\016\n\nK"
-      "illTarget\020\004\022\013\n\007Endless\020\005\022\n\n\006Normal\020\006\022\t\n\005"
-      "Story\020\007\022\010\n\004Moba\020\010\"\'\n\013RoomPattern\022\013\n\007_Nor"
-      "mal\020\001\022\013\n\007_Replay\020\002\"\"\n\016OnLeaveRoomRsp\022\020\n\010"
-      "playerId\030\002 \002(\r\",\n\nGetRoomRsp\022\036\n\013RoomInLo"
-      "bby\030\002 \003(\0132\t.RoomInfo\"\206\001\n\rCreateRoomReq\022\021"
-      "\n\tmaxPlayer\030\002 \002(\r\022\020\n\010levelIdx\030\003 \002(\r\022\014\n\004r"
-      "ule\030\004 \002(\r\022\020\n\010roomName\030\005 \002(\t\022\r\n\005hpMax\030\006 \002"
-      "(\r\022\021\n\troundTime\030\007 \002(\r\022\016\n\006secret\030\010 \001(\t\"@\n"
-      "\rCreateRoomRsp\022\016\n\006result\030\002 \002(\r\022\016\n\006roomId"
-      "\030\003 \002(\r\022\017\n\007levelId\030\004 \002(\r\"\?\n\013JoinRoomReq\022\016"
-      "\n\006roomId\030\002 \002(\r\022\020\n\010userNick\030\003 \002(\t\022\016\n\006secr"
-      "et\030\004 \001(\t\"s\n\013JoinRoomRsp\022\016\n\006result\030\002 \002(\r\022"
-      "\016\n\006reason\030\003 \002(\r\022\020\n\010levelIdx\030\004 \002(\r\022\016\n\006roo"
-      "mId\030\005 \002(\r\022\020\n\010playerId\030\006 \002(\r\022\020\n\010userNick\030"
-      "\007 \002(\t\"<\n\rEnterLevelReq\022\014\n\004camp\030\002 \002(\r\022\r\n\005"
-      "model\030\003 \002(\r\022\016\n\006weapon\030\004 \002(\r\"*\n\rEnterLeve"
-      "lRsp\022\031\n\005scene\030\001 \001(\0132\n.SceneInfo\"$\n\016OnEnt"
-      "erRoomRsp\022\022\n\nplayerNick\030\001 \002(\t\"+\n\017OnEnter"
-      "LevelRsp\022\030\n\006player\030\001 \002(\0132\010.Player_\" \n\010Ve"
-      "ctor2_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\"+\n\010Vector3_"
-      "\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\022\t\n\001z\030\003 \002(\005\"9\n\013Qua"
-      "ternion_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\022\t\n\001z\030\003 \002("
-      "\005\022\t\n\001w\030\004 \002(\005\"B\n\tSceneInfo\022\032\n\005items\030\001 \003(\013"
-      "2\013.SceneItem_\022\031\n\007players\030\002 \003(\0132\010.Player_"
-      "\"b\n\nSceneItem_\022\r\n\005model\030\001 \002(\t\022\026\n\003pos\030\002 \002"
-      "(\0132\t.Vector3_\022\036\n\010rotation\030\003 \002(\0132\014.Quater"
-      "nion_\022\r\n\005frame\030\004 \002(\005\"\236\002\n\007Player_\022\n\n\002id\030\001"
-      " \002(\r\022\014\n\004name\030\002 \002(\t\022\017\n\007weapon1\030\003 \002(\r\022\017\n\007w"
-      "eapon2\030\004 \002(\r\022\016\n\006weapon\030\005 \002(\r\022\022\n\nweapon_p"
-      "os\030\006 \002(\r\022\026\n\003pos\030\007 \002(\0132\t.Vector3_\022\036\n\010rota"
-      "tion\030\010 \002(\0132\014.Quaternion_\022\r\n\005model\030\t \002(\005\022"
-      "\021\n\taniSource\030\n \002(\005\022\r\n\005frame\030\013 \002(\005\022\r\n\005hpM"
-      "ax\030\014 \002(\005\022\n\n\002hp\030\r \002(\005\022\r\n\005angry\030\016 \002(\005\022\014\n\004C"
-      "amp\030\017 \002(\005\022\022\n\nSpawnPoint\030\020 \002(\005\"\"\n\010InputRe"
-      "q\022\026\n\005input\030\001 \003(\0132\007.Input_\"7\n\006Input_\022\020\n\010p"
-      "layerId\030\001 \002(\r\022\033\n\006frames\030\002 \003(\0132\013.InputFra"
-      "me\"8\n\nTurnFrames\022\021\n\tturnIndex\030\001 \002(\r\022\027\n\006I"
-      "nputs\030\002 \003(\0132\007.Input_\"\030\n\006UserId\022\016\n\006Player"
-      "\030\001 \003(\r\"\334\001\n\nInputFrame\022\033\n\010JoyStick\030\002 \002(\0132"
-      "\t.Vector2_\022\035\n\nMouseDelta\030\003 \002(\0132\t.Vector2"
-      "_\022\t\n\001w\030\004 \002(\014\022\t\n\001s\030\005 \002(\014\022\t\n\001a\030\006 \002(\014\022\t\n\001d\030"
-      "\007 \002(\014\022\014\n\004jump\030\010 \002(\014\022\r\n\005break\030\t \002(\014\022\016\n\006at"
-      "tack\030\n \002(\014\022\t\n\001e\030\013 \002(\014\022\t\n\001r\030\014 \002(\014\022\t\n\001y\030\r "
-      "\002(\014\022\r\n\005space\030\016 \002(\014\022\t\n\001c\030\017 \002(\014\"E\n\007ChatMsg"
-      "\022\020\n\010playerId\030\001 \002(\r\022\023\n\013channelType\030\002 \002(\r\022"
-      "\023\n\013chatMessage\030\003 \002(\t"
+      "\n\021OnPlayerReConnect\020\225\001\022\016\n\tAudioChat\020\226\001\"H"
+      "\n\rEnterQueueRsp\022\016\n\006result\030\001 \002(\r\022\020\n\010playe"
+      "rId\030\002 \002(\r\022\025\n\rplayerInQueue\030\003 \002(\r\"g\n\rOnBa"
+      "ttleBegin\022\025\n\rTeamMemberAId\030\001 \003(\r\022\025\n\rTeam"
+      "MemberBId\030\002 \003(\r\022\023\n\013TeamMemberA\030\003 \003(\t\022\023\n\013"
+      "TeamMemberB\030\004 \003(\t\"2\n\016UserSelectRole\022\020\n\010p"
+      "layerId\030\001 \002(\r\022\016\n\006HeroId\030\002 \002(\r\"4\n\017UserSel"
+      "ectSkill\022\020\n\010playerId\030\001 \002(\r\022\017\n\007SkillId\030\002 "
+      "\002(\r\"0\n\016UserSelectSkin\022\020\n\010playerId\030\001 \002(\r\022"
+      "\014\n\004Skin\030\002 \002(\r\"\"\n\020OnBattleCanceled\022\016\n\006rea"
+      "son\030\001 \002(\r\"4\n\017OnBattleLoading\022\020\n\010playerId"
+      "\030\001 \003(\r\022\017\n\007percent\030\002 \003(\r\" \n\016OnBattleResul"
+      "t\022\016\n\006result\030\001 \002(\r\"\026\n\024OnBattleResultDetai"
+      "l\"2\n\016PlayerSellItem\022\020\n\010playerId\030\001 \002(\r\022\016\n"
+      "\006itemId\030\002 \002(\r\"1\n\rPlayerBuyItem\022\020\n\010player"
+      "Id\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"1\n\022OnPlayerFetc"
+      "hInput\022\033\n\006frames\030\001 \003(\0132\013.TurnFrames\"3\n\021P"
+      "rotocolVerifyReq\022\020\n\010protocol\030\001 \002(\r\022\014\n\004da"
+      "ta\030\002 \002(\t\"D\n\021ProtocolVerifyRsp\022\016\n\006result\030"
+      "\001 \002(\r\022\017\n\007message\030\002 \002(\t\022\016\n\006Secret\030\003 \002(\t\"\271"
+      "\002\n\010RoomInfo\022\016\n\006roomId\030\001 \002(\r\022\020\n\010roomName\030"
+      "\002 \002(\t\022 \n\004rule\030\003 \002(\0162\022.RoomInfo.RoomRule\022"
+      "\020\n\010levelIdx\030\004 \002(\r\022\016\n\006Group1\030\005 \002(\r\022\016\n\006Gro"
+      "up2\030\006 \002(\r\022\023\n\013playerCount\030\007 \002(\r\022\021\n\tmaxPla"
+      "yer\030\010 \002(\r\"f\n\010RoomRule\022\006\n\002MZ\020\001\022\007\n\003ROB\020\002\022\013"
+      "\n\007Defence\020\003\022\016\n\nKillTarget\020\004\022\013\n\007Endless\020\005"
+      "\022\n\n\006Normal\020\006\022\t\n\005Story\020\007\022\010\n\004Moba\020\010\"\'\n\013Roo"
+      "mPattern\022\013\n\007_Normal\020\001\022\013\n\007_Replay\020\002\"\"\n\016On"
+      "LeaveRoomRsp\022\020\n\010playerId\030\002 \002(\r\",\n\nGetRoo"
+      "mRsp\022\036\n\013RoomInLobby\030\002 \003(\0132\t.RoomInfo\"\206\001\n"
+      "\rCreateRoomReq\022\021\n\tmaxPlayer\030\002 \002(\r\022\020\n\010lev"
+      "elIdx\030\003 \002(\r\022\014\n\004rule\030\004 \002(\r\022\020\n\010roomName\030\005 "
+      "\002(\t\022\r\n\005hpMax\030\006 \002(\r\022\021\n\troundTime\030\007 \002(\r\022\016\n"
+      "\006secret\030\010 \001(\t\"@\n\rCreateRoomRsp\022\016\n\006result"
+      "\030\002 \002(\r\022\016\n\006roomId\030\003 \002(\r\022\017\n\007levelId\030\004 \002(\r\""
+      "\?\n\013JoinRoomReq\022\016\n\006roomId\030\002 \002(\r\022\020\n\010userNi"
+      "ck\030\003 \002(\t\022\016\n\006secret\030\004 \001(\t\"s\n\013JoinRoomRsp\022"
+      "\016\n\006result\030\002 \002(\r\022\016\n\006reason\030\003 \002(\r\022\020\n\010level"
+      "Idx\030\004 \002(\r\022\016\n\006roomId\030\005 \002(\r\022\020\n\010playerId\030\006 "
+      "\002(\r\022\020\n\010userNick\030\007 \002(\t\"<\n\rEnterLevelReq\022\014"
+      "\n\004camp\030\002 \002(\r\022\r\n\005model\030\003 \002(\r\022\016\n\006weapon\030\004 "
+      "\002(\r\"*\n\rEnterLevelRsp\022\031\n\005scene\030\001 \001(\0132\n.Sc"
+      "eneInfo\"$\n\016OnEnterRoomRsp\022\022\n\nplayerNick\030"
+      "\001 \002(\t\"+\n\017OnEnterLevelRsp\022\030\n\006player\030\001 \002(\013"
+      "2\010.Player_\" \n\010Vector2_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002"
+      " \002(\005\"+\n\010Vector3_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\022\t"
+      "\n\001z\030\003 \002(\005\"9\n\013Quaternion_\022\t\n\001x\030\001 \002(\005\022\t\n\001y"
+      "\030\002 \002(\005\022\t\n\001z\030\003 \002(\005\022\t\n\001w\030\004 \002(\005\"B\n\tSceneInf"
+      "o\022\032\n\005items\030\001 \003(\0132\013.SceneItem_\022\031\n\007players"
+      "\030\002 \003(\0132\010.Player_\"b\n\nSceneItem_\022\r\n\005model\030"
+      "\001 \002(\t\022\026\n\003pos\030\002 \002(\0132\t.Vector3_\022\036\n\010rotatio"
+      "n\030\003 \002(\0132\014.Quaternion_\022\r\n\005frame\030\004 \002(\005\"\236\002\n"
+      "\007Player_\022\n\n\002id\030\001 \002(\r\022\014\n\004name\030\002 \002(\t\022\017\n\007we"
+      "apon1\030\003 \002(\r\022\017\n\007weapon2\030\004 \002(\r\022\016\n\006weapon\030\005"
+      " \002(\r\022\022\n\nweapon_pos\030\006 \002(\r\022\026\n\003pos\030\007 \002(\0132\t."
+      "Vector3_\022\036\n\010rotation\030\010 \002(\0132\014.Quaternion_"
+      "\022\r\n\005model\030\t \002(\005\022\021\n\taniSource\030\n \002(\005\022\r\n\005fr"
+      "ame\030\013 \002(\005\022\r\n\005hpMax\030\014 \002(\005\022\n\n\002hp\030\r \002(\005\022\r\n\005"
+      "angry\030\016 \002(\005\022\014\n\004Camp\030\017 \002(\005\022\022\n\nSpawnPoint\030"
+      "\020 \002(\005\"\"\n\010InputReq\022\026\n\005input\030\001 \003(\0132\007.Input"
+      "_\"7\n\006Input_\022\020\n\010playerId\030\001 \002(\r\022\033\n\006frames\030"
+      "\002 \003(\0132\013.InputFrame\"8\n\nTurnFrames\022\021\n\tturn"
+      "Index\030\001 \002(\r\022\027\n\006Inputs\030\002 \003(\0132\007.Input_\"\030\n\006"
+      "UserId\022\016\n\006Player\030\001 \003(\r\"\334\001\n\nInputFrame\022\033\n"
+      "\010JoyStick\030\002 \002(\0132\t.Vector2_\022\035\n\nMouseDelta"
+      "\030\003 \002(\0132\t.Vector2_\022\t\n\001w\030\004 \002(\014\022\t\n\001s\030\005 \002(\014\022"
+      "\t\n\001a\030\006 \002(\014\022\t\n\001d\030\007 \002(\014\022\014\n\004jump\030\010 \002(\014\022\r\n\005b"
+      "reak\030\t \002(\014\022\016\n\006attack\030\n \002(\014\022\t\n\001e\030\013 \002(\014\022\t\n"
+      "\001r\030\014 \002(\014\022\t\n\001y\030\r \002(\014\022\r\n\005space\030\016 \002(\014\022\t\n\001c\030"
+      "\017 \002(\014\"E\n\007ChatMsg\022\020\n\010playerId\030\001 \002(\r\022\023\n\013ch"
+      "annelType\030\002 \002(\r\022\023\n\013chatMessage\030\003 \002(\t\"B\n\014"
+      "AudioChatMsg\022\020\n\010playerId\030\001 \002(\r\022\014\n\004type\030\002"
+      " \002(\r\022\022\n\naudio_data\030\003 \003(\002"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3900);
+      descriptor, 3984);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "protocol.proto", &protobuf_RegisterTypes);
 }
@@ -1728,6 +1769,7 @@ bool MeteorMsg_MsgType_IsValid(int value) {
     case 147:
     case 148:
     case 149:
+    case 150:
       return true;
     default:
       return false;
@@ -1786,6 +1828,7 @@ const MeteorMsg_MsgType MeteorMsg::OnPlayerQuit;
 const MeteorMsg_MsgType MeteorMsg::OnPlayerReStart;
 const MeteorMsg_MsgType MeteorMsg::OnPlayerFetchInput;
 const MeteorMsg_MsgType MeteorMsg::OnPlayerReConnect;
+const MeteorMsg_MsgType MeteorMsg::AudioChat;
 const MeteorMsg_MsgType MeteorMsg::MsgType_MIN;
 const MeteorMsg_MsgType MeteorMsg::MsgType_MAX;
 const int MeteorMsg::MsgType_ARRAYSIZE;
@@ -15529,6 +15572,362 @@ void ChatMsg::InternalSwap(ChatMsg* other) {
 }
 
 ::google::protobuf::Metadata ChatMsg::GetMetadata() const {
+  protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void AudioChatMsg::InitAsDefaultInstance() {
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int AudioChatMsg::kPlayerIdFieldNumber;
+const int AudioChatMsg::kTypeFieldNumber;
+const int AudioChatMsg::kAudioDataFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+AudioChatMsg::AudioChatMsg()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_protocol_2eproto::InitDefaultsAudioChatMsg();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:AudioChatMsg)
+}
+AudioChatMsg::AudioChatMsg(const AudioChatMsg& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _has_bits_(from._has_bits_),
+      _cached_size_(0),
+      audio_data_(from.audio_data_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&playerid_, &from.playerid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
+    reinterpret_cast<char*>(&playerid_)) + sizeof(type_));
+  // @@protoc_insertion_point(copy_constructor:AudioChatMsg)
+}
+
+void AudioChatMsg::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(&playerid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&type_) -
+      reinterpret_cast<char*>(&playerid_)) + sizeof(type_));
+}
+
+AudioChatMsg::~AudioChatMsg() {
+  // @@protoc_insertion_point(destructor:AudioChatMsg)
+  SharedDtor();
+}
+
+void AudioChatMsg::SharedDtor() {
+}
+
+void AudioChatMsg::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* AudioChatMsg::descriptor() {
+  ::protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const AudioChatMsg& AudioChatMsg::default_instance() {
+  ::protobuf_protocol_2eproto::InitDefaultsAudioChatMsg();
+  return *internal_default_instance();
+}
+
+AudioChatMsg* AudioChatMsg::New(::google::protobuf::Arena* arena) const {
+  AudioChatMsg* n = new AudioChatMsg;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void AudioChatMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:AudioChatMsg)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  audio_data_.Clear();
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 3u) {
+    ::memset(&playerid_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&type_) -
+        reinterpret_cast<char*>(&playerid_)) + sizeof(type_));
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool AudioChatMsg::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:AudioChatMsg)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required uint32 playerId = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
+          set_has_playerid();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &playerid_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required uint32 type = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+          set_has_type();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &type_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated float audio_data = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(29u /* 29 & 0xFF */)) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 1, 29u, input, this->mutable_audio_data())));
+        } else if (
+            static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, this->mutable_audio_data())));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:AudioChatMsg)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AudioChatMsg)
+  return false;
+#undef DO_
+}
+
+void AudioChatMsg::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AudioChatMsg)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required uint32 playerId = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->playerid(), output);
+  }
+
+  // required uint32 type = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->type(), output);
+  }
+
+  // repeated float audio_data = 3;
+  for (int i = 0, n = this->audio_data_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(
+      3, this->audio_data(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:AudioChatMsg)
+}
+
+::google::protobuf::uint8* AudioChatMsg::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:AudioChatMsg)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required uint32 playerId = 1;
+  if (cached_has_bits & 0x00000001u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->playerid(), target);
+  }
+
+  // required uint32 type = 2;
+  if (cached_has_bits & 0x00000002u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->type(), target);
+  }
+
+  // repeated float audio_data = 3;
+  target = ::google::protobuf::internal::WireFormatLite::
+    WriteFloatToArray(3, this->audio_data_, target);
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:AudioChatMsg)
+  return target;
+}
+
+size_t AudioChatMsg::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:AudioChatMsg)
+  size_t total_size = 0;
+
+  if (has_playerid()) {
+    // required uint32 playerId = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->playerid());
+  }
+
+  if (has_type()) {
+    // required uint32 type = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->type());
+  }
+
+  return total_size;
+}
+size_t AudioChatMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:AudioChatMsg)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required uint32 playerId = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->playerid());
+
+    // required uint32 type = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->type());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  // repeated float audio_data = 3;
+  {
+    unsigned int count = static_cast<unsigned int>(this->audio_data_size());
+    size_t data_size = 4UL * count;
+    total_size += 1 *
+                  ::google::protobuf::internal::FromIntSize(this->audio_data_size());
+    total_size += data_size;
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void AudioChatMsg::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:AudioChatMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const AudioChatMsg* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const AudioChatMsg>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:AudioChatMsg)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:AudioChatMsg)
+    MergeFrom(*source);
+  }
+}
+
+void AudioChatMsg::MergeFrom(const AudioChatMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:AudioChatMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  audio_data_.MergeFrom(from.audio_data_);
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 3u) {
+    if (cached_has_bits & 0x00000001u) {
+      playerid_ = from.playerid_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      type_ = from.type_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+}
+
+void AudioChatMsg::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:AudioChatMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void AudioChatMsg::CopyFrom(const AudioChatMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:AudioChatMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool AudioChatMsg::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  return true;
+}
+
+void AudioChatMsg::Swap(AudioChatMsg* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void AudioChatMsg::InternalSwap(AudioChatMsg* other) {
+  using std::swap;
+  audio_data_.InternalSwap(&other->audio_data_);
+  swap(playerid_, other->playerid_);
+  swap(type_, other->type_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata AudioChatMsg::GetMetadata() const {
   protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
 }

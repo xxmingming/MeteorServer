@@ -23,10 +23,7 @@
 
 #define BAGGOLD								5000000
 
-#define USERMODE_PLAYGAME					1
-#define USERMODE_LOGIN						2
-#define USERMODE_LOGOFF						3
-#define USERMODE_NOTICE						4
+#define USERMODE_LOGIN						1
 
 void MakeItemToDB(int nReadyUserInfo, char *pszUserId, char *pszCharName, _LPTMAKEITEMRCD lpMakeItemRcd);
 
@@ -87,7 +84,6 @@ public:
 	CPlayerObject*					m_pxPlayerObject;
 	CGateInfo*						m_pGateInfo;
 	CRoomInfo*						m_pRoom;
-	BYTE							m_btCurrentMode;
 	//∞¥º¸ ‰»Î
 	byte*							m_pKeys;
 	//“°∏À
@@ -101,13 +97,14 @@ public:
 	bool IsEmpty();
 	void							CloseAccount(char *pszName, int nCertification);
 	void							CloseUserHuman();
-	void							DoClientCertification(char *pszPacket);
+	void							DoClientCertification(UINT32 clientV);
 	void							Operate(Input_ * pInput);
 	void							ProcessUserMessage(char *pszPacket);
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
 	void							Update(Player_ * pPlayer);
 	BOOL							NeedReborn(float delta);
+	_inline bool					ClientSafe() { return m_nCertification == 1; }
 };
 
 void InsertLogMsg(UINT nID);

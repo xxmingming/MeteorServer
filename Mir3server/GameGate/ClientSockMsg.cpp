@@ -118,6 +118,8 @@ bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 					pSessionInfo->nServerUserIndex = lpMsgHeader->wUserListIndex;
 				break;
 			}
+			case GM_CLOSE:
+				break;
 			default://游戏服发向网关，让网关发给客户端的消息.
 				ProcessGameSvrPacket(pszData);
 				break;
