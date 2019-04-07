@@ -86,7 +86,7 @@ void InsertLogPacket(char *pszPacket);
 void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags);
 
 void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2);
-void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData);
+void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData, byte * pMemory);
 
 extern BOOL	g_fTerminated;
 void LoadConfig();

@@ -1,53 +1,18 @@
 #include "stdafx.h"
-
-//global function def
-void LoadMap(CMapInfo* pMapInfo)
-{
-	int			nLen = memlen(pMapInfo->szMapFileName);
-	int			nLen2 = memlen(pMapInfo->szMapName);
-	CMirMap*	pMirMap = new CMirMap;
-	if (pMirMap)
-	{
-		memcpy(pMirMap->m_szMapName, pMapInfo->szMapFileName, nLen);
-		memcpy(pMirMap->m_szMapTextName, pMapInfo->szMapName, nLen2);
-		pMirMap->m_nLevelIdx = pMapInfo->m_nLevelIdx;
-		if (pMirMap->LoadMapData(pMapInfo->szMapFileName))
-			g_xMirMapList.AddNewNode(pMirMap);
-	}
-}
-
-CMirMap* GetMap(char *pszMapName)
-{
-	PLISTNODE		pListNode;
-	CMirMap*		pMirMap = NULL;
-
-	if (g_xMirMapList.GetCount())
-	{
-		pListNode = g_xMirMapList.GetHead();
-
-		while (pListNode)
-		{
-			pMirMap = g_xMirMapList.GetData(pListNode);
-
-			if (memcmp(pMirMap->m_szMapName, pszMapName, memlen(pszMapName) - 1) == 0)
-				return pMirMap;
-			pListNode = g_xMirMapList.GetNext(pListNode);
-		}
-	}
-	return NULL;
-}
-
-/* **************************************************************************************
-		CRoomInfo Class Members
-   **************************************************************************************/
 CRoomInfo::CRoomInfo()
 {
 	memset(m_szName, 0, 20);
 	memset(m_szPassword, 0, 8);
+	m_bHasPsd = false;
 	m_nCount = 0;
 	m_nGroup1 = m_nGroup2 = m_nHpMax = m_nMaxPlayer = m_nRoomIndex = 0;
 	m_nRule = 1;
-	m_pMap = NULL;
+	m_dwTurnIndex = 0;
+	m_totalTime = 0;
+	m_turnTime = 0;
+	m_bTurnStart = false;
+	m_currentTick = 0;
+	m_delta = 0;
 }
 
 CRoomInfo::~CRoomInfo()
@@ -73,24 +38,7 @@ BOOL CRoomInfo::RemovePlayer(CUserInfo * pRemoveObject)
 void CRoomInfo::OnAllPlayerLeaved()
 {
 	m_bTurnStart = false;
-}
-
-void CRoomInfo::CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int turnTime, int roomIdx)
-{
-	if (m_pMap != NULL)
-		return;
-	m_pMap = map;
-	m_nMaxPlayer = maxPlayer;
-	m_nCount = 0;
-	m_nRoomIndex = roomIdx;
-	m_nHpMax = hpMax;
-	strncpy(m_szName, map->m_szMapTextName, min(18, strlen(map->m_szMapTextName)));
-	m_szName[18] = 0;
-	m_szName[19] = 0;
-	m_currentTick = ::GetTickCount();
-	m_turnTime = turnTime;
-	m_totalTime = turnTime;
-	m_delta = 0;
+	m_dwWaitClose = ::GetTickCount();
 }
 
 void CRoomInfo::OnNewTurn()
@@ -99,6 +47,7 @@ void CRoomInfo::OnNewTurn()
 	m_totalTime = m_turnTime;
 	m_delta = 0;
 	m_bTurnStart = true;
+	closed = false;
 }
 
 void CRoomInfo::OnUserKeyFrame(TurnFrames * pk)
@@ -140,6 +89,15 @@ void CRoomInfo::NewTurn()
 {
 	//给房间所有玩家发送消息，让进入结束界面，退出结束界面后，重新选人和武器，开始新一轮.
 	OnNewTurn();
+}
+
+void CRoomInfo::WaitClose()
+{
+	DWORD t = ::GetTickCount();
+	if (t - m_dwWaitClose >= 30000)
+	{
+		Close();
+	}
 }
 
 void CRoomInfo::Update()

@@ -47,25 +47,32 @@ void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, 
 }
 
 //向游戏服发一个消息，告知游戏客户端怎么了
-void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
+BYTE *		pszBuf = NULL; ;
+void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData, byte * pMemory)
 {
 	_TMSGHEADER	msg;
-	char		szBuf[1024];
+	
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
+	byte		buff[4096];
+	if (pMemory != NULL)
+		pszBuf = pMemory;
+	else
+		pszBuf = &buff[0];
+
 
 	msg.nSocket			= nSocket;
 	msg.wSessionIndex	= wIndex;
 	msg.wIdent			= nIdent;
 	msg.wUserListIndex	= wSrvIndex;
 	msg.nLength			= nLen;
-	memmove(szBuf, &msg, sizeof(_TMSGHEADER));
+	memmove(pszBuf, &msg, sizeof(_TMSGHEADER));
 
 	if (pszData)
-		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData, nLen);
+		memmove((byte*)&pszBuf[sizeof(_TMSGHEADER)], pszData, nLen);
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
-	Buf.buf = szBuf;
+	Buf.buf = (char*)pszBuf;
 	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
 }
 
@@ -111,7 +118,7 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 				Address.sin_addr.s_lh, Address.sin_addr.s_impno);
 			nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
 			//客户端链接到网关时，在游戏服同步创建一个用户，把用户ID给网关
-			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, nCvtLen, szMsg);
+			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, nCvtLen, szMsg, NULL);
 		}
 	}
 
@@ -152,7 +159,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 		if (g_fTerminated) return 0;
 		if (dwBytesTransferred == 0)
 		{
-			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL);
+			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL, NULL);
 			CloseSession(pSessionInfo);
 			continue;
 		}

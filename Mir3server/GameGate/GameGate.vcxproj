@@ -97,6 +97,7 @@
       <OutputFile>.\../_Bin/Debug\GameGate.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;libprotobufd.lib;log4cppD.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
+      <StackReserveSize>4</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

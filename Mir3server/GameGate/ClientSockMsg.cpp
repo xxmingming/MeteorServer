@@ -73,30 +73,36 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 //处理游戏服发来的消息.
 //处理成功-返回True
 //处理失败-返回FALSE，上一级断开套接字
-bool ProcReceiveBuffer(char *pszPacket, int nRecv)
+BYTE * pszData = NULL;
+BYTE * pszDataOffset = NULL;
+bool ProcReceiveBuffer(char *pszPacket, int nRecv, byte * pMemory)
 {
 	int limit = nRecv + g_nRemainBuffLen;
-	if (limit > 2 * DATA_BUFSIZE)
+	if (limit > DATA_BUFSIZE)
 	{
-		print("limit > 2 * DATA_BUFSIZE");
+		print("limit > DATA_BUFSIZE");
 		return FALSE;
 	}
 	int				nLen = nRecv;
 	int				nNext = 0;
-	BYTE			szBuff[2 * DATA_BUFSIZE];
-	BYTE			*pszData = &szBuff[0];
+	BYTE			szBuff[8192];
+	if (pMemory != NULL)
+		pszData = pMemory;
+	else
+		pszData = &szBuff[0];
+	pszDataOffset = pszData;
 	_LPTMSGHEADER	lpMsgHeader;
 
 	if (g_nRemainBuffLen > 0)
-		memmove(szBuff, g_szRemainBuff, g_nRemainBuffLen);
+		memmove(pszDataOffset, g_szRemainBuff, g_nRemainBuffLen);
 
-	memmove(&szBuff[g_nRemainBuffLen], pszPacket, nLen);
+	memmove(&pszDataOffset[g_nRemainBuffLen], pszPacket, nLen);
 
 	nLen += g_nRemainBuffLen;
 
 	while (nLen >= (int)sizeof(_TMSGHEADER))
 	{
-		lpMsgHeader = (_LPTMSGHEADER)pszData;
+		lpMsgHeader = (_LPTMSGHEADER)pszDataOffset;
 		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
 		{
 			//print("nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength)");
@@ -121,11 +127,11 @@ bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 			case GM_CLOSE:
 				break;
 			default://游戏服发向网关，让网关发给客户端的消息.
-				ProcessGameSvrPacket(pszData);
+				ProcessGameSvrPacket(pszDataOffset);
 				break;
 		}
 
-		pszData += sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
+		pszDataOffset += sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
 		nLen -= sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
 		if (nLen < 0)
 		{
@@ -135,9 +141,9 @@ bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 		}
 	} // while
 
-	if (nLen > 0)
+	if (nLen > 0 && nLen <= DATA_BUFSIZE)
 	{
-		memmove(g_szRemainBuff, pszData, nLen);
+		memmove(g_szRemainBuff, pszDataOffset, nLen);
 		g_nRemainBuffLen = nLen;
 		return TRUE;
 	}
@@ -189,8 +195,11 @@ BOOL InitServerThreadForMsg()
 }
 
 //没有处理游戏服发来的消息.
+byte * pMemory = NULL;
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 {
+	if (pMemory == NULL)
+		pMemory = new byte[DATA_BUFSIZE + sizeof(_TMSGHEADER)];
 	switch (WSAGETSELECTEVENT(lParam))
 	{
 		case FD_CONNECT:
@@ -240,11 +249,11 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case FD_READ:
 		{
-			char szPacket[DATA_BUFSIZE];
+			char szPacket[DATA_BUFSIZE / 256];
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
 			if (nRecv <= 0)
 				break;
-			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
+			BOOL processed = ProcReceiveBuffer(szPacket, nRecv, &pMemory[0]);
 			break;
 		}
 	}
@@ -260,7 +269,8 @@ UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 	DWORD				dwBytesTransferred;
 	DWORD				dwFlags;
 	DWORD				dwRecvBytes;
-		
+	
+	BYTE*				pMemory = new byte[DATA_BUFSIZE + sizeof(_TMSGHEADER)];
 //	char				*pszPos;
 //	int					nSocket;
 
@@ -290,7 +300,7 @@ UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 		if (dwBytesTransferred == 0)
 			break;
 
-		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred);
+		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred, pMemory);
 		dwFlags = 0;
 
 		ZeroMemory(&(ClientOverlapped.Overlapped), sizeof(OVERLAPPED));

@@ -48,7 +48,6 @@
 
 #define _IDM_SERVERSOCK_MSG			WM_USER + 1000
 #define _IDM_CLIENTSOCK_MSG			_IDM_SERVERSOCK_MSG + 1
-#define _IDM_LOGSVRSOCK_MSG			_IDM_SERVERSOCK_MSG + 2
 
 #define _IDW_TOOLBAR				_IDM_SERVERSOCK_MSG + 3
 #define _IDW_STATUSBAR				_IDM_SERVERSOCK_MSG + 4
@@ -86,20 +85,9 @@ using namespace std;
 #include "..\Def\_orzEx/list.h"
 
 class CCharObject;
-class CAnimalObject;
-class CObjectAddAbility;
 class CEvent;
-
-class CMonRaceInfo;
-
-#include "MagicHandler.h"
-#include "ItemHandler.h"
 #include "ObjectEngine.h"
 #include "ObjectPlayer.h"
-#include "ObjectScripter.h"
-#include "ObjectPlayerClone.h"
-
-#include "Tables.h"
 #include "DataHandler.h"
 #include "GameSvr.h"
 #include "FrontEngine.h"

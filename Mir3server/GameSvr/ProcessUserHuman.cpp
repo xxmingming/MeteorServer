@@ -45,11 +45,20 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 			{
 				CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
 
-				if (pRoomInfo && !pRoomInfo->IsEmpty())
+				if (pRoomInfo)
 				{
-					pRoomInfo->Update();//第一次是0，第二次开始
+					if (!pRoomInfo->IsEmpty())
+						pRoomInfo->Update();//第一次是0，第二次开始
+					else
+					{
+						pRoomInfo->WaitClose();
+						if (pRoomInfo->closed)
+						{
+							pListNode = g_xRoomList.RemoveNode(pListNode);
+							continue;
+						}
+					}
 				}
-
 				pListNode = g_xRoomList.GetNext(pListNode);
 			} // while
 		} // if g_xReadyUserInfoList.GetCount()

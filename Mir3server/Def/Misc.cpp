@@ -39,59 +39,6 @@ int memlen(const char *str)
     return((int)(eos - str));
 }
 
-int AnsiStrToVal(const char *nptr)
-{
-    int c		= (int)(unsigned char)*nptr++;
-    int total	= 0;
-
-    while (c >= '0' && c <= '9') 
-	{
-        total = 10 * total + (c - '0');     /* accumulate digit */
-        c = (int)(unsigned char)*nptr++;    /* get next char */
-    }
-
-	return total;
-}
-
-char *ValToAnsiStr(unsigned long val, char *buf)
-{
-    char *p;                /* pointer to traverse string */
-    char *firstdig;         /* pointer to first digit */
-    char temp;              /* temp char */
-	char *next;
-    unsigned digval;        /* value of digit */
-
-    p = buf;
-
-    firstdig = p;           /* save pointer to first digit */
-
-    do {
-        digval = (unsigned) (val % 10);
-        val /= 10;	       /* get next digit */
-
-        /* convert to ascii and store */
-        if (digval > 9)
-            *p++ = (char) (digval - 10 + 'a');  /* a letter */
-        else
-            *p++ = (char) (digval + '0');       /* a digit */
-    } while (val > 0);
-
-    /* We now have the digit of the number in the buffer, but in reverse
-       order.  Thus we reverse them now. */
-
-	next = p;
-    *p-- = '\0';            /* terminate string; p points to last digit */
-
-    do {
-        temp = *p;
-        *p = *firstdig;
-        *firstdig = temp;   /* swap *p and *firstdig */
-        --p;
-        ++firstdig;         /* advance to next two digits */
-    } while (firstdig < p); /* repeat until halfway */
-
-	return next;
-}
 
 void ChangeSpaceToNull(char *pszData)
 {

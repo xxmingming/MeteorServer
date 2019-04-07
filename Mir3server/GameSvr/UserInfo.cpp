@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 void UpdateStatusBarUsers(BOOL fGrow);
-void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
 
 int CUserInfo::KeyMax = 20;
 CUserInfo::CUserInfo()
@@ -33,75 +32,7 @@ void CUserInfo::SetName(const char * pszName)
 
 void CUserInfo::ProcessUserMessage(char *pszPacket)
 {
-	//_LPTDEFAULTMESSAGE lpDefMsg = (_LPTDEFAULTMESSAGE)pszPacket;
-
-	//if (m_pxPlayerObject->m_fIsCapture)
-	//{
-	//	if (m_pxPlayerObject->m_hCaptureFile)
-	//	{
-	//		DWORD	dwWrite = 0;
-
-	//		fprintf(m_pxPlayerObject->m_hCaptureFile, "%d, %d, %d, %d, %d\r\n", lpDefMsg->wIdent, lpDefMsg->nRecog, lpDefMsg->wParam, lpDefMsg->wTag, lpDefMsg->wSeries);
-
-	//		switch (lpDefMsg->wIdent)
-	//		{
-	//			case CM_SAY:
-	//			case CM_PICKUP:
-	//			{
-	//				char szDecodeMsg[512];
-	//				int nPos = fnDecode6BitBufA(pszPacket + sizeof(_TDEFAULTMESSAGE), szDecodeMsg, sizeof(szDecodeMsg));
-	//				szDecodeMsg[nPos] = '\0';
-
-	//				fprintf(m_pxPlayerObject->m_hCaptureFile, "%s\r\n", szDecodeMsg);
-	//			}
-	//		}
-	//	}
-	//}
-
-	//switch (lpDefMsg->wIdent)
-	//{
-	//	case CM_HIT:
-	//	case CM_POWERHIT:
-	//	case CM_LONGHIT:
-	//	case CM_WIDEHIT:
-	//	case CM_HEAVYHIT:
-	//	case CM_BIGHIT:
-	//	case CM_FIREHIT:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wTag, LOWORD(lpDefMsg->nRecog), HIWORD(lpDefMsg->nRecog), lpDefMsg->wParam, NULL);
-	//		break;
-	//	case CM_TURN:
-	//	case CM_WALK:
-	//	case CM_RUN:
-	//	case CM_SITDOWN:
-	//	case CM_RIDE:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wTag, LOWORD(lpDefMsg->nRecog), HIWORD(lpDefMsg->nRecog), NULL);
-	//		break;
-	//	case CM_SAY:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, 0, 0, 0, 0, pszPacket + sizeof(_TDEFAULTMESSAGE));
-	//		break;
-	//	case CM_SPELL:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, 
-	//		//											lpDefMsg->wTag/*MagicID*/, LOWORD(lpDefMsg->nRecog)/*TargetX*/, HIWORD(lpDefMsg->nRecog)/*TargetY*/, 
-	//		//											MAKELONG(lpDefMsg->wSeries, lpDefMsg->wParam)/*TargetObj*/, NULL);
-	//		break;
-	//	case CM_TAKEONITEM:
-	//	case CM_TAKEOFFITEM:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wSeries, lpDefMsg->nRecog, lpDefMsg->wParam, lpDefMsg->wTag, pszPacket + sizeof(_TDEFAULTMESSAGE));
-	//		break;
- //       case CM_QUERYUSERNAME:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, 0, lpDefMsg->nRecog, lpDefMsg->wParam, lpDefMsg->wTag, NULL);
-	//		break;
-	//	case CM_EAT:
-	//	case CM_DROPITEM:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wSeries, 0, 0, 0, pszPacket + sizeof(_TDEFAULTMESSAGE));
-	//		break;
-	//	case CM_PICKUP:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wSeries, lpDefMsg->nRecog, lpDefMsg->wTag, lpDefMsg->wParam);
-	//		break;
-	//	default:
-	//		//m_pxPlayerObject->AddProcess(m_pxPlayerObject, lpDefMsg->wIdent, lpDefMsg->wSeries, lpDefMsg->nRecog, lpDefMsg->wTag, NULL);
-	//		break;
-	//}
+	
 }
 
 void CUserInfo::Operate(Input_ * pInput)
@@ -112,12 +43,12 @@ void CUserInfo::Operate(Input_ * pInput)
 		//pInput->set_c(m_pKeys[i]);
 	}
 	pInput->set_playerid(m_nUserServerIndex);
-	Vector2_ J = pInput->joystick(); 
-	J.set_x(Jx);
-	J.set_y(Jy);
-	Vector2_ d = pInput->mousedelta();
-	d.set_x(Mx);
-	d.set_y(My);
+	//Vector2_ J = pInput->(); 
+	//J.set_x(Jx);
+	//J.set_y(Jy);
+	//Vector2_ d = pInput->mousedelta();
+	//d.set_x(Mx);
+	//d.set_y(My);
 
 }
 
@@ -134,26 +65,6 @@ void CUserInfo::CloseUserHuman()
 	}
 	m_bEmpty = TRUE;
 	Unlock();
-}
-
-void CUserInfo::CloseAccount(char *pszName, int nCertification)
-{
-	char	szMsg[256];
-	int		nLen = memlen(pszName) - 1;
-
-	szMsg[0] = '%';
-	szMsg[1] = 'S';
-
-	memcpy(&szMsg[2], pszName, nLen);
-
-	szMsg[nLen + 2] = '/';
-
-	char *pszPos = ValToAnsiStr(nCertification, &szMsg[nLen + 3]);
-
-	*pszPos++	= '$';
-	*pszPos		= '\0';
-
-	send(g_clsock, szMsg, memlen(szMsg) - 1, 0);
 }
 
 void CUserInfo::DoClientCertification(UINT32 clientV)
@@ -193,7 +104,6 @@ void CUserInfo::Update(Player_ * pPlayer)
 		return;
 	}
 
-	int hp = m_pxPlayerObject->m_AddAbility.HP;
 	m_pxPlayerObject->m_Ability.MP = pPlayer->angry();
 	m_pxPlayerObject->m_Ability.HP = pPlayer->hp();
 	m_pxPlayerObject->m_Ability.Weapon = pPlayer->weapon();

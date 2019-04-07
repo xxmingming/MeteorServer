@@ -3,9 +3,12 @@
 CMirMap * FindMap(int levelIdx);
 CRoomInfo * FindRoom(int roomIdx);
 BOOL ProcessMessage(CGateInfo * pGate, char * pBytes);
+bool OnProtocolVerify(ProtocolVerifyReq * pReq, int * p_reason);
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName);
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq);
 void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
+void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, ChatMsg * pMsg);
+void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, AudioChatMsg * pMsg);
 void UpdateStatusBarSession(BOOL fGrow)
 {
 	static long	nNumOfCurrSession = 0;
@@ -303,36 +306,56 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 				CloseUser(pGate, pUserInfo, pMsgHeader->wUserListIndex);
 			}
 			break;
-		case MeteorMsg_MsgType_ProtocolVerify:
-			ProtocolVerifyReq pReq;
+		case MeteorMsg_MsgType_ChatInRoomReq:
+		{
+			ChatMsg pReq;
 			pReq.ParseFromArray(data, pMsgHeader->nLength);
-			ProtocolVerifyRsp pRsp;
-			int reason = 0;
-			bool verifyOK = OnProtocolVerify(&pReq, &reason);
-			if (verifyOK)
+			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			if (pUser->m_pRoom)
+				OnUserChatInRoom(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pReq);
+		}
+			break;
+		case MeteorMsg_MsgType_AudioChat:
+		{
+			AudioChatMsg pReq;
+			pReq.ParseFromArray(data, pMsgHeader->nLength);
+			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			if (pUser->m_pRoom)
+				OnUserAudioChatInRoom(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pReq);
+		}
+			break;
+		case MeteorMsg_MsgType_ProtocolVerify:
 			{
-				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-				pUserInfo->DoClientCertification(pReq.protocol());
-				pRsp.set_result(1);
-				pRsp.set_message("验证成功");
-				pRsp.set_secret("");
-			}
-			else
-			{
-				//关闭掉用户
-				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-				pRsp.set_result(reason);
-				pRsp.set_message("验证失败，客户端协议版本号太低");
-				pRsp.set_secret("");
-			}
+				ProtocolVerifyReq pReq;
+				pReq.ParseFromArray(data, pMsgHeader->nLength);
+				ProtocolVerifyRsp pRsp;
+				int reason = 0;
+				bool verifyOK = OnProtocolVerify(&pReq, &reason);
+				if (verifyOK)
+				{
+					CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+					pUserInfo->DoClientCertification(pReq.protocol());
+					pRsp.set_result(1);
+					pRsp.set_message("验证成功");
+					pRsp.set_secret("");
+				}
+				else
+				{
+					//关闭掉用户
+					CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+					pRsp.set_result(reason);
+					pRsp.set_message("验证失败，客户端协议版本号太低");
+					pRsp.set_secret("");
+				}
 
-			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-			pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
-			pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
-			pMsgHeader->nLength = pRsp.ByteSize();
-			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+				pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
+				pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
+				pMsgHeader->nLength = pRsp.ByteSize();
+				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			}
 			break;
 		//无参数，仅仅取得房间列表.
 		case MeteorMsg_MsgType_GetRoomReq:
@@ -352,7 +375,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 						room->set_roomid(pRoom->m_nRoomIndex);
 						room->set_roomname(GBK2UTF8(string(pRoom->m_szName)).c_str());
 						room->set_rule((RoomInfo_RoomRule)pRoom->m_nRule);
-						room->set_levelidx(pRoom->m_pMap->m_nLevelIdx);
+						room->set_levelidx(pRoom->m_dwMap);
 						room->set_group1(pRoom->m_nGroup1);
 						room->set_group2(pRoom->m_nGroup2);
 						room->set_maxplayer(pRoom->m_nMaxPlayer);
@@ -378,49 +401,68 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			break;
 		case MeteorMsg_MsgType_CreateRoomReq:
 		{
-			int RoomIdx = g_xRoom.GetFreeKey();
-			if (RoomIdx < 0)
+			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			if (pUser->m_pRoom)
 			{
-				CreateRoomRsp pCreateRoomRsp;
-				pCreateRoomRsp.set_result(0);
-				pCreateRoomRsp.set_levelid(0);
-				pCreateRoomRsp.set_roomid(0);
-				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-				pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSize();
-				pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_CreateRoomRsp;
-				pMsgHeader->nLength = pCreateRoomRsp.ByteSize();
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				//玩家在其他房间未退出.无法创建新房间.
 			}
 			else
 			{
-				CreateRoomReq pCreateRoomReq;
-				pCreateRoomReq.ParseFromArray(data, pMsgHeader->nLength);
-				CRoomInfo * pRoom = &g_xRoom[RoomIdx];
-				pRoom->m_nMaxPlayer = min(pCreateRoomReq.maxplayer(), _NUM_OF_MAXPLAYER);
-				pRoom->m_nGroup1 = 0;
-				pRoom->m_nGroup2 = 0;
-				pRoom->m_nHpMax = pCreateRoomReq.hpmax();
-				pRoom->m_nRoomIndex = RoomIdx;
-				pRoom->m_nRule = pCreateRoomReq.rule();
-				strncpy_s(pRoom->m_szName, pCreateRoomReq.roomname().c_str(), min(strlen(pCreateRoomReq.roomname().c_str()), 18));
-				pRoom->m_pMap = FindMap(pCreateRoomReq.levelidx());
-				g_xRoomList.Lock();
-				g_xRoomList.AddNewNode(pRoom);
-				g_xRoomList.Unlock();
+				int RoomIdx = g_xRoom.GetFreeKey();
+				if (RoomIdx < 0)
+				{
+					//房间超出容量上限
+					CreateRoomRsp pCreateRoomRsp;
+					pCreateRoomRsp.set_result(0);
+					pCreateRoomRsp.set_levelid(0);
+					pCreateRoomRsp.set_roomid(0);
+					_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+					pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSize();
+					pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_CreateRoomRsp;
+					pMsgHeader->nLength = pCreateRoomRsp.ByteSize();
+					memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+					pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				}
+				else
+				{
+					CreateRoomReq pCreateRoomReq;
+					pCreateRoomReq.ParseFromArray(data, pMsgHeader->nLength);
+					CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+					pRoom->m_nMaxPlayer = min(pCreateRoomReq.maxplayer(), _NUM_OF_MAXPLAYER);
+					pRoom->m_nGroup1 = 0;
+					pRoom->m_nGroup2 = 0;
+					pRoom->m_nHpMax = pCreateRoomReq.hpmax();
+					pRoom->m_nRoomIndex = RoomIdx;
+					pRoom->m_nRule = pCreateRoomReq.rule();
+					pRoom->m_bTurnStart = true;
+					pRoom->m_turnTime = pCreateRoomReq.roundtime() * 60;
+					pRoom->m_totalTime = pRoom->m_turnTime;
+					pRoom->m_dwTurnIndex = 0;
+					pRoom->m_dwMap = pCreateRoomReq.levelidx();
+					pRoom->m_dwOwnerId = pMsgHeader->wUserListIndex;
+					pRoom->m_bHasPsd = strlen(pCreateRoomReq.secret().c_str()) != 0;
+					pRoom->m_dwWaitClose = ::GetTickCount();
+					pRoom->closed = false;
+					strncpy_s(pRoom->m_szPassword, pCreateRoomReq.secret().c_str(), min(strlen(pCreateRoomReq.secret().c_str()), 6));
+					strncpy_s(pRoom->m_szName, UTF82GBK(pCreateRoomReq.roomname().c_str()).c_str(), min(strlen(UTF82GBK(pCreateRoomReq.roomname().c_str()).c_str()), 18));
+					//pRoom->m_pMap = FindMap(pCreateRoomReq.levelidx());
+					g_xRoomList.Lock();
+					g_xRoomList.AddNewNode(pRoom);
+					g_xRoomList.Unlock();
 
-				CreateRoomRsp pCreateRoomRsp;
-				pCreateRoomRsp.set_result(1);
-				pCreateRoomRsp.set_roomid(pRoom->m_nRoomIndex);
-				pCreateRoomRsp.set_levelid(pRoom->m_pMap->m_nLevelIdx);
-				pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
-				pMsgHeader->nLength = pCreateRoomRsp.ByteSize();
-				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSize();
-				pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+					CreateRoomRsp pCreateRoomRsp;
+					pCreateRoomRsp.set_result(1);
+					pCreateRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+					pCreateRoomRsp.set_levelid(pRoom->m_dwMap);
+					pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
+					pMsgHeader->nLength = pCreateRoomRsp.ByteSize();
+					_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+					memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSize();
+					pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+					pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				}
 			}
 		}
 			break;
@@ -437,6 +479,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 				pJoinRoomRsp.set_levelidx(0);
 				pJoinRoomRsp.set_playerid(0);
 				pJoinRoomRsp.set_roomid(0);
+				pJoinRoomRsp.set_usernick("");
 			}
 			else
 			{
@@ -447,24 +490,50 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pJoinRoomRsp.set_reason(3);//当前已经在某房间，需要先退出
 					pJoinRoomRsp.set_levelidx(0);
 					pJoinRoomRsp.set_playerid(0);
-					pJoinRoomRsp.set_roomid(0);
+					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+					pJoinRoomRsp.set_usernick("");
 				}
 				else
-				if (pRoom->m_nMaxPlayer == pRoom->m_nCount)
+				if (pRoom->m_nMaxPlayer <= pRoom->m_nCount)
 				{
 					pJoinRoomRsp.set_result(0);
 					pJoinRoomRsp.set_reason(1);//房间人数满
 					pJoinRoomRsp.set_levelidx(0);
 					pJoinRoomRsp.set_playerid(0);
-					pJoinRoomRsp.set_roomid(0);
+					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+					pJoinRoomRsp.set_usernick("");
+				}
+				else if (pRoom->m_bHasPsd)
+				{
+					if (pRoom->m_dwOwnerId == pMsgHeader->wUserListIndex || strcmp(pRoom->m_szPassword, pJoinRoomReq.secret().c_str()) == 0)
+					{
+						pJoinRoomRsp.set_result(1);
+						pJoinRoomRsp.set_reason(0);
+						pJoinRoomRsp.set_levelidx(pRoom->m_dwMap);
+						pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
+						pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+						pJoinRoomRsp.set_usernick(GBK2UTF8(pUser->m_szCharName));
+						//给房间其他人发,不发给自己.
+						OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
+					}
+					else
+					{
+						pJoinRoomRsp.set_result(0);
+						pJoinRoomRsp.set_reason(4);//密码不正确
+						pJoinRoomRsp.set_levelidx(0);
+						pJoinRoomRsp.set_playerid(0);
+						pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+						pJoinRoomRsp.set_usernick("");
+					}
 				}
 				else
 				{
 					pJoinRoomRsp.set_result(1);
 					pJoinRoomRsp.set_reason(0);
-					pJoinRoomRsp.set_levelidx(pRoom->m_pMap->m_nLevelIdx);
+					pJoinRoomRsp.set_levelidx(pRoom->m_dwMap);
 					pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
 					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+					pJoinRoomRsp.set_usernick(GBK2UTF8(pUser->m_szCharName));
 					//给房间其他人发,不发给自己.
 					OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
 				}
@@ -659,6 +728,57 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 	pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 }
 
+void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, AudioChatMsg * pMsg)
+{
+	pRoom->Lock();
+	PLISTNODE no = pRoom->m_pUserList.GetHead();
+	while (no != NULL)
+	{
+		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+		if (pUserNode)
+		{
+			tag_TMSGHEADER Msg;
+			Msg.nLength = pMsg->ByteSize();
+			Msg.nSocket = pUserNode->m_sock;
+			Msg.wIdent = MeteorMsg_MsgType_AudioChat;//任何人在房间说话
+			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+			_LPTSENDBUFF pBuffer = new _TSENDBUFF;
+			pBuffer->nLen = sizeof(_TMSGHEADER) + pMsg->ByteSize();
+			memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+			pMsg->SerializeToArray(pBuffer->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+			pGate->m_xSendBuffQ.PushQ((BYTE*)pBuffer);
+			no = pRoom->m_pUserList.GetNext(no);
+		}
+	}
+	pRoom->Unlock();
+}
+
+void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, ChatMsg * pMsg)
+{
+	pRoom->Lock();
+	PLISTNODE no = pRoom->m_pUserList.GetHead();
+	while (no != NULL)
+	{
+		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+		if (pUserNode)
+		{
+			tag_TMSGHEADER Msg;
+			Msg.nLength = pMsg->ByteSize();
+			Msg.nSocket = pUserNode->m_sock;
+			Msg.wIdent = MeteorMsg_MsgType_ChatInRoomRsp;//任何人在房间说话
+			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+			_LPTSENDBUFF pBuffer = new _TSENDBUFF;
+			pBuffer->nLen = sizeof(_TMSGHEADER) + pMsg->ByteSize();
+			memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+			pMsg->SerializeToArray(pBuffer->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+			pGate->m_xSendBuffQ.PushQ((BYTE*)pBuffer);
+			no = pRoom->m_pUserList.GetNext(no);
+		}
+	}
+	pRoom->Unlock();
+}
 //在加入房间时，设置玩家的昵称，以及房间
 //当进入房间，并且选择角色和武器进入场景时，创建游戏角色.
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName)
@@ -666,7 +786,6 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 	pUserInfo->SetName(szName);
 	pUserInfo->m_pRoom = pRoom;
 	pRoom->Lock();
-		
 	PLISTNODE no = pRoom->m_pUserList.GetHead();
 	while (no != NULL)
 	{
@@ -690,9 +809,9 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 		}
 	}
 	//针对房间里每一个对象都返回一个通知，告知有人进去了房间.但是还未进入战场.已经开始计时，
-	if (pRoom->m_nCount == 0)
-		pRoom->OnNewTurn();
 	pRoom->m_nCount++;
+	if (pRoom->m_nCount != 0)
+		pRoom->OnNewTurn();
 	pRoom->m_pUserList.AddNewNode(pUserInfo);
 	pRoom->Unlock();
 }
@@ -702,24 +821,24 @@ bool OnProtocolVerify(ProtocolVerifyReq * pReq, int * p_reason)
 	int v = pReq->protocol();
 	string s = pReq->data();
 	//只判断协议版本号
-	if (v >= 20190224)
+	if (v >= 20190404)
 		return true;
 	*p_reason = 10;
 	return false;
 }
 
-CMirMap * FindMap(int levelIdx)
-{
-	PLISTNODE node = g_xMirMapList.GetHead();
-	while (node != NULL)
-	{
-		CMirMap * pMap = g_xMirMapList.GetData(node);
-		if (pMap->m_nLevelIdx == levelIdx)
-			return pMap;
-		node = g_xMirMapList.GetNext(node);
-	}
-	return NULL;
-}
+//CMirMap * FindMap(int levelIdx)
+//{
+//	PLISTNODE node = g_xMirMapList.GetHead();
+//	while (node != NULL)
+//	{
+//		CMirMap * pMap = g_xMirMapList.GetData(node);
+//		if (pMap->m_nLevelIdx == levelIdx)
+//			return pMap;
+//		node = g_xMirMapList.GetNext(node);
+//	}
+//	return NULL;
+//}
 
 CRoomInfo * FindRoom(int roomIdx)
 {

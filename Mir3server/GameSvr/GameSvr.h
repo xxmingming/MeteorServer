@@ -12,7 +12,7 @@
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-#define _NUM_OF_MAXROOM						48//最大房间数.
+#define _NUM_OF_MAXROOM						30//最大房间数.
 #define _NUM_OF_MAXPLAYER					16//房间人数上限.
 
 #define HAM_ALL								0
@@ -95,7 +95,6 @@ public:
 public:
 	CUserInfo();
 	bool IsEmpty();
-	void							CloseAccount(char *pszName, int nCertification);
 	void							CloseUserHuman();
 	void							DoClientCertification(UINT32 clientV);
 	void							Operate(Input_ * pInput);

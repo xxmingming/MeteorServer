@@ -18,7 +18,7 @@ VOID WINAPI OnTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		{
 			if (g_csock != INVALID_SOCKET)
 			{
-				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL);
+				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL, NULL);
 				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(2, 0), (LPARAM)_TEXT("Check Activity"));
 			}
 
