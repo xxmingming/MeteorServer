@@ -94,6 +94,9 @@
     <ClInclude Include="..\Def\MiniDumper.h">
       <Filter>Def</Filter>
     </ClInclude>
+    <ClInclude Include="..\Def\ikcp.h">
+      <Filter>Def</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConfigDlgFunc.cpp">
@@ -185,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="..\Def\protocol.pb.cc" />
     <ClCompile Include="..\Def\LuaMng.cpp">
+      <Filter>Def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Def\ikcp.c">
       <Filter>Def</Filter>
     </ClCompile>
   </ItemGroup>
