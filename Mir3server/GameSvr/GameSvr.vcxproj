@@ -66,7 +66,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_LOG4CPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\../_Obj_Debug/GameSvr\</AssemblerListingLocation>
       <BrowseInformation>true</BrowseInformation>
       <PrecompiledHeaderOutputFile>.\../_Obj_Debug/GameSvr\GameSvr.pch</PrecompiledHeaderOutputFile>
@@ -95,9 +95,9 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>.\../_Bin/Debug\GameSvr.exe</OutputFile>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;libprotobufd.lib;log4cppD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
   </ItemDefinitionGroup>
@@ -149,15 +149,12 @@
     <ClInclude Include="FrontEngine.h" />
     <ClInclude Include="GameSvr.h" />
     <ClInclude Include="Global.h" />
-    <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="..\Def\_OrzEx\list.h" />
     <ClInclude Include="..\Def\List.h" />
-    <ClInclude Include="MagicHandler.h" />
     <ClInclude Include="..\Def\Misc.h" />
     <ClInclude Include="ObjectEngine.h" />
     <ClInclude Include="ObjectPlayer.h" />
     <ClInclude Include="ObjectPlayerClone.h" />
-    <ClInclude Include="ObjectScripter.h" />
     <ClInclude Include="..\Def\Protocol.h" />
     <ClInclude Include="..\Def\_OrzEx\queue.h" />
     <ClInclude Include="..\Def\Queue.h" />
@@ -174,30 +171,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Def\LuaMng.cpp" />
+    <ClCompile Include="..\Def\Misc.cpp" />
     <ClCompile Include="..\Def\protocol.pb.cc" />
     <ClCompile Include="..\Def\setting.cpp" />
-    <ClCompile Include="ConfigDlgFunc.cpp" />
     <ClCompile Include="..\Def\_OrzEx\database.cpp" />
+    <ClCompile Include="..\Def\_OrzEx\syncobj.cpp" />
     <ClCompile Include="GameSvr.cpp" />
     <ClCompile Include="GateInfo.cpp" />
     <ClCompile Include="Global.cpp" />
-    <ClCompile Include="Handler_CommonDB.cpp" />
-    <ClCompile Include="Handler_Item.cpp" />
     <ClCompile Include="Handler_Map.cpp" />
-    <ClCompile Include="MainWndProc.cpp" />
-    <ClCompile Include="..\Def\Misc.cpp" />
     <ClCompile Include="ObjectEngine.cpp" />
     <ClCompile Include="ObjectPlayer.cpp" />
-    <ClCompile Include="ObjectPlayerAdmin.cpp" />
-    <ClCompile Include="ObjectPlayerAdminSaid.cpp" />
     <ClCompile Include="ObjectPlayerClone.cpp" />
-    <ClCompile Include="ObjectPlayerSaid.cpp" />
-    <ClCompile Include="ObjectScripter.cpp" />
     <ClCompile Include="ProcessUserHuman.cpp" />
     <ClCompile Include="ProcessUserMsg.cpp" />
     <ClCompile Include="SockMsg_DBSrv.cpp" />
     <ClCompile Include="SockMsg_GateComm.cpp" />
-    <ClCompile Include="SockMsg_LogSvr.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</PrecompiledHeaderFile>
@@ -208,7 +197,6 @@
     <ClCompile Include="UserInfo.cpp" />
     <ClCompile Include="..\Def\EnDecode.cpp" />
     <ClCompile Include="..\Def\ServerSockHandler.cpp" />
-    <ClCompile Include="..\Def\_OrzEx\syncobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameSvr.rc" />

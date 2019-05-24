@@ -34,16 +34,10 @@
     <ClInclude Include="Global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ItemHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Def\_OrzEx\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Def\List.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MagicHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Def\Misc.h">
@@ -56,9 +50,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectPlayerClone.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectScripter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Def\Protocol.h">
@@ -96,9 +87,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConfigDlgFunc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Def\_OrzEx\database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,19 +99,7 @@
     <ClCompile Include="Global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Handler_CommonDB.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Handler_Item.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Handler_Map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainWndProc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Def\Misc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ObjectEngine.cpp">
@@ -132,19 +108,7 @@
     <ClCompile Include="ObjectPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectPlayerAdmin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectPlayerAdminSaid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectPlayerClone.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectPlayerSaid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectScripter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProcessUserHuman.cpp">
@@ -157,9 +121,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockMsg_GateComm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SockMsg_LogSvr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp">
@@ -177,15 +138,18 @@
     <ClCompile Include="..\Def\ServerSockHandler.cpp">
       <Filter>Def</Filter>
     </ClCompile>
-    <ClCompile Include="..\Def\_OrzEx\syncobj.cpp">
-      <Filter>Def</Filter>
-    </ClCompile>
     <ClCompile Include="..\Def\setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Def\protocol.pb.cc" />
     <ClCompile Include="..\Def\LuaMng.cpp">
       <Filter>Def</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Def\_OrzEx\syncobj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Def\Misc.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

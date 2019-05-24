@@ -68,12 +68,9 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 				pGateInfo->Recv();
 
-				UpdateStatusBarSession(TRUE);
-
-				_stprintf(szGateIP, _T("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host, 
-															Address.sin_addr.s_lh, Address.sin_addr.s_impno);
-
-				InsertLogMsgParam(IDS_ACCEPT_GATESERVER, szGateIP, LOGPARAM_STR);
+				//UpdateStatusBarSession(TRUE);
+				_stprintf(szGateIP, _T("\ngate:%d.%d.%d.%d connected!"), Address.sin_addr.s_net, Address.sin_addr.s_host, Address.sin_addr.s_lh, Address.sin_addr.s_impno);
+				print(szGateIP);
 			}
 		}
 	}
@@ -153,22 +150,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 
 		if (lpOverlapped->nOvFlag == OVERLAPPED_FLAG::OVERLAPPED_RECV)
 		{
-			//static DWORD nLastTick = GetTickCount();
-			//static DWORD nBytes = 0;
-
-			//nBytes += dwBytesTransferred;
-/*
-			if (GetTickCount() - nLastTick >= 1000)
-			{
-				TCHAR buf[256];
-				wsprintf( buf, _T("R: %d bytes/sec"), nBytes );
-
-				nLastTick = GetTickCount();
-				nBytes = 0;
-
-				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(3, 0), (LPARAM)buf);
-			}*/	
-
 			pGateInfo->OverlappedEx[0].bufLen += dwBytesTransferred;
 
 			while (pGateInfo->HasCompletionPacket())
@@ -230,7 +211,9 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			}
 	
 			if (pGateInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
-				InsertLogMsg( _T("WSARecv() failed") );
+			{
+				print(L"WSARecv() failed");
+			}
 		}
 		else if (lpOverlapped->nOvFlag == OVERLAPPED_FLAG::OVERLAPPED_SEND)
 		{

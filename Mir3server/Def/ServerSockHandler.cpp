@@ -35,19 +35,11 @@ BOOL InitThread(LPTHREAD_START_ROUTINE lpRoutine)
 	return FALSE;
 }
 
-
-//lEvent在完成端口起作用时候，作用为线程数量
-//在完成端口不起作用时，其指示在套接字上绑定的哪些操作发送 nMsgID消息
-
-BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, int nPort, long lEvent)
+BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort)
 {
 	if (s == INVALID_SOCKET)
 	{
-#ifdef _SOCKET_ASYNC_IO
-		s = socket(AF_INET, SOCK_STREAM, 0);
-#else
 		s = WSASocketA(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-#endif
 
 		addr->sin_family		= AF_INET;
 		addr->sin_port			= htons(nPort);
@@ -64,22 +56,9 @@ BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, int nPort, long
 		if ((listen(s, 5)) == SOCKET_ERROR)
 			return FALSE;
 
-#ifdef _SOCKET_ASYNC_IO
-		if ((WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent)) == SOCKET_ERROR)
-			return FALSE;
-#else
-#ifdef _SOCKET_OVERLAPPED_IO
-		if ((WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent)) == SOCKET_ERROR)
-			return FALSE;
-#else
-//		CreateIOCPWorkerThread((int)lEvent);				  
 		CreateIOCPWorkerThread((int)1);	
-//		InitServerThreadForMsg();
-
 		if (!InitThread(AcceptThread))
 			return FALSE;
-#endif
-#endif
 	}
 	else 
 		return FALSE;
@@ -191,18 +170,14 @@ BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServer
 	return FALSE;
 }
 
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
+#define InsertLogMsg(a) MessageBox(0, a, NULL, MB_OK)
 
 BOOL CheckSocketError(LPARAM lParam)
 {
 	switch (WSAGETSELECTERROR(lParam))
 	{
 		case WSANOTINITIALISED:
-			InsertLogMsg(_T("A successful WSAStartup must occur before using this function."));
+			MessageBox(0, _T("A successful WSAStartup must occur before using this function."), NULL, MB_OK);
 			return FALSE;
 		case WSAENETDOWN:
 			InsertLogMsg(_T("The network subsystem has failed."));
@@ -227,7 +202,7 @@ BOOL CheckSocketError(LPARAM lParam)
 			return FALSE;
 		case WSAECONNREFUSED:			// Can't Connect Server...
 		case WSAETIMEDOUT:				// Time Out
-			InsertLogMsg(IDS_CANT_CONNECT);
+			MessageBox(0, _T("Can not connect to server"), NULL, MB_OK);
 			return FALSE;
 		case WSAEFAULT:
 			InsertLogMsg(_T("The name or the namelen parameter is not a valid part of the user address space, the namelen parameter is too small, or the name parameter contains incorrect address format for the associated address family."));
@@ -256,25 +231,6 @@ BOOL CheckSocketError(LPARAM lParam)
 	}
 
 	return TRUE;
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-#ifndef _SOCKET_ASYNC_IO
-BOOL CheckAvailableIOCP()
-{
-//	OSVERSIONINFO VersionInfo;
-
-//	GetVersionEx(&VersionInfo);
-
-//	if (VersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT && VersionInfo.dwMajorVersion >= 5)
-		return TRUE;
-
-//	return FALSE;
 }
 
 // **************************************************************************************
@@ -313,4 +269,3 @@ INT CreateIOCPWorkerThread(int nThread)
 
 	return -1;
 }
-#endif

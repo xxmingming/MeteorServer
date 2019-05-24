@@ -10,13 +10,13 @@ public:
 	WORD			nServerUserIndex;//游戏服，该客户端对应的用户下标
 	WORD			nSessionIndex;//单个网关服下的序号，[0-500)
 	CIntLock		SendBuffLock;
-	CHAR			SendBuffer[DATA_BUFSIZE];
+	CHAR			SendBuffer[DATA_PACKETMAX];
 	int				nSendBufferLen;
 
 	// For Overlapped I/O
 	OVERLAPPED		Overlapped;
 	WSABUF			DataBuf;
-	CHAR			Buffer[DATA_BUFSIZE];
+	CHAR			Buffer[DATA_PACKETMAX];
 	INT				bufLen;
 	INT				nOvFlag;
 
@@ -80,11 +80,6 @@ typedef struct tag_TSENDBUFF
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-void InsertLogMsg(UINT nID);
-void InsertLogMsg(LPTSTR lpszMsg);
-void InsertLogPacket(char *pszPacket);
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags);
-
 void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2);
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData);
 
@@ -95,4 +90,8 @@ extern short g_localPort;
 extern short g_GameSvrPort;
 extern string	 g_strGameSvrIP;
 extern Setting * g_set;
+extern SOCKET					g_csock;
+extern SOCKET					g_ssock;
+extern SOCKADDR_IN					g_caddr;
+extern SOCKADDR_IN					g_saddr;
 #endif //_GAMEGATE_DEFINE

@@ -79,50 +79,6 @@ char			g_strClientPath[MAX_PATH];
 //string			g_strDBPassword;
 // **************************************************************************************
 
-BOOL	InitApplication(HANDLE hInstance);
-BOOL	InitInstance(HANDLE hInstance, int nCmdShow);
-LPARAM	APIENTRY MainWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-
-
-BOOL	CALLBACK ConfigDlgFunc(HWND hWndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-static WSADATA	g_wsd;
-
-WNDPROC			OrgLogMsgWndProc;
-
-// **************************************************************************************
-
-void __cbDBMsg( char *pState, int nNativeCode, char *pDesc )
-{
-	static TCHAR szState[256], szDesc[2048];
-	static TCHAR szMsg[2048];
-
-	MultiByteToWideChar( CP_ACP, 0, pState, -1, szState, sizeof( szState ) / sizeof( TCHAR ) );
-	MultiByteToWideChar( CP_ACP, 0, pDesc, -1, szDesc, sizeof( szDesc ) / sizeof( TCHAR ) );
-	
-	wsprintf( szMsg, _T("ODBC MsgID: %s(%d)"), szState, nNativeCode );
-	InsertLogMsg( szMsg );
-
-	wsprintf( szMsg, _T("%s"), szDesc );
-	InsertLogMsg( szMsg );
-}
-
-LPARAM APIENTRY LogMsgWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
-{
-	if (nMsg == WM_ERASEBKGND)
-	{
-		RECT rc;
-
-		GetClientRect(hWnd, &rc);
-
-		FillRect((HDC)wParam, &rc, CreateSolidBrush(RGB(255, 0, 0)));
-	}
-
-	return CallWindowProc(OrgLogMsgWndProc, hWnd, nMsg, wParam, lParam);
-}
-
-
-
 //生产DUMP文件
 int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHAR pwAppName)
 {
@@ -228,19 +184,139 @@ void LogInit()
 }
 #endif
 
+CMapInfo* InitMapInfo();
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+void LoadMap(CMapInfo* pMapInfo);
+
+CMapInfo* InitDataInDatabase()
+{
+	return InitMapInfo();
+}
+
+//加载地图数据，地图信息后期不再放在数据库内
+CMapInfo* InitMapInfo()
+{
+	//string s = "sn";
+	g_nNumOfMapInfo = 30;
+	CMapInfo* pMapInfo = new CMapInfo[g_nNumOfMapInfo];
+	char * s = (char*)malloc(14);
+	strcpy(s, "01");
+
+	//s[1] = "钟乳洞";
+	//s[2] = "一线天";
+	for (int i = 0; i < g_nNumOfMapInfo; i++)
+	{
+		pMapInfo[i].m_nLevelIdx = i + 1;//地图ID
+	}
+	return pMapInfo;
+}
+
+void InitRoom()
+{
+	PLISTNODE p = g_xMirMapList.GetHead();
+	while (p != NULL)
+	{
+		CMirMap * pMap = g_xMirMapList.GetData(p);
+		int RoomIdx = g_xRoom.GetFreeKey();
+		//房间数量受数组限制，可能返回RoomIdx重复
+		if (RoomIdx >= 0)
+		{
+			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+			pRoom->CreateRoom(pMap, 16, 2000, 30 * 60 * 1000, RoomIdx);
+			g_xRoomList.AddNewNode(pRoom);
+		}
+		p = g_xMirMapList.GetNext(p);
+	}
+}
+
+
+UINT WINAPI ProcessRoom(LPVOID lpParameter)
+{
+	PLISTNODE pListNode = NULL;
+	while (TRUE)
+	{
+		if (g_fTerminated)
+			return 0L;
+
+		if (g_xRoomList.GetCount())
+		{
+			pListNode = g_xRoomList.GetHead();
+
+			while (pListNode)
+			{
+				CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
+
+				if (pRoomInfo && !pRoomInfo->IsEmpty())
+				{
+					pRoomInfo->Update();//第一次是0，第二次开始
+				}
+
+				pListNode = g_xRoomList.GetNext(pListNode);
+			} // while
+		} // if g_xReadyUserInfoList.GetCount()
+
+		if (g_xGateList.GetCount())
+		{
+			pListNode = g_xGateList.GetHead();
+
+			while (pListNode)
+			{
+				CGateInfo *pGateInfo = g_xGateList.GetData(pListNode);
+
+				if (pGateInfo)
+					pGateInfo->xSend();
+
+				pListNode = g_xUserInfoList.GetNext(pListNode);
+			} // while
+		}
+
+		SleepEx(1, TRUE);
+	}
+}
+
+UINT WINAPI InitializingServer(LPVOID lpParameter)
+{
+	TCHAR		wszPath[128];
+	TCHAR		wszFullPath[256];
+	DWORD		dwReadLen;
+	//MultiByteToWideChar(CP_ACP, 0, g_strClientPath, -1, wszPath, sizeof(wszPath) / sizeof(TCHAR));
+	CMapInfo* pMapInfo = (CMapInfo*)lpParameter;
+
+	for (int i = 0; i < g_nNumOfMapInfo; i++)
+		LoadMap(&pMapInfo[i]);
+
+	delete[] pMapInfo;
+	pMapInfo = NULL;
+
+	InitRoom();
+
+	UINT			dwThreadIDForMsg = 0;
+	unsigned long	hThreadForMsg = 0;
+	//if (hThreadForMsg = _beginthreadex(NULL, 0, ProcessLogin, NULL, 0, &dwThreadIDForMsg))
+	//{
+	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
+	hThreadForMsg = _beginthreadex(NULL, 0, ProcessRoom, NULL, 0, &dwThreadIDForMsg);
+	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
+	//}
+
+	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
+
+	//InitAdminCommandList();
+	//连接到数据库服务器 端口6000
+	//ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strDBSvrIP, NULL, g_nDBSrvPort, FD_CONNECT|FD_READ|FD_CLOSE);
+	return 0L;
+}
+
+int main()
 {
 	//初始化日志系统
 #if defined(_LOG4CPP)
 	LogInit();
 #endif
 
-	print("game svr start");
+	print(L"game svr start");
 	//初始化脚本系统
 	//g_xLuaMng.Init();
-
-    MSG msg;
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
 
@@ -248,229 +324,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//int* p = 0;
 	//*p = 0;
 	LoadConfig();
-//	if (CheckAvailableIOCP())
-//	{
-		if (!InitApplication(hInstance))
-			return (FALSE);
-
-		if (!InitInstance(hInstance, nCmdShow))
-			return (FALSE);
-
-		while (GetMessage(&msg, NULL, 0, 0))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-/*	}
-	else
-	{
-		TCHAR szMsg[1024];
-
-		LoadString(hInstance, IDS_NOTWINNT, szMsg, sizeof(szMsg));
-		MessageBox(NULL, szMsg, _LOGINGATE_SERVER_TITLE, MB_OK|MB_ICONINFORMATION);
-		
-		return -1;
-	}
-*/
-	delete g_set;
-    return (msg.wParam);
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-BOOL InitApplication(HANDLE hInstance)
-{
-    WNDCLASS  wc;
-
-    wc.style            = CS_GLOBALCLASS|CS_HREDRAW|CS_VREDRAW;
-    wc.lpfnWndProc      = (WNDPROC)MainWndProc;
-    wc.cbClsExtra       = 0;
-    wc.cbWndExtra       = 0;
-    wc.hIcon            = LoadIcon((HINSTANCE)hInstance, MAKEINTRESOURCE(IDI_MIR2));
-    wc.hInstance        = (HINSTANCE)hInstance;
-    wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground    = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszMenuName     = MAKEINTRESOURCE(IDR_MAINMENU);
-    wc.lpszClassName    = _GAME_SERVER_CLASS;
-
-	return RegisterClass(&wc);
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-BOOL InitInstance(HANDLE hInstance, int nCmdShow)
-{
-	g_hInst = (HINSTANCE)hInstance;
-	
-	OleInitialize(NULL);
-
-	INITCOMMONCONTROLSEX	icex;
-
-	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_BAR_CLASSES | ICC_INTERNET_CLASSES;
-
-	InitCommonControlsEx(&icex);
-
-    g_hMainWnd = CreateWindowEx(0, _GAME_SERVER_CLASS, _GAME_SERVER_TITLE, 
-							WS_OVERLAPPEDWINDOW|WS_VISIBLE,
-							CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,                 
-							NULL, NULL, (HINSTANCE)hInstance, NULL);
-
-	g_hToolBar = CreateToolbarEx(g_hMainWnd, WS_CHILD|CCS_TOP|WS_VISIBLE|WS_BORDER,
-									_IDW_TOOLBAR, sizeof(tbButtons) / sizeof(TBBUTTON), (HINSTANCE)hInstance, IDB_TOOLBAR,
-									(LPCTBBUTTON)&tbButtons, sizeof(tbButtons) / sizeof(TBBUTTON),
-									_BMP_CX, _BMP_CY, _BMP_CX, _BMP_CY, sizeof(TBBUTTON));
-
-	RECT rcMainWnd, rcToolBar, rcStatusBar;
-
-	GetClientRect(g_hMainWnd, &rcMainWnd);
-	GetWindowRect(g_hToolBar, &rcToolBar);
-
-	g_hStatusBar = CreateWindowEx(0L, STATUSCLASSNAME, _TEXT(""), WS_CHILD|WS_BORDER|WS_VISIBLE|SBS_SIZEGRIP,
-									0, rcMainWnd.bottom - _STATUS_HEIGHT, (rcMainWnd.right - rcMainWnd.left), _STATUS_HEIGHT, g_hMainWnd, (HMENU)_IDW_STATUSBAR, g_hInst, NULL);
-
-	int	nStatusPartsWidths[_NUMOFMAX_STATUS_PARTS];
-	int nCnt = 0;
-	int i;
-	for (i = _NUMOFMAX_STATUS_PARTS - 1; i >= 0; i--)
-		nStatusPartsWidths[nCnt++] = (rcMainWnd.right - rcMainWnd.left) - (90 * i);
-
-	SendMessage(g_hStatusBar, SB_SETPARTS, _NUMOFMAX_STATUS_PARTS, (LPARAM)nStatusPartsWidths);
-
-	GetWindowRect(g_hStatusBar, &rcStatusBar);
-
-    g_hLogMsgWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTVIEW, _TEXT(""), 
-							WS_CHILD|WS_VISIBLE|WS_BORDER|LVS_REPORT|LVS_EDITLABELS,
-							0, (rcToolBar.bottom - rcToolBar.top), (rcMainWnd.right - rcMainWnd.left), 
-							(rcMainWnd.bottom - rcMainWnd.top) - (rcToolBar.bottom - rcToolBar.top) - (rcStatusBar.bottom - rcStatusBar.top),
-							g_hMainWnd, NULL, (HINSTANCE)hInstance, NULL);
-
-	ListView_SetExtendedListViewStyleEx(g_hLogMsgWnd, 0, LVS_EX_FULLROWSELECT);
-
-	LV_COLUMN	lvc;
-	TCHAR		szText[64];
-
-	lvc.mask	= LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	lvc.fmt		= LVCFMT_LEFT;
-	lvc.cx		= 150;
-	lvc.pszText	= szText;
-
-	for (i = 0; i < 3; i++)
-	{
-		lvc.iSubItem = i;
-		LoadString((HINSTANCE)hInstance, IDS_LVS_LABEL1 + i, szText, sizeof(szText)/sizeof(TCHAR));
-		
-		ListView_InsertColumn(g_hLogMsgWnd, i, &lvc);
-	}
-
-	OrgLogMsgWndProc = (WNDPROC)SetWindowLong(g_hLogMsgWnd, GWL_WNDPROC, (LONG)LogMsgWndProc);
-
-	SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STOPSERVICE, (LPARAM)MAKELONG(TBSTATE_INDETERMINATE, 0));
-
-	ShowWindow(g_hMainWnd, SW_SHOW);
-	UpdateWindow(g_hMainWnd);
-
+	WSADATA	g_wsd;
 	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
 		return (FALSE);
 
-	srand((unsigned)time(NULL));
-	//g_MirDB.SetDiagRec( __cbDBMsg );
-	//g_MirDB.Init();
-	
-	//g_pConnCommon	= g_MirDB.CreateConnection(g_strDBSource.c_str(), g_strDBAccount.c_str(), g_strDBPassword.c_str());
-	//g_pConnGame		= g_MirDB.CreateConnection(g_strDBSource.c_str(), g_strDBAccount.c_str(), g_strDBPassword.c_str());
+	g_fTerminated = FALSE;
 
-	return TRUE;
-}
+	CMapInfo* pMapInfo = InitDataInDatabase();
 
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
+	UINT			dwThreadIDForMsg = 0;
+	unsigned long	hThreadForMsg = 0;
 
-int AddNewLogMsg()
-{
-	LV_ITEM		lvi;
-	TCHAR		szText[64];
+	hThreadForMsg = _beginthreadex(NULL, 0, InitializingServer, pMapInfo, 0, &dwThreadIDForMsg);
 
-	int nCount = ListView_GetItemCount(g_hLogMsgWnd);
-
-	if (nCount >= 500)
+	while (1)
 	{
-		ListView_DeleteItem(g_hLogMsgWnd, 0);
-		nCount--;
+		Sleep(1);
 	}
+		//if (!InitApplication(hInstance))
+		//	return (FALSE);
 
-	lvi.mask		= LVIF_TEXT;
-	lvi.iItem		= nCount;
-	lvi.iSubItem	= 0;
-	
-	_tstrdate(szText);
+		//if (!InitInstance(hInstance, nCmdShow))
+		//	return (FALSE);
 
-	lvi.pszText = szText;
-	
-	ListView_InsertItem(g_hLogMsgWnd, &lvi);
-
-	_tstrtime(szText);
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 1, szText);
-
-	return nCount;
-}
-
-void InsertLogMsg(UINT nID)
-{
-	TCHAR	szText[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szText);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsg(LPTSTR lpszMsg)
-{
-	int nCount = AddNewLogMsg();
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, lpszMsg);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags)
-{
-	TCHAR	szText[128];
-	TCHAR	szMsg[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-	
-	switch (btFlags)
-	{
-		case LOGPARAM_STR:
-			_stprintf(szMsg, szText, (LPTSTR)pParam);
-			break;
-		case LOGPARAM_INT:
-			_stprintf(szMsg, szText, *(int *)pParam);
-			break;
-	}
-
-	if (lstrlen(szMsg) <= 256)
-	{
-		ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szMsg);
-		ListView_Scroll(g_hLogMsgWnd, 0, 8);
-	}
+	delete g_set;
+    return 0;
 }
 
 void LoadConfig()

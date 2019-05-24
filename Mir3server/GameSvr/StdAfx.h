@@ -86,17 +86,10 @@ using namespace std;
 #include "..\Def\_orzEx/list.h"
 
 class CCharObject;
-class CAnimalObject;
 class CObjectAddAbility;
-class CEvent;
 
-class CMonRaceInfo;
-
-#include "MagicHandler.h"
-#include "ItemHandler.h"
 #include "ObjectEngine.h"
 #include "ObjectPlayer.h"
-#include "ObjectScripter.h"
 #include "ObjectPlayerClone.h"
 
 #include "Tables.h"
@@ -111,8 +104,6 @@ class CMonRaceInfo;
 #pragma comment (lib, "comctl32.lib")
 #define CFG_GameSvr    "GameSvr.ini"
 #define DEFAULTSECT	"GameSvr"
-
-
 //lua
 //extern "C"
 //{
@@ -131,7 +122,7 @@ extern log4cpp::Category * main_log;
 #define print(s)	main_log->debug("[File:%s/Line:%d]\t%s", __FILE__, __LINE__, s)
 #define vprint(s, ...)   main_log->debug("[File:%s/Line:%d]\t"##s, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define print(s)
+#define print(s) wprintf(L"%s", s)
 #define vprint(s, ...)
 #endif
 

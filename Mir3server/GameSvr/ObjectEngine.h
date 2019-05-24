@@ -50,66 +50,12 @@ class CCharObject;
 class CMirMap;
 class CUserInfo;
 class CRoomInfo;
-typedef struct tag_TPROCESSMSG
-{
-	WORD			wIdent;
-	WORD			wParam;
-	DWORD			lParam1;
-	DWORD			lParam2;
-	DWORD			lParam3;
 
-	DWORD			dwDeliveryTime;
-
-	CCharObject*	pCharObject;
-
-	char			*pszData;
-} _TPROCESSMSG, *_LPTPROCESSMSG;
-
-/*
-*/
 
 #define _OBJECT_HUMAN			1
 #define _OBJECT_MONSTER			2
 #define _OBJECT_ANIMAL			6
 #define _OBJECT_NPC				8
-
-typedef struct tag_TOBJECTFEATURE
-{
-	BYTE		btGender;
-	BYTE		btWear;
-	BYTE		btHair;
-	BYTE		btWeapon;
-} _TOBJECTFEATURE, _LPTOBJECTFEATURE;
-
-typedef struct tag_TOBJECTFEATUREEX
-{
-	BYTE		btHorse;
-	WORD		dwHairColor;
-	WORD		dwWearColor;
-} _TOBJECTFEATUREEX, _LPTOBJECTFEATUREEX;
-
-class CVisibleObject
-{
-public:
-	int				nVisibleFlag;
-	CCharObject*	pObject;
-};
-
-class CVisibleEvent
-{
-public:
-	int				nVisibleFlag;
-	CEvent*			pEvent;
-};
-
-class CVisibleMapItem
-{
-public:
-	int				nVisibleFlag;
-	WORD			wX;
-	WORD			wY;
-	CMapItem*		pMapItem;
-};
 
 #pragma pack(1)
 class CObjectAbility
@@ -131,28 +77,6 @@ public:
 	int	AniSource;//땡뺌都
 };
 
-class CObjectAddAbility	// 아이템 착용으로 늘어나는 능력치
-{
-public:
-	WORD	HP;
-	WORD	MP;
-	WORD	HIT;
-	WORD	SPEED;
-	WORD	AC;
-	WORD	MAC;
-	WORD	DC;
-	WORD	MC;
-	WORD	SC;
-	WORD	AntiPoison;
-	WORD	PoisonRecover;
-	WORD	HealthRecover;
-	WORD	SpellRecover;
-	WORD	AntiMagic;			//마법 회피율
-	BYTE	Luck;				//행운 포인트
-	BYTE	UnLuck;				//불행 포인트
-	BYTE	WeaponStrong;
-	short	HitSpeed;
-};
 #pragma pack(8)
 
 class CCharObject
@@ -166,7 +90,6 @@ public:
 	char						m_szName[20];
 	CObjectAbility				m_Ability;
 	CObjectAbility				m_WAbility;
-	CObjectAddAbility			m_AddAbility;
 	UINT						m_nCharStatusEx;
 	UINT						m_nCharStatus;
 	WORD						m_wStatusArr[MAX_STATUS_ATTRIBUTE];

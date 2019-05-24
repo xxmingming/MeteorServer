@@ -10,18 +10,18 @@ extern HANDLE		g_hIOCP;
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
 
-void UpdateStatusBar(BOOL fGrow)
-{
-	static long	nNumOfCurrSession = 0;
-
-	TCHAR	szText[20];
-
-	(fGrow ? InterlockedIncrement(&nNumOfCurrSession) : InterlockedDecrement(&nNumOfCurrSession));
-	
-	wsprintf(szText, _TEXT("%d Sessions"), nNumOfCurrSession);
-
-	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(3, 0), (LPARAM)szText);
-}
+//void UpdateStatusBar(BOOL fGrow)
+//{
+//	static long	nNumOfCurrSession = 0;
+//
+//	TCHAR	szText[20];
+//
+//	(fGrow ? InterlockedIncrement(&nNumOfCurrSession) : InterlockedDecrement(&nNumOfCurrSession));
+//	
+//	wsprintf(szText, _TEXT("%d Sessions"), nNumOfCurrSession);
+//
+//	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(3, 0), (LPARAM)szText);
+//}
 
 void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2)
 {
@@ -100,18 +100,17 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			pNewSessionInfo->nSessionIndex = nIndex;
 			pNewSessionInfo->nServerUserIndex = 0;
 			// Initializing Session Information
-			pNewSessionInfo->nSendBufferLen	= 0;
+			pNewSessionInfo->m_xSendBuffQ.ClearAll();
 			pNewSessionInfo->bufLen = 0;
 
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
-			UpdateStatusBar(TRUE);
 			// Make packet and send to login server.
-			wsprintf(szAddress, _TEXT("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host,
-				Address.sin_addr.s_lh, Address.sin_addr.s_impno);
-			nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
+			//wsprintf(szAddress, _TEXT("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host,
+			//	Address.sin_addr.s_lh, Address.sin_addr.s_impno);
+			//nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
 			//客户端链接到网关时，在游戏服同步创建一个用户，把用户ID给网关
-			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, nCvtLen, szMsg);
+			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL);
 		}
 	}
 
@@ -124,10 +123,7 @@ void CloseSession(CSessionInfo* pSessionInfo)
 	if (pSessionInfo != NULL)
 		pSessionInfo->Reset();
 	g_UserInfoArray.SetEmptyElement(pSessionInfo->nSessionIndex, pSessionInfo);
-
 	closesocket(pSessionInfo->sock);
-
-	UpdateStatusBar(FALSE);
 }
 
 //只处理客户端发来的消息.
@@ -176,19 +172,17 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 				}
 				else
 				{
-					g_SendToServerQ.Lock();
 					if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
 					{
-						InsertLogMsg(_TEXT("PushQ() failed"));
+						print("pushQ failed");
 						delete pSendData;
 					}
-					g_SendToServerQ.Unlock();
 				}
 			}
 
 			if (pSessionInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 			{
-				InsertLogMsg(_TEXT("WSARecv() failed"));
+				print("WSARecv() failed");
 				CloseSession(pSessionInfo);
 				continue;
 			}

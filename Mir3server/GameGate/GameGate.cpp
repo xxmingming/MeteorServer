@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <DbgHelp.h>
 #include <strsafe.h>
+#include "TimerMng.h"
 // **************************************************************************************
 
 BOOL	InitApplication(HANDLE hInstance);
@@ -180,240 +181,39 @@ void LogInit()
 }
 #endif
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main()
 {
 #if defined(_LOG4CPP)
 	LogInit();
-#endif
 	print("gamegate start");
+#endif
     MSG msg;
 	//加入崩溃dump文件功能
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
 	LoadConfig();
-#ifndef _SOCKET_ASYNC_IO
-	if (CheckAvailableIOCP())
-	{
-#endif
-		if (!InitApplication(hInstance))
-			return (FALSE);
-
-		if (!InitInstance(hInstance, nCmdShow))
-			return (FALSE);
-
-		while (GetMessage(&msg, NULL, 0, 0))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-#ifndef _SOCKET_ASYNC_IO
-	}
-	else
-	{
-		TCHAR szMsg[1024];
-
-		LoadString(hInstance, IDS_NOTWINNT, szMsg, sizeof(szMsg));
-		MessageBox(NULL, szMsg, _GAMEGATE_SERVER_TITLE, MB_OK|MB_ICONINFORMATION);
-		
-		return -1;
-	}
-#endif
-	delete g_set;
-	return (msg.wParam);
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-BOOL InitApplication(HANDLE hInstance)
-{
-    WNDCLASS  wc;
-
-    wc.style            = CS_GLOBALCLASS|CS_HREDRAW|CS_VREDRAW;
-    wc.lpfnWndProc      = (WNDPROC)MainWndProc;
-    wc.cbClsExtra       = 0;
-    wc.cbWndExtra       = 0;
-    wc.hIcon            = LoadIcon((HINSTANCE)hInstance, MAKEINTRESOURCE(IDI_MIR2));
-    wc.hInstance        = (HINSTANCE)hInstance;
-    wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground    = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszMenuName     = MAKEINTRESOURCE(IDR_MAINMENU);
-    wc.lpszClassName    = _GAMEGATE_SERVER_CLASS;
-
-	return RegisterClass(&wc);
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-BOOL InitInstance(HANDLE hInstance, int nCmdShow)
-{
-	g_hInst = (HINSTANCE)hInstance;
-	
-	INITCOMMONCONTROLSEX	icex;
-
-	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_BAR_CLASSES | ICC_INTERNET_CLASSES;
-
-	InitCommonControlsEx(&icex);
-
-    g_hMainWnd = CreateWindowEx(0, _GAMEGATE_SERVER_CLASS, _GAMEGATE_SERVER_TITLE, 
-							WS_OVERLAPPEDWINDOW|WS_VISIBLE,
-							CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,                 
-							NULL, NULL, (HINSTANCE)hInstance, NULL);
-
-	g_hToolBar = CreateToolbarEx(g_hMainWnd, WS_CHILD|CCS_TOP|WS_VISIBLE|WS_BORDER,
-									_IDW_TOOLBAR, sizeof(tbButtons) / sizeof(TBBUTTON), (HINSTANCE)hInstance, IDB_TOOLBAR,
-									(LPCTBBUTTON)&tbButtons, sizeof(tbButtons) / sizeof(TBBUTTON),
-									_BMP_CX, _BMP_CY, _BMP_CX, _BMP_CY, sizeof(TBBUTTON));
-
-	RECT rcMainWnd, rcToolBar, rcStatusBar;
-
-	GetClientRect(g_hMainWnd, &rcMainWnd);
-	GetWindowRect(g_hToolBar, &rcToolBar);
-
-	g_hStatusBar = CreateWindowEx(0L, STATUSCLASSNAME, _TEXT(""), WS_CHILD|WS_BORDER|WS_VISIBLE|SBS_SIZEGRIP,
-									0, rcMainWnd.bottom - _STATUS_HEIGHT, (rcMainWnd.right - rcMainWnd.left), _STATUS_HEIGHT, g_hMainWnd, (HMENU)_IDW_STATUSBAR, g_hInst, NULL);
-
-	int	nStatusPartsWidths[_NUMOFMAX_STATUS_PARTS];
-	int nCnt = 0;
-	int i;
-	for (int i = _NUMOFMAX_STATUS_PARTS - 1; i >= 0; i--)
-		nStatusPartsWidths[nCnt++] = (rcMainWnd.right - rcMainWnd.left) - (90 * i);
-
-	SendMessage(g_hStatusBar, SB_SETPARTS, _NUMOFMAX_STATUS_PARTS, (LPARAM)nStatusPartsWidths);
-	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Not Connected"));
-
-	GetWindowRect(g_hStatusBar, &rcStatusBar);
-
-    g_hLogMsgWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTVIEW, _TEXT(""), 
-							WS_CHILD|WS_VISIBLE|WS_BORDER|LVS_REPORT|LVS_EDITLABELS,
-							0, (rcToolBar.bottom - rcToolBar.top), (rcMainWnd.right - rcMainWnd.left), 
-							(rcMainWnd.bottom - rcMainWnd.top) - (rcToolBar.bottom - rcToolBar.top) - (rcStatusBar.bottom - rcStatusBar.top),
-							g_hMainWnd, NULL, (HINSTANCE)hInstance, NULL);
-
-	ListView_SetExtendedListViewStyleEx(g_hLogMsgWnd, 0, LVS_EX_FULLROWSELECT);
-
-	LV_COLUMN	lvc;
-	TCHAR		szText[64];
-
-	lvc.mask	= LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	lvc.fmt		= LVCFMT_LEFT;
-	lvc.cx		= 150;
-	lvc.pszText	= szText;
-
-	for (i = 0; i < 3; i++)
-	{
-		lvc.iSubItem = i;
-		LoadString((HINSTANCE)hInstance, IDS_LVS_LABEL1 + i, szText, sizeof(szText)/sizeof(TCHAR));
-		
-		ListView_InsertColumn(g_hLogMsgWnd, i, &lvc);
-	}
-
-	SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STOPSERVICE, (LPARAM)MAKELONG(TBSTATE_INDETERMINATE, 0));
-
-	ShowWindow(g_hMainWnd, SW_SHOW);
-	UpdateWindow(g_hMainWnd);
 
 	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
 		return (FALSE);
 
-	//BYTE	btInstalled;
-
-	//if (!jRegGetKey(_GAMEGATE_SERVER_REGISTRY, _TEXT("Installed"), (LPBYTE)&btInstalled))
-	//	DialogBox(g_hInst, MAKEINTRESOURCE(IDD_CONFIGDLG), NULL, (DLGPROC)ConfigDlgFunc);
-
-	return TRUE;
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-int AddNewLogMsg()
-{
-	LV_ITEM		lvi;
-	TCHAR		szText[64];
-
-	int nCount = ListView_GetItemCount(g_hLogMsgWnd);
-
-	if (nCount >= 50)
-	{
-		ListView_DeleteItem(g_hLogMsgWnd, 0);
-		nCount--;
-	}
-
-	lvi.mask		= LVIF_TEXT;
-	lvi.iItem		= nCount;
-	lvi.iSubItem	= 0;
+	TimerMng timer;
+	timer.SetTimer(_ID_TIMER_CONNECTSERVER, 5000);
+	DWORD tick = ::GetTickCount();
 	
-	_tstrdate(szText);
-
-	lvi.pszText = szText;
-	
-	ListView_InsertItem(g_hLogMsgWnd, &lvi);
-
-	_tstrtime(szText);
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 1, szText);
-
-	return nCount;
-}
-
-void InsertLogMsg(UINT nID)
-{
-	TCHAR	szText[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szText);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsg(LPTSTR lpszMsg)
-{
-	int nCount = AddNewLogMsg();
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, lpszMsg);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags)
-{
-	TCHAR	szText[128];
-	TCHAR	szMsg[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-	
-	switch (btFlags)
+	//主线程主要负责
+	while (true)
 	{
-		case LOGPARAM_STR:
-			_stprintf(szMsg, szText, (LPTSTR)pParam);
-			break;
-		case LOGPARAM_INT:
-			_stprintf(szMsg, szText, *(int *)pParam);
-			break;
+		int elapsed = ::GetTickCount() - tick;
+		tick = ::GetTickCount();
+		timer.Update(elapsed);
+		//主要定时器1，链接到游戏服，2，发送心跳包到游戏服
+		//3启动IOCP线程获取完成端口对应的消息，4启动accept线程监听客户端的链接
+		Sleep(1);
+		
 	}
-
-	if (lstrlen(szMsg) <= 256)
-	{
-		ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szMsg);
-		ListView_Scroll(g_hLogMsgWnd, 0, 8);
-	}
+	delete g_set;
+	return 0;
 }
-
 
 void LoadConfig()
 {

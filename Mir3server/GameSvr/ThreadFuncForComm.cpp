@@ -13,9 +13,6 @@ VOID WINAPI OnTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				//DWORD	dwIP = 0;
 				//int		nPort = 0;
 				//TCHAR	szPort[24];
-
-				InsertLogMsg(IDS_APPLY_RECONNECT);
-
 				//jRegGetKey(_GAME_SERVER_REGISTRY, _TEXT("DBServerIP"), (LPBYTE)&dwIP);
 				//jRegGetKey(_GAME_SERVER_REGISTRY, _TEXT("DBServerPort"), (LPBYTE)&nPort);
 				//_itow(nPort, szPort, 10);

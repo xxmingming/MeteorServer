@@ -14,7 +14,6 @@ void CPlayerObject::Constructor()
 	m_fIsDead				= FALSE;
 	m_fAdmin				= FALSE;
 	m_dwLastTalkTime = 0;
-	m_fIsCapture			= FALSE;
 }
 
 bool CPlayerObject::IsEmpty()

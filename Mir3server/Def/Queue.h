@@ -3,8 +3,7 @@
 #pragma once
 
 #include "../def/_orzex/queue.h"
-#include "../def/_orzex/syncobj.h"
-
+#include "..\Def\_orzEx/syncobj.h"
 class CWHQueue : public CQueue< BYTE >, public CIntLock
 {
 public:

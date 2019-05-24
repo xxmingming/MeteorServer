@@ -9,6 +9,7 @@ CGateInfo::CGateInfo()
 	memset( &OverlappedEx, 0, sizeof( OverlappedEx ) );
 }
 
+///向网关发送保活回执.
 void CGateInfo::SendGateCheck()
 {
 	_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
@@ -29,6 +30,10 @@ void CGateInfo::SendGateCheck()
 
 //		Send(lpSendBuff);
 		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
+	}
+	else
+	{
+		print(L"Not enough memory");
 	}
 }
 

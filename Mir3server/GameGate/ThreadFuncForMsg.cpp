@@ -10,8 +10,6 @@ extern CWHQueue					g_SendToServerQ;
 extern BOOL						g_fTerminated;
 extern CWHDynamicArray<CSessionInfo>			g_UserInfoArray;
 
-CWHAbusive						g_xAbusive;
-
 //向游戏服发消息的线程.
 DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 {
@@ -27,10 +25,6 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 	int							nPos;
 
 	UINT						nIdentity = 0;
-	//MsgHdr.wIdent	= GM_DATA;
-
-//	g_xAbusive.LoadAbusiveList();
-	
 	while(TRUE)
 	{
 		if (g_fTerminated) return 0;
@@ -50,28 +44,22 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 					}
 					delete pSendBuff;
 				}
-			}// for nLoop
+			}
 		}
 		g_SendToServerQ.Unlock();
 
-		//Send Packet to Client,游戏服发给网关，让网关下发的信息，都放在SendBuffer里。但是pSession没lock应该是有同步问题的.
+		//Send packet to Client.
 		for (int nLoop = 0; nLoop < _MAX_USER_ARRAY; nLoop++)
 		{
 			pSessionInfo = g_UserInfoArray.GetData(nLoop);
 			if (pSessionInfo)
 			{
-				pSessionInfo->SendBuffLock.Lock();
-				if (pSessionInfo->nSendBufferLen)
+				CMsg * Buf = (CMsg*)pSessionInfo->m_xSendBuffQ.PopQ();
+				while (Buf != NULL)
 				{
-					WSABUF	Buf;
-					Buf.len = pSessionInfo->nSendBufferLen;
-					Buf.buf = pSessionInfo->SendBuffer;
-					WSASend(pSessionInfo->sock, &Buf, 1, &dwBytesSends, 0, NULL, NULL);
-					//if (dwBytesSends < Buf.len)
-					//	_RPT2(_CRT_WARN, "%d:%s\n", memlen(pSessionInfo->SendBuffer) - 1, pSessionInfo->SendBuffer);
-					pSessionInfo->nSendBufferLen = 0;
+					WSASend(pSessionInfo->sock, Buf, 1, &dwBytesSends, 0, NULL, NULL);
+					Buf = (WSABUF*)pSessionInfo->m_xSendBuffQ.PopQ();
 				}
-				pSessionInfo->SendBuffLock.Unlock();
 			}
 		}
 

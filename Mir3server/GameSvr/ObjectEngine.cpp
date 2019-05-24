@@ -8,7 +8,6 @@
 #define HEALTHFILLTICK		1500
 #define SPELLFILLTICK		800
 
-CMagicInfo*		GetMagicInfo(int nMagicID);
 CMirMap*		GetMap(char *pszMapName);
 
 CCharObject::CCharObject(CUserInfo*	pUserInfo)
@@ -19,20 +18,6 @@ CCharObject::CCharObject(CUserInfo*	pUserInfo)
 CCharObject::~CCharObject()
 {
 }
-
-UINT CCharObject::GetCharStatus()
-{
-	UINT s = 0;
-
-	for (int i = 0; i < MAX_STATUS_ATTRIBUTE; i++)
-	{
-		if (m_wStatusArr[i] > 0)
-			s |= (0x80000000 >> i);
-	}
-
-	return (s | (m_nCharStatusEx & 0x000FFFFF));
-}
-
 
 void CCharObject::Die()
 {

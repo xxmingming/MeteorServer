@@ -42,7 +42,6 @@ using namespace std;
 #include "..\Def\Misc.h"
 #include "..\Def\\protocol.pb.h"
 #include "GameGate.h"
-#include "Abusive.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma comment (lib, "comctl32.lib")
@@ -80,10 +79,16 @@ extern log4cpp::Category * main_log;
 #define print(s)	main_log->debug("[File:%s/Line:%d]\t%s", __FILE__, __LINE__, s)
 #define vprint(s, ...)   main_log->debug("[File:%s/Line:%d]\t"##s, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define print(s)
+#define print(s) wprintf(L"%s", s)
 #define vprint(s, ...)
 #endif
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)
+DWORD WINAPI	ThreadFuncForMsg(LPVOID lpParameter);
+BOOL			CheckSocketError(LPARAM lParam);
+VOID WINAPI		OnTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+BOOL InitServerThreadForMsg();
+UINT WINAPI		ClientWorkerThread(LPVOID lpParameter);
+extern WSAEVENT	g_ClientIoEvent;

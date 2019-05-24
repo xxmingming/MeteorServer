@@ -110,10 +110,6 @@ public:
 	BOOL							NeedReborn(float delta);
 };
 
-void InsertLogMsg(UINT nID);
-void InsertLogMsg(LPTSTR lpszMsg);
-void InsertLogPacket(char *pszPacket);
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags);
 //提供给GameSrv的端口7200
 extern short			g_nLocalPort;
 //提供给角色网关的端口5500

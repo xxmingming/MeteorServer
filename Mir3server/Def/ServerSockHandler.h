@@ -3,6 +3,7 @@
 #define _DEFAULT_SOCKET_HANDLER
 
 #define DATA_BUFSIZE 4096
+#define DATA_PACKETMAX 512 * 1024
 
 class OVERLAPPED_FLAG
 {
@@ -30,14 +31,12 @@ typedef struct tag_TOVERLAPPEDEX
    INT				nOvFlag;
 } _TOVERLAPPEDEX, * _LPTOVERLAPPEDEX;
 
-BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, int nPort, long lEvent = 2);
+BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
 BOOL ClearSocket(SOCKET &s);
-
-BOOL CheckAvailableIOCP();
 INT	 CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
-
+BOOL InitServerThreadForMsg();
 BOOL InitThread(LPTHREAD_START_ROUTINE lpRoutine);
 
 BOOL CheckSocketError(LPARAM lParam);
