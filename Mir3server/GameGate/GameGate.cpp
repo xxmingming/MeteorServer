@@ -23,7 +23,7 @@ HWND			g_hMainWnd = NULL;			// Main window handle
 HWND			g_hLogMsgWnd = NULL;
 HWND			g_hToolBar = NULL;
 HWND			g_hStatusBar = NULL;
-
+CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 BOOL			g_fTerminated = FALSE;
 
 //ÐÂÔö 2016-winson  begin

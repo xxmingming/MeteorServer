@@ -81,9 +81,9 @@ void InitRoom()
 
 UINT WINAPI InitializingServer(LPVOID lpParameter)
 {
-	TCHAR		wszPath[128];
-	TCHAR		wszFullPath[256];
-	DWORD		dwReadLen;
+	//TCHAR		wszPath[128];
+	//TCHAR		wszFullPath[256];
+	//DWORD		dwReadLen;
 	//MultiByteToWideChar(CP_ACP, 0, g_strClientPath, -1, wszPath, sizeof(wszPath) / sizeof(TCHAR));
 	CMapInfo* pMapInfo = (CMapInfo*)lpParameter;
 
@@ -229,10 +229,10 @@ LPARAM APIENTRY MainWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 		case _IDM_SERVERSOCK_MSG:
 			return OnServerSockMsg(wParam, lParam);
 #endif
-		case _IDM_CLIENTSOCK_MSG:
-			return OnClientSockMsg(wParam, lParam);
-		case _IDM_LOGSVRSOCK_MSG:
-			return OnLogSvrSockMsg(wParam, lParam);
+		//case _IDM_CLIENTSOCK_MSG:
+		//	return OnClientSockMsg(wParam, lParam);
+		//case _IDM_LOGSVRSOCK_MSG:
+		//	return OnLogSvrSockMsg(wParam, lParam);
 		case WM_COMMAND:
 			OnCommand(wParam, lParam);
 			break;

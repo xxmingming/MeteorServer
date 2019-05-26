@@ -87,7 +87,8 @@ void CPlayerObject::GetCharName(char *pszCharName)
 
 void CPlayerObject::SetCharName(const char *pszCharName)
 {
-	strncpy(m_szName, pszCharName, min(18, strlen(pszCharName)));
-	m_szName[18] = 0;
-	m_szName[19] = 0;
+	int namelen = min(18, strlen(pszCharName));
+	strncpy(m_szName, pszCharName, namelen);
+	for (int i = namelen; i < 20; i++)
+		m_szName[i] = 0;
 }

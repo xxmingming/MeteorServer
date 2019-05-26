@@ -11,23 +11,23 @@ CGateInfo::CGateInfo()
 
 void CGateInfo::SendGateCheck()
 {
-	_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-
+	int k = g_memPool.GetAvailablePosition();
+	if (k < 0)
+	{
+		print("no more memory");
+	}
+	_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 	if (lpSendBuff)
 	{
+		lpSendBuff->nIndex = k;
 		_TMSGHEADER		MsgHdr;
 		MsgHdr.nSocket			= 0;
 		MsgHdr.wSessionIndex	= 0;
 		MsgHdr.wIdent			= GM_CHECKSERVER;
 		MsgHdr.wUserListIndex	= 0;
 		MsgHdr.nLength			= 0;
-
 		lpSendBuff->nLen = sizeof(_TMSGHEADER);
-
 		memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
-		//lpSendBuff->szData[sizeof(_TMSGHEADER) + 1] = '\0';
-
-//		Send(lpSendBuff);
 		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
 	}
 }
@@ -43,18 +43,24 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 		while (no != NULL)
 		{
 			CUserInfo * pRoomUser = pUser->m_pRoom->m_pUserList.GetData(no);
-			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+			int k = g_memPool.GetAvailablePosition();
+			if (k < 0)
+			{
+				print("no more memory");
+			}
+			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 			OnLeaveRoomRsp pOnLeaveRoomRsp;
 			pOnLeaveRoomRsp.set_playerid(pUser->m_nUserServerIndex);
 			if (lpSendBuff)
 			{
+				lpSendBuff->nIndex = k;
 				_TMSGHEADER	MsgHdr;
 				MsgHdr.nSocket = pRoomUser->m_sock;
 				MsgHdr.wSessionIndex = pRoomUser->m_nUserGateIndex;
 				MsgHdr.wIdent = MeteorMsg_MsgType_OnLeaveRoomRsp;
 				MsgHdr.wUserListIndex = pRoomUser->m_nUserServerIndex;
-				MsgHdr.nLength = pOnLeaveRoomRsp.ByteSize();
-				lpSendBuff->nLen = sizeof(_TMSGHEADER) + pOnLeaveRoomRsp.ByteSize();
+				MsgHdr.nLength = pOnLeaveRoomRsp.ByteSizeLong();
+				lpSendBuff->nLen = sizeof(_TMSGHEADER) + pOnLeaveRoomRsp.ByteSizeLong();
 				memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
 				pOnLeaveRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
 				m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
@@ -97,15 +103,24 @@ void CGateInfo::OpenNewUser(char *pszPacket)
 		pUserInfo->m_bEmpty = false;
 		pUserInfo->Unlock();
 
-		_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+		int k = g_memPool.GetAvailablePosition();
+		if (k < 0)
+		{
+			print("no more memory");
+		}
+		_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 		MsgHdr.nSocket			= lpMsgHeader->nSocket;
 		MsgHdr.wSessionIndex	= lpMsgHeader->wSessionIndex;
 		MsgHdr.wIdent			= GM_SERVERUSERINDEX;
 		MsgHdr.wUserListIndex	= pUserInfo->m_nUserServerIndex;
 		MsgHdr.nLength			= 0;
-		lpSendBuff->nLen		= sizeof(_TMSGHEADER);
-		memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
-		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
+		if (lpSendBuff != NULL)
+		{
+			lpSendBuff->nIndex = k;
+			lpSendBuff->nLen = sizeof(_TMSGHEADER);
+			memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
+			m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
+		}
 		g_xUserInfoList.Lock();
 		g_xUserInfoList.AddNewNode(pUserInfo);
 		g_xUserInfoList.Unlock();
@@ -117,96 +132,56 @@ void CGateInfo::xSend()
 {
 	if (m_xSendBuffQ.GetCount())
 	{
+		vprint("packet %d wait for xSend()", m_xSendBuffQ.GetCount());
 		DWORD	dwBytesSends = 0;
-		int		nPos = 0;
-
+		DWORD   dwSend = 0;
 		_LPTSENDBUFF lpSendBuff = (_LPTSENDBUFF)m_xSendBuffQ.PopQ();
 
 		while (lpSendBuff)
 		{
-			memmove(&OverlappedEx[1].Buffer[nPos], lpSendBuff->szData, lpSendBuff->nLen);
-			nPos += lpSendBuff->nLen;
-
-			delete lpSendBuff;
-			lpSendBuff = NULL;
-
-			if (nPos >= DATA_BUFSIZE)
+			if (dwSend + lpSendBuff->nLen > DATA_BUFSIZE)
+			{
+				if (lpSendBuff->nLen > DATA_BUFSIZE)
+				{
+					vprint("send to gate packet is too long:%d", lpSendBuff->nLen);
+					g_memPool.SetEmptyElement(lpSendBuff->nIndex, lpSendBuff);
+					break;
+				}
+				vprint("send to gate packet is too long 2:%d", lpSendBuff->nLen);
+				m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 				break;
-
+			}
+			memmove(&OverlappedEx[1].Buffer[OverlappedEx[1].bufLen], lpSendBuff->szData, lpSendBuff->nLen);
+			dwSend += lpSendBuff->nLen;
+			OverlappedEx[1].bufLen += lpSendBuff->nLen;
+			g_memPool.SetEmptyElement(lpSendBuff->nIndex, lpSendBuff);
 			lpSendBuff = (_LPTSENDBUFF)m_xSendBuffQ.PopQ();
 		}
 
-		if (nPos)
+		if (dwSend != 0)
 		{
 			memset( &OverlappedEx[1].Overlapped, 0, sizeof( OVERLAPPED ) );
 			OverlappedEx[1].nOvFlag		= OVERLAPPED_FLAG::OVERLAPPED_SEND;
-			OverlappedEx[1].DataBuf.len	= nPos;
+			OverlappedEx[1].DataBuf.len	= dwSend;
 			OverlappedEx[1].DataBuf.buf	= OverlappedEx[1].Buffer;
-
-			WSASend(
+			vprint("send to gate start size %d", dwSend);
+			m_fDoSending = true;
+			int hResult = WSASend(
 				m_sock, 
 				&OverlappedEx[1].DataBuf, 
 				1, 
 				&dwBytesSends, 
 				0, 
 				(OVERLAPPED *) &OverlappedEx[1], 
-//				NULL, 
 				NULL
 				);
+			if (hResult == SOCKET_ERROR)
+			{
+				if (WSAGetLastError() == WSAEWOULDBLOCK)
+					print("WSASend failed");
+			}
 		}
 	}
-}
-
-int CGateInfo::Send(_LPTSENDBUFF lpSendBuff)
-{
-	DWORD	dwBytesSends = 0;
-	int		nPos = 0;				 	
-	int		nRet = 0;
-	
-	if ( lpSendBuff )
-		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
-
-	if (m_fDoSending)
-	{			  
-		return 0;	   
-	}
-	
-	_LPTSENDBUFF lpSBuff = (_LPTSENDBUFF)m_xSendBuffQ.PopQ();
-
-	if ( !lpSBuff )	 	
-	{			  
-		return 0;	   
-	}
-
-
-	while (lpSBuff)
-	{
-		memmove(&OverlappedEx[1].Buffer[nPos], lpSBuff->szData, lpSBuff->nLen);
-		nPos += lpSBuff->nLen;
-
-		delete lpSBuff;
-
-		if (nPos >= 4096)
-			break;
-
-		lpSBuff = (_LPTSENDBUFF)m_xSendBuffQ.PopQ();
-	}
-
-	if ( nPos )
-	{
-		memset( &OverlappedEx[1].Overlapped, 0, sizeof( OVERLAPPED ) );
-		
-		OverlappedEx[1].nOvFlag		= OVERLAPPED_FLAG::OVERLAPPED_SEND;
-		OverlappedEx[1].DataBuf.len	= nPos;
-		OverlappedEx[1].DataBuf.buf	= OverlappedEx[1].Buffer;
-
-		int nRet =WSASend(m_sock, &OverlappedEx[1].DataBuf, 1, 
-			&dwBytesSends, 0, (OVERLAPPED *) &OverlappedEx[1], NULL);
-
-		m_fDoSending = TRUE;
-	}
-
-	return nRet;
 }
 
 int CGateInfo::Recv()

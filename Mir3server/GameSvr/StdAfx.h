@@ -78,6 +78,7 @@ using namespace std;
 #include "..\Def\ServerSockHandler.h"
 #include "..\Def\Queue.h"
 #include "..\Def\List.h"
+#include "..\Def\DynamicArray.h"
 #include "..\Def\StaticArray.h"
 #include "..\Def\Misc.h"
 

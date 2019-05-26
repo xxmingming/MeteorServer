@@ -72,9 +72,10 @@ typedef struct tag_TSENDBUFF
 {
 	SOCKET			sock;
 	int				nSessionIndex;
-	int				nMessage;
-	int				nLength;//szData的有效区域.
-	char			szData[DATA_BUFSIZE];
+	int				nMessage;//客户端发给网关的信息ID
+	int				nLength;//szData的有效区域.序列化的信息长度
+	int				nIndex;//内存池下标
+	char			szData[DATA_BUFSIZE];//客户端发给网关的，序列化的信息
 }_TSENDBUFF, *_LPTSENDBUFF;
 
 #define LOGPARAM_STR						1
@@ -95,4 +96,5 @@ extern short g_localPort;
 extern short g_GameSvrPort;
 extern string	 g_strGameSvrIP;
 extern Setting * g_set;
+extern CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 #endif //_GAMEGATE_DEFINE

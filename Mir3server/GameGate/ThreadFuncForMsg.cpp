@@ -48,7 +48,7 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 					{
 						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData);
 					}
-					delete pSendBuff;
+					g_memPool.SetEmptyElement(pSendBuff->nIndex, pSendBuff);
 				}
 			}// for nLoop
 		}

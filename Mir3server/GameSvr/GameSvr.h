@@ -28,8 +28,6 @@
 #define USERMODE_LOGOFF						3
 #define USERMODE_NOTICE						4
 
-void MakeItemToDB(int nReadyUserInfo, char *pszUserId, char *pszCharName, _LPTMAKEITEMRCD lpMakeItemRcd);
-
 typedef struct tagOVERLAPPEDEX
 {
 	OVERLAPPED				Overlapped;
@@ -42,10 +40,11 @@ typedef struct tagOVERLAPPEDEX
 typedef struct tag_TSENDBUFF
 {
 	int				nLen;
+	int				nIndex;//ÄÚ´æ³ØÏÂ±ê
 	char			szData[DATA_BUFSIZE];
 }_TSENDBUFF, *_LPTSENDBUFF;
 
-class CGateInfo
+class CGateInfo:public CIntLock
 {
 public:
 	SOCKET					m_sock;

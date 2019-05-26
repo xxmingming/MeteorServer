@@ -267,65 +267,65 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 //		g_nRemainBuffLen = 0;
 }
 
-VOID WINAPI OnProcessUserHuman(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+//VOID WINAPI OnProcessUserHuman(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 //游戏服处理数据库服发来的消息，当连接数据库服务器成功时.
-LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
-{
-	switch (WSAGETSELECTEVENT(lParam))
-	{
-		case FD_CONNECT:
-		{
-			//当与数据库服链接OK后，启动服务端线程.
-			if (CheckSocketError(lParam))
-			{
-				InsertLogMsg(IDS_CONNECT_DBSERVER);
-				KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
-				UINT			dwThreadIDForMsg = 0;
-				unsigned long	hThreadForMsg = 0;
-				//if (hThreadForMsg = _beginthreadex(NULL, 0, ProcessLogin, NULL, 0, &dwThreadIDForMsg))
-				//{
-					hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
-					//hThreadForMsg = _beginthreadex(NULL, 0, ProcessMonster, NULL, 0, &dwThreadIDForMsg);
-					//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
-				//}
-
-				InitServerSocket(g_ssock, &g_saddr, _IDM_SERVERSOCK_MSG, g_nLocalPort, 1);
-				InsertLogMsg(IDS_STARTSERVICE);
-				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_T("Ready"));
-			}
-			else
-			{
-				//closesocket(g_csock);
-				//g_csock = INVALID_SOCKET;
-				//if (!g_fTerminated)
-				//	SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
-			}
-
-			break;
-		}
-		case FD_CLOSE:
-		{
-			closesocket(g_csock);
-			g_csock = INVALID_SOCKET;
-
-			InsertLogMsg(IDS_DISCONNECT_DBSERVER);
-
-			break;
-		}
-		case FD_READ:
-		{
-			char	szPacket[8192];
-	
-			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
-
-#ifdef _DEBUG
-			_RPT1(_CRT_WARN, "ClientSockMsg[FD_READ]:%d\n", nRecv);
-#endif
-			ProcReceiveBuffer(szPacket, nRecv);
-			break;
-		}
-	}
-
-	return 0L;
-}
+//LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
+//{
+//	switch (WSAGETSELECTEVENT(lParam))
+//	{
+//		case FD_CONNECT:
+//		{
+//			//当与数据库服链接OK后，启动服务端线程.
+//			if (CheckSocketError(lParam))
+//			{
+//				InsertLogMsg(IDS_CONNECT_DBSERVER);
+//				KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
+//				UINT			dwThreadIDForMsg = 0;
+//				unsigned long	hThreadForMsg = 0;
+//				//if (hThreadForMsg = _beginthreadex(NULL, 0, ProcessLogin, NULL, 0, &dwThreadIDForMsg))
+//				//{
+//					hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
+//					//hThreadForMsg = _beginthreadex(NULL, 0, ProcessMonster, NULL, 0, &dwThreadIDForMsg);
+//					//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
+//				//}
+//
+//				InitServerSocket(g_ssock, &g_saddr, _IDM_SERVERSOCK_MSG, g_nLocalPort, 1);
+//				InsertLogMsg(IDS_STARTSERVICE);
+//				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_T("Ready"));
+//			}
+//			else
+//			{
+//				//closesocket(g_csock);
+//				//g_csock = INVALID_SOCKET;
+//				//if (!g_fTerminated)
+//				//	SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
+//			}
+//
+//			break;
+//		}
+//		case FD_CLOSE:
+//		{
+//			closesocket(g_csock);
+//			g_csock = INVALID_SOCKET;
+//
+//			InsertLogMsg(IDS_DISCONNECT_DBSERVER);
+//
+//			break;
+//		}
+//		case FD_READ:
+//		{
+//			char	szPacket[8192];
+//	
+//			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
+//
+//#ifdef _DEBUG
+//			_RPT1(_CRT_WARN, "ClientSockMsg[FD_READ]:%d\n", nRecv);
+//#endif
+//			ProcReceiveBuffer(szPacket, nRecv);
+//			break;
+//		}
+//	}
+//
+//	return 0L;
+//}

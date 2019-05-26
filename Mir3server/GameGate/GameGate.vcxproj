@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Def\protocol.pb.cc" />
     <ClCompile Include="..\Def\setting.cpp" />
     <ClCompile Include="Abusive.cpp" />
     <ClCompile Include="ClientSockMsg.cpp" />

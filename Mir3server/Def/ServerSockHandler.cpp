@@ -296,7 +296,7 @@ INT CreateIOCPWorkerThread(int nThread)
 
 		GetSystemInfo(&SystemInfo);
 		//CPU数量x1为线程数.
-		for (UINT i = 0; i < SystemInfo.dwNumberOfProcessors * nThread; i++)
+		for (UINT i = 0; i < 1; i++)
 		{
 			HANDLE ThreadHandle;
 
@@ -308,7 +308,7 @@ INT CreateIOCPWorkerThread(int nThread)
 			CloseHandle(ThreadHandle);
 		}
 
-		return SystemInfo.dwNumberOfProcessors * nThread;
+		return 1;
 	}
 
 	return -1;

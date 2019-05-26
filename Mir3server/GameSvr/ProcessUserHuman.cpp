@@ -61,59 +61,59 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 			while (pListNode)
 			{
 				CGateInfo *pGateInfo = g_xGateList.GetData(pListNode);
-
-				if (pGateInfo)
+				pGateInfo->Lock();
+				if (pGateInfo && !pGateInfo->m_fDoSending)
 					pGateInfo->xSend();
-
-				pListNode = g_xUserInfoList.GetNext(pListNode);
+				pGateInfo->Unlock();
+				pListNode = g_xGateList.GetNext(pListNode);
 			} // while
 		}
 
 		SleepEx(1, TRUE);
 	}
 }
-
-UINT WINAPI ProcessUserHuman(LPVOID lpParameter)
-{
-	PLISTNODE pListNode = NULL;
-
-	while (TRUE)
-	{
-		if (g_fTerminated) 
-		{
-			if (g_xUserInfoList.GetCount())
-			{
-				pListNode = g_xUserInfoList.GetHead();
-
-				while (pListNode)
-				{
-					CUserInfo *pUserInfo = g_xUserInfoList.GetData(pListNode);
-					if (pUserInfo)
-						pUserInfo->CloseUserHuman();
-					pListNode = g_xUserInfoList.RemoveNode(pListNode);
-				}
-			}
-
-			return 0L;
-		}
-
-		if (g_xGateList.GetCount())
-		{
-			pListNode = g_xGateList.GetHead();
-
-			while (pListNode)
-			{
-				CGateInfo *pGateInfo = g_xGateList.GetData(pListNode);
-
-				if (pGateInfo)
-					pGateInfo->xSend();
-
-				pListNode = g_xUserInfoList.GetNext(pListNode);
-			} // while
-		}
-
-		SleepEx(1, TRUE);
-	}
-
-//	return 0L;
-}
+//
+//UINT WINAPI ProcessUserHuman(LPVOID lpParameter)
+//{
+//	PLISTNODE pListNode = NULL;
+//
+//	while (TRUE)
+//	{
+//		if (g_fTerminated) 
+//		{
+//			if (g_xUserInfoList.GetCount())
+//			{
+//				pListNode = g_xUserInfoList.GetHead();
+//
+//				while (pListNode)
+//				{
+//					CUserInfo *pUserInfo = g_xUserInfoList.GetData(pListNode);
+//					if (pUserInfo)
+//						pUserInfo->CloseUserHuman();
+//					pListNode = g_xUserInfoList.RemoveNode(pListNode);
+//				}
+//			}
+//
+//			return 0L;
+//		}
+//
+//		if (g_xGateList.GetCount())
+//		{
+//			pListNode = g_xGateList.GetHead();
+//
+//			while (pListNode)
+//			{
+//				CGateInfo *pGateInfo = g_xGateList.GetData(pListNode);
+//
+//				if (pGateInfo)
+//					pGateInfo->xSend();
+//
+//				pListNode = g_xGateList.GetNext(pListNode);
+//			} // while
+//		}
+//
+//		SleepEx(1, TRUE);
+//	}
+//
+////	return 0L;
+//}

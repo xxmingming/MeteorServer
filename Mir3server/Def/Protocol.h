@@ -49,10 +49,9 @@
 #define GM_CLOSE				2
 #define	GM_CHECKSERVER			3			// Send check signal to Server
 #define GM_CHECKCLIENT			4			// Send check signal to Client
-#define GM_DATA					5
+#define BOARDCASTS2G			5			//从游戏服到网关的广播消息.
 #define GM_SERVERUSERINDEX		6
-#define GM_TEST					20
-#define CM_SAY          3003
+
 
 // For game process
 // Client To Server Commands

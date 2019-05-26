@@ -23,7 +23,7 @@ int								g_nRemainBuffLen = 0;
 WSAEVENT						g_ClientIoEvent;
 
 //这种包，是要发送给客户端的，所以必须带一些参数标识是哪个客户端.
-#pragma pack(1)
+#pragma pack(8)
 struct CMsg
 {
 	uint32_t Size;
@@ -31,9 +31,41 @@ struct CMsg
 };
 #pragma pack()
 
+void ProcessGameSvrBoardCastPacket(BYTE *lpMsg)
+{
+	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
+	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	{
+		if (lpMsgHeader->wUserList[i] == -1)
+			continue;
+		CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wUserList[i]);
+		if (!pSessionInfo)
+		{
+			//print("pSessionInfo == null");
+			continue;
+		}
+		pSessionInfo->SendBuffLock.Lock();
+		if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
+		{
+			//丢弃了一个游戏服的包
+			vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
+			pSessionInfo->SendBuffLock.Unlock();
+			continue;
+		}
+
+		char * pszData = &pSessionInfo->SendBuffer[pSessionInfo->nSendBufferLen];
+		CMsg msg;
+		msg.Size = htonl(lpMsgHeader->nLength + (int)sizeof(CMsg));
+		msg.Message = htonl(lpMsgHeader->nMessage);
+		memmove(pszData, &msg, sizeof(CMsg));
+		memmove(pszData + sizeof(CMsg), lpMsg + (int)sizeof(_TMSGHEADER), lpMsgHeader->nLength);
+		pSessionInfo->nSendBufferLen += (lpMsgHeader->nLength + (int)sizeof(CMsg));
+		pSessionInfo->SendBuffLock.Unlock();
+	}
+}
+
 void ProcessGameSvrPacket(BYTE *lpMsg)
 {
-	//_LPTSENDBUFF	lpSendUserData = new _TSENDBUFF;
 	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
 
 	CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);
@@ -45,28 +77,21 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 	}
 
 	pSessionInfo->SendBuffLock.Lock();
-	if (pSessionInfo->nSendBufferLen >= DATA_BUFSIZE)
+	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
 	{
-		//print("pSessionInfo->nSendBufferLen >= DATA_BUFSIZE");
-		pSessionInfo->nSendBufferLen = 0;
-		pSessionInfo->SendBuffLock.Unlock();
-		return;
-	}
-	
-	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + sizeof(CMsg)) >= DATA_BUFSIZE)
-	{
-		//print("pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + sizeof(CMsg)) >= DATA_BUFSIZE");
+		//丢弃了一个游戏服的包
+		vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
 		pSessionInfo->SendBuffLock.Unlock();
 		return;
 	}
 
 	char * pszData = &pSessionInfo->SendBuffer[pSessionInfo->nSendBufferLen];
 	CMsg msg;
-	msg.Size = htonl(lpMsgHeader->nLength + sizeof(CMsg));
+	msg.Size = htonl(lpMsgHeader->nLength + (int)sizeof(CMsg));
 	msg.Message = htonl(lpMsgHeader->wIdent);
 	memmove(pszData, &msg, sizeof(CMsg));
-	memmove(pszData + sizeof(CMsg), lpMsg + sizeof(_TMSGHEADER), lpMsgHeader->nLength);
-	pSessionInfo->nSendBufferLen += lpMsgHeader->nLength + sizeof(CMsg);
+	memmove(pszData + sizeof(CMsg), lpMsg + (int)sizeof(_TMSGHEADER), lpMsgHeader->nLength);
+	pSessionInfo->nSendBufferLen += (lpMsgHeader->nLength + (int)sizeof(CMsg));
 	pSessionInfo->SendBuffLock.Unlock();
 }
 
@@ -76,40 +101,46 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 	int limit = nRecv + g_nRemainBuffLen;
-	if (limit > 2 * DATA_BUFSIZE)
+	int tid = GetCurrentThreadId();
+	if (limit > DATA_BUFSIZE)
 	{
-		print("limit > 2 * DATA_BUFSIZE");
+		vprint("recv total size:%d > DATA_BUFSIZE:%d !!!!", limit, DATA_BUFSIZE);
+		vprint("ProcReceiveBuffer return false reason %d", 0);
+		g_nRemainBuffLen = 0;
 		return FALSE;
 	}
-	int				nLen = nRecv;
 	int				nNext = 0;
-	BYTE			szBuff[2 * DATA_BUFSIZE];
-	BYTE			*pszData = &szBuff[0];
+	BYTE			*pszData = (BYTE*)&g_szRemainBuff[0];
 	_LPTMSGHEADER	lpMsgHeader;
+	memmove(pszData + g_nRemainBuffLen, pszPacket, nRecv);
 
-	if (g_nRemainBuffLen > 0)
-		memmove(szBuff, g_szRemainBuff, g_nRemainBuffLen);
+	g_nRemainBuffLen += nRecv;
 
-	memmove(&szBuff[g_nRemainBuffLen], pszPacket, nLen);
-
-	nLen += g_nRemainBuffLen;
-
-	while (nLen >= (int)sizeof(_TMSGHEADER))
+	while (g_nRemainBuffLen >= (int)sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
-		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
+		//收到的消息ID和序列化信息长度
+		vprint("recv message:%d serialize size:%d, g_nRemainBufflen:%d", lpMsgHeader->wIdent, lpMsgHeader->nLength, g_nRemainBuffLen);
+		if (g_nRemainBuffLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
 		{
-			//print("nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength)");
+			vprint("remain len: %d extract packet failed! wait for more info current serialize size:%d", g_nRemainBuffLen, lpMsgHeader->nLength);
 			break;
 		}
-		//if ((int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength) > DATA_BUFSIZE)
-		//{
-		//	//极端情况，单个包大于8192;
-		//}
+		if ((int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength) > DATA_BUFSIZE)
+		{
+			vprint("packet size > DATA_BUFSIZE  消息id:%d tid:%d, serailize size:%d", lpMsgHeader->wIdent, tid, lpMsgHeader->nLength);
+			g_nRemainBuffLen = 0;
+			vprint("ProcReceiveBuffer return false reason %d", 1);
+			return FALSE;
+		}
+
 		switch (lpMsgHeader->wIdent)
 		{
+			case BOARDCASTS2G:
+				ProcessGameSvrBoardCastPacket(pszData);
+				break;
 			case GM_CHECKSERVER:
-				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(2, 0), (LPARAM)_TEXT("Activation"));	// Received keep alive check code from game server 
+				//SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(2, 0), (LPARAM)_TEXT("Activation"));	// Received keep alive check code from game server 
 				break;
 			case GM_SERVERUSERINDEX://游戏服向网关发来的序号和游戏服角色对应关系.
 			{
@@ -122,54 +153,26 @@ bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 				ProcessGameSvrPacket(pszData);
 				break;
 		}
-
-		pszData += sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
-		nLen -= sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
-		if (nLen < 0)
-		{
-			char buff[64];
-			sprintf(buff, "message id:%d nLen < 0", lpMsgHeader->wIdent);
-			print(buff);
-		}
+		g_nRemainBuffLen -= (sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength));
+		vprint("process message:%d tid:%d left buff len:%d", lpMsgHeader->wIdent, tid, g_nRemainBuffLen);
+		pszData += (sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength));
+		
 	} // while
 
-	if (nLen > 0)
+	if (g_nRemainBuffLen > 0)
 	{
-		memmove(g_szRemainBuff, pszData, nLen);
-		g_nRemainBuffLen = nLen;
+		memmove(g_szRemainBuff, pszData, g_nRemainBuffLen);
 		return TRUE;
 	}
-	else if (nLen == 0)
+	else if (g_nRemainBuffLen < 0)
 	{
-		g_nRemainBuffLen = 0;
-		return TRUE;
-	}
-	else if (nLen < 0)
-	{
-		g_nRemainBuffLen = 0;
+		vprint("the buff remains len:%d", g_nRemainBuffLen);
+		vprint("ProcReceiveBuffer return false reason %d", 2);
 		return FALSE;
 	}
+	return TRUE;
 }
 
-/*
-BOOL InitServerThreadForComm()
-{
-	DWORD	dwThreadIDForComm = 0;
-
-	if (!g_hSvrMsgEvnt)
-		g_hSvrMsgEvnt = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-	if (!g_hThreadForComm)
-	{
-		g_hThreadForComm	= CreateThread(NULL, 0, ThreadFuncForComm,	NULL, 0, &dwThreadIDForComm);
-
-		if (g_hThreadForComm)
-			return TRUE;
-	}
-
-	return FALSE;
-}
-*/
 BOOL InitServerThreadForMsg()
 {
 	DWORD	dwThreadIDForMsg = 0;
@@ -186,7 +189,6 @@ BOOL InitServerThreadForMsg()
 	return FALSE;
 }
 
-//没有处理游戏服发来的消息.
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 {
 	switch (WSAGETSELECTEVENT(lParam))
@@ -238,11 +240,18 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case FD_READ:
 		{
-			char szPacket[DATA_BUFSIZE];
+			char szPacket[1024];
 			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
 			if (nRecv <= 0)
 				break;
 			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
+			if (!processed)
+			{
+				MessageBoxW(NULL, _T("无法正确处理来自游戏服务器的信息"), _T("Error"), MB_OK);
+				int zero = 0;
+				setsockopt((SOCKET)wParam, SOL_SOCKET, SO_SNDBUF, (char *)&zero, sizeof(zero));
+				ClearSocket((SOCKET)wParam);
+			}
 			break;
 		}
 	}

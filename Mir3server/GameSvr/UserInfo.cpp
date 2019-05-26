@@ -25,9 +25,10 @@ bool CUserInfo::IsEmpty()
 
 void CUserInfo::SetName(const char * pszName)
 {
-	memcpy(m_szCharName, pszName, min(strlen(pszName), 18));
-	m_szCharName[18] = 0;
-	m_szCharName[19] = 0;
+	int namelen = min(strlen(pszName), 18);
+	memcpy(m_szCharName, pszName, namelen);
+	for (int i = namelen; i < 20; i++)
+		m_szCharName[i] = 0x00;
 }
 
 void CUserInfo::ProcessUserMessage(char *pszPacket)

@@ -1,4 +1,4 @@
-#define _MAX_USER_ARRAY 500
+#define _MAX_USER_ARRAY 10000
 /*
 typedef struct tag_TDYNAMICARRAY
 {

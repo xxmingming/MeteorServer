@@ -23,34 +23,11 @@ void UpdateStatusBar(BOOL fGrow)
 	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(3, 0), (LPARAM)szText);
 }
 
-void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2)
-{
-	char		szBuf[1024];
-
-	WSABUF		Buf;
-	DWORD		dwSendBytes;
-
-	memmove(szBuf, lpMsg, sizeof(_TMSGHEADER));
-
-	if (pszData1)
-		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData1, nLen1);
-
-	if (pszData2)
-		memmove(&szBuf[sizeof(_TMSGHEADER) + nLen1], pszData2, nLen2);
-
-	szBuf[sizeof(_TMSGHEADER) + nLen1 + nLen2] = '\0';
-
-	Buf.len = sizeof(_TMSGHEADER) + nLen1 + nLen2;
-	Buf.buf = szBuf;
-
-	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
-}
-
 //向游戏服发一个消息，告知游戏客户端怎么了
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
 {
 	_TMSGHEADER	msg;
-	char		szBuf[1024];
+	char		szBuf[DATA_BUFSIZE];
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
@@ -65,6 +42,8 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 	if (pszData)
 		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData, nLen);
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
+	if (Buf.len > DATA_BUFSIZE)
+		print("Buf.len > DATA_BUFSIZE");
 	Buf.buf = szBuf;
 	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
 }
@@ -105,13 +84,13 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
-			UpdateStatusBar(TRUE);
+			//UpdateStatusBar(TRUE);
 			// Make packet and send to login server.
-			wsprintf(szAddress, _TEXT("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host,
-				Address.sin_addr.s_lh, Address.sin_addr.s_impno);
-			nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
+			//wsprintf(szAddress, _TEXT("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host,
+			//	Address.sin_addr.s_lh, Address.sin_addr.s_impno);
+			//nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
 			//客户端链接到网关时，在游戏服同步创建一个用户，把用户ID给网关
-			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, nCvtLen, szMsg);
+			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL);
 		}
 	}
 
@@ -162,10 +141,16 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			pSessionInfo->bufLen += dwBytesTransferred;
 			while (pSessionInfo->HasCompletionPacket())
 			{
-				_LPTSENDBUFF pSendData = new _TSENDBUFF;
+				int k = g_memPool.GetAvailablePosition();
+				if (k < 0)
+				{
+					print("no more memory");
+				}
+
+				_LPTSENDBUFF pSendData = g_memPool.GetEmptyElement(k);
 				if (!pSendData)
 					break;
-
+				pSendData->nIndex = k;
 				pSendData->sock				= pSessionInfo->sock;
 				pSendData->nSessionIndex	= pSessionInfo->nSessionIndex;
 				pSendData->nLength			= pSessionInfo->ExtractPacket(pSendData->szData, pSendData->nMessage);
@@ -180,7 +165,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 					if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
 					{
 						InsertLogMsg(_TEXT("PushQ() failed"));
-						delete pSendData;
+						g_memPool.SetEmptyElement(pSendData->nIndex, pSendData);
 					}
 					g_SendToServerQ.Unlock();
 				}
