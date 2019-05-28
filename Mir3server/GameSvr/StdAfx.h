@@ -97,8 +97,6 @@ class CMonRaceInfo;
 #include "ItemHandler.h"
 #include "ObjectEngine.h"
 #include "ObjectPlayer.h"
-#include "ObjectScripter.h"
-#include "ObjectPlayerClone.h"
 
 #include "Tables.h"
 #include "DataHandler.h"

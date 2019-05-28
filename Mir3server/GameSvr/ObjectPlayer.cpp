@@ -10,11 +10,9 @@ void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData
 void CPlayerObject::Constructor()
 {
 	m_bEmpty				= true;
-	m_wObjectType			= _OBJECT_HUMAN;
 	m_fIsDead				= FALSE;
 	m_fAdmin				= FALSE;
 	m_dwLastTalkTime = 0;
-	m_fIsCapture			= FALSE;
 }
 
 bool CPlayerObject::IsEmpty()

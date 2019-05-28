@@ -50,20 +50,6 @@ class CCharObject;
 class CMirMap;
 class CUserInfo;
 class CRoomInfo;
-typedef struct tag_TPROCESSMSG
-{
-	WORD			wIdent;
-	WORD			wParam;
-	DWORD			lParam1;
-	DWORD			lParam2;
-	DWORD			lParam3;
-
-	DWORD			dwDeliveryTime;
-
-	CCharObject*	pCharObject;
-
-	char			*pszData;
-} _TPROCESSMSG, *_LPTPROCESSMSG;
 
 /*
 */
@@ -72,45 +58,6 @@ typedef struct tag_TPROCESSMSG
 #define _OBJECT_MONSTER			2
 #define _OBJECT_ANIMAL			6
 #define _OBJECT_NPC				8
-
-typedef struct tag_TOBJECTFEATURE
-{
-	BYTE		btGender;
-	BYTE		btWear;
-	BYTE		btHair;
-	BYTE		btWeapon;
-} _TOBJECTFEATURE, _LPTOBJECTFEATURE;
-
-typedef struct tag_TOBJECTFEATUREEX
-{
-	BYTE		btHorse;
-	WORD		dwHairColor;
-	WORD		dwWearColor;
-} _TOBJECTFEATUREEX, _LPTOBJECTFEATUREEX;
-
-class CVisibleObject
-{
-public:
-	int				nVisibleFlag;
-	CCharObject*	pObject;
-};
-
-class CVisibleEvent
-{
-public:
-	int				nVisibleFlag;
-	CEvent*			pEvent;
-};
-
-class CVisibleMapItem
-{
-public:
-	int				nVisibleFlag;
-	WORD			wX;
-	WORD			wY;
-	CMapItem*		pMapItem;
-};
-
 #pragma pack(1)
 class CObjectAbility
 {
@@ -130,29 +77,6 @@ public:
 	int	Frame;//¶¯»­Ö¡
 	int	AniSource;//¶¯»­Ô´
 };
-
-class CObjectAddAbility	// ¾ÆÀÌÅÛ Âø¿ëÀ¸·Î ´Ã¾î³ª´Â ´É·ÂÄ¡
-{
-public:
-	WORD	HP;
-	WORD	MP;
-	WORD	HIT;
-	WORD	SPEED;
-	WORD	AC;
-	WORD	MAC;
-	WORD	DC;
-	WORD	MC;
-	WORD	SC;
-	WORD	AntiPoison;
-	WORD	PoisonRecover;
-	WORD	HealthRecover;
-	WORD	SpellRecover;
-	WORD	AntiMagic;			//¸¶¹ý È¸ÇÇÀ²
-	BYTE	Luck;				//Çà¿î Æ÷ÀÎÆ®
-	BYTE	UnLuck;				//ºÒÇà Æ÷ÀÎÆ®
-	BYTE	WeaponStrong;
-	short	HitSpeed;
-};
 #pragma pack(8)
 
 class CCharObject
@@ -161,16 +85,11 @@ public:
 	CUserInfo*					m_pUserInfo;
 	Vector3_					m_Pos;
 	Quaternion_					m_nRotation;
-	WORD						m_wObjectType;
-	CWHList<CCharObject*>		m_xCacheObjectList;
 	char						m_szName[20];
 	CObjectAbility				m_Ability;
 	CObjectAbility				m_WAbility;
-	CObjectAddAbility			m_AddAbility;
 	UINT						m_nCharStatusEx;
 	UINT						m_nCharStatus;
-	WORD						m_wStatusArr[MAX_STATUS_ATTRIBUTE];
-	DWORD						m_dwStatusTime[MAX_STATUS_ATTRIBUTE];
 	void						Reset(CUserInfo*pUserInfo)
 	{
 		m_fDeadTick = 0;
@@ -179,7 +98,6 @@ public:
 		m_nCharStatusEx = 0;
 		m_nCharStatus = 0;
 		m_fIsDead = FALSE;
-		ZeroMemory(m_wStatusArr, sizeof(m_wStatusArr));
 		ZeroMemory(m_szName, sizeof(m_szName));
 		m_bWaitReborn = false;
 		m_bNeedSend = false;
@@ -191,8 +109,6 @@ public:
 public:
 	CCharObject(CUserInfo*	pUserInfo);
 	virtual ~CCharObject();
-	void	SendSocket(char *pszPacket);
 	void	Die();
-	UINT	GetCharStatus();
 	virtual void	GetCharName(char *pszCharName) = 0;
 };

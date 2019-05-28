@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-void UpdateStatusBarUsers(BOOL fGrow);
-
 CGateInfo::CGateInfo()
 {
 	m_fDoSending = FALSE;
@@ -124,7 +122,6 @@ void CGateInfo::OpenNewUser(char *pszPacket)
 		g_xUserInfoList.Lock();
 		g_xUserInfoList.AddNewNode(pUserInfo);
 		g_xUserInfoList.Unlock();
-		UpdateStatusBarUsers(TRUE);
 	}
 }
 

@@ -70,6 +70,4 @@ extern SOCKADDR_IN					g_claddr;
 
 extern HANDLE						g_hThreadForComm;
 extern HANDLE						g_hSvrMsgEvnt;
-
-extern CWHList<CScripterObject*>	g_xScripterList;
 extern CWHDynamicArray<tag_TSENDBUFF> g_memPool;

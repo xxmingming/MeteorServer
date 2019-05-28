@@ -15,16 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Abusive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ClientSockMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConfigDlgFunc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Def\EnDecode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameGate.cpp">
@@ -67,9 +61,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Abusive.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Def\DynamicArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>

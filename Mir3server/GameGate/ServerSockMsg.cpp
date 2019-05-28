@@ -164,7 +164,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 					g_SendToServerQ.Lock();
 					if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
 					{
-						InsertLogMsg(_TEXT("PushQ() failed"));
 						g_memPool.SetEmptyElement(pSendData->nIndex, pSendData);
 					}
 					g_SendToServerQ.Unlock();
@@ -173,7 +172,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 
 			if (pSessionInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 			{
-				InsertLogMsg(_TEXT("WSARecv() failed"));
 				CloseSession(pSessionInfo);
 				continue;
 			}

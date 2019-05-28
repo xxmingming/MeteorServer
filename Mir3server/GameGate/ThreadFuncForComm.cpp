@@ -28,7 +28,6 @@ VOID WINAPI OnTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		{
 			if (g_csock == INVALID_SOCKET)
 			{
-				InsertLogMsg(IDS_APPLY_RECONNECT);
 				ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strGameSvrIP.c_str(), NULL, g_GameSvrPort, FD_CONNECT|FD_READ|FD_CLOSE);
 			}
 

@@ -42,7 +42,6 @@ using namespace std;
 #include "..\Def\Misc.h"
 #include "..\Def\\protocol.pb.h"
 #include "GameGate.h"
-#include "Abusive.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma comment (lib, "comctl32.lib")

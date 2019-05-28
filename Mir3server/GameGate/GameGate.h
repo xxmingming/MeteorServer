@@ -81,12 +81,6 @@ typedef struct tag_TSENDBUFF
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-void InsertLogMsg(UINT nID);
-void InsertLogMsg(LPTSTR lpszMsg);
-void InsertLogPacket(char *pszPacket);
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags);
-
-void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2);
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData);
 
 extern BOOL	g_fTerminated;

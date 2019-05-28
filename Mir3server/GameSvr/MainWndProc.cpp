@@ -115,51 +115,6 @@ UINT WINAPI InitializingServer(LPVOID lpParameter)
 	return 0L;
 }
 
-void UnInitializingServer()
-{
-	/*if (g_pMagicInfo) 
-	{
-		delete [] g_pMagicInfo;
-		g_pMagicInfo = NULL;
-	}
-	
-	if (g_pMonGenInfo) 
-	{
-		delete [] g_pMonGenInfo;
-		g_pMonGenInfo = NULL;
-	}
-	
-	if (g_pMonRaceInfo) 
-	{
-		delete [] g_pMonRaceInfo;
-		g_pMonRaceInfo = NULL;
-	}
-
-	if (g_pStdItemSpecial) 
-	{
-		delete [] g_pStdItemSpecial;
-		g_pStdItemSpecial = NULL;
-	}
-
-	if (g_pStdItemEtc) 
-	{
-		delete [] g_pStdItemEtc;
-		g_pStdItemEtc = NULL;
-	}
-
-	if (g_pMerchantInfo) 
-	{
-		delete [] g_pMerchantInfo;
-		g_pMerchantInfo = NULL;
-	}
-
-	if (g_pMoveMapEventInfo) 
-	{
-		delete [] g_pMoveMapEventInfo;
-		g_pMoveMapEventInfo = NULL;
-	}*/
-}
-
 void OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch (LOWORD(wParam))
@@ -188,12 +143,7 @@ void OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDM_STOPSERVICE:
 		{
 			g_fTerminated = TRUE;
-
 			SwitchMenuItem(FALSE);
-			
-			UnInitializingServer();
-			UnInitAdminCommandList();
-		
 			return;
 		}
 		case IDM_CONFIG:

@@ -204,9 +204,6 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 					KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
 					
 					SetTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE, 50000, (TIMERPROC)OnTimerProc);
-//					SetTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE, 1000, (TIMERPROC)OnTimerProc);
-
-					InsertLogMsg(IDS_CONNECT_LOGINSERVER);
 					SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Connected"));
 
 					//
@@ -234,7 +231,6 @@ LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 			g_csock = INVALID_SOCKET;
 			KillTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE);
 			SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
-			InsertLogMsg(IDS_DISCONNECT_LOGINSERVER);
 			SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Not Connected"));
 			break;
 		}

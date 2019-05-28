@@ -84,5 +84,3 @@ SOCKADDR_IN					g_claddr;
 
 HANDLE							g_hThreadForComm = NULL;
 HANDLE							g_hSvrMsgEvnt = NULL;
-
-CWHList<CScripterObject*>		g_xScripterList;

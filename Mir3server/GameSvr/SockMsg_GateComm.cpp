@@ -6,26 +6,6 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes);
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName);
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq);
 void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
-//void UpdateStatusBarSession(BOOL fGrow)
-//{
-//	static long	nNumOfCurrSession = 0;
-//
-//	TCHAR	szText[20];
-//
-//	(fGrow ? InterlockedIncrement(&nNumOfCurrSession) : InterlockedDecrement(&nNumOfCurrSession));
-//	
-//	wsprintf(szText, _TEXT("%d Sessions"), nNumOfCurrSession);
-//
-//	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)szText);
-//}
-
-void UpdateStatusBarUsers(BOOL fGrow)
-{
-	//static long	nNumOfUsers = 0;
-	////TCHAR	szText[20];
-	//(fGrow ? InterlockedIncrement(&nNumOfUsers) : InterlockedDecrement(&nNumOfUsers));
-	//vprint("%d Users", nNumOfUsers);
-}
 
 DWORD WINAPI AcceptThread(LPVOID lpParameter)
 {
@@ -33,8 +13,6 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 	SOCKET				Accept;
 	SOCKADDR_IN			Address;
-
-	TCHAR				szGateIP[16];
 
 	while (TRUE)
 	{
@@ -113,14 +91,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 						pUserInfo->Lock();
 						pUserInfo->m_bEmpty = true;
 						pUserInfo->m_pGateInfo = NULL;
-						//当玩家处于房间内(玩家可以仅仅链接服务器，但是不进入游戏)，且房间已经开始游戏了.
-						//if (pUserInfo->m_pxPlayerObject != NULL && pUserInfo->m_pRoom != NULL && pUserInfo->m_pRoom->m_bReady)
-						//	pUserInfo->m_pRoom->RemovePlayer(pUserInfo->m_pxPlayerObject);
-						//pUserInfo->m_pxPlayerObject = NULL;
-						//pUserInfo->
-						//pListNode = g_xUserInfoList.RemoveNode(pListNode);
 						pUserInfo->Unlock();
-						UpdateStatusBarUsers(FALSE);
 					}
 					pListNode = g_xUserInfoList.GetNext(pListNode);
 				}
@@ -198,7 +169,6 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					g_xUserInfoList.Lock();
 					g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
 					g_xUserInfoList.Unlock();
-					UpdateStatusBarUsers(FALSE);
 				}
 			}
 			break;

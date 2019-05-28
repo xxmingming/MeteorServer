@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-LPARAM OnServerSockMsg(WPARAM wParam, LPARAM lParam);
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK ConfigDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -24,8 +23,6 @@ SOCKADDR_IN		g_caddr;
 extern HANDLE					g_hIOCP;
 #endif
 
-extern CWHAbusive	g_xAbusive;
-
 void SwitchMenuItem(BOOL fFlag)
 {
 	HMENU hMainMenu = GetMenu(g_hMainWnd);
@@ -38,8 +35,6 @@ void SwitchMenuItem(BOOL fFlag)
 
 		SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STARTSERVICE, (LPARAM)MAKELONG(TBSTATE_INDETERMINATE, 0));
 		SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STOPSERVICE, (LPARAM)MAKELONG(TBSTATE_ENABLED, 0));
-
-		InsertLogMsg(IDS_STARTSERVICE);
 	}
 	else
 	{
@@ -48,8 +43,6 @@ void SwitchMenuItem(BOOL fFlag)
 
 		SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STARTSERVICE, (LPARAM)MAKELONG(TBSTATE_ENABLED, 0));
 		SendMessage(g_hToolBar, TB_SETSTATE, (WPARAM)IDM_STOPSERVICE, (LPARAM)MAKELONG(TBSTATE_INDETERMINATE, 0));
-
-		InsertLogMsg(IDS_STOPSERVICE);
 	}
 }
 
@@ -95,11 +88,6 @@ void OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 }
 
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
 
 LPARAM APIENTRY MainWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {

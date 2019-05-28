@@ -35,7 +35,6 @@ BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerI
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
 BOOL ClearSocket(SOCKET &s);
 
-BOOL CheckAvailableIOCP();
 INT	 CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
 
 BOOL InitThread(LPTHREAD_START_ROUTINE lpRoutine);

@@ -10,21 +10,19 @@ extern CWHQueue					g_SendToServerQ;
 extern BOOL						g_fTerminated;
 extern CWHDynamicArray<CSessionInfo>			g_UserInfoArray;
 
-CWHAbusive						g_xAbusive;
-
 //向游戏服发消息的线程.
 DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 {
 	int							nCount;
-	int							nBodyLen;
-	_TMSGHEADER					MsgHdr;
-	char						szDecodeSay[256];
-	char						szEncodeSay[256];
-	char						*pData;
+	//int							nBodyLen;
+	//_TMSGHEADER					MsgHdr;
+	//char						szDecodeSay[256];
+	//char						szEncodeSay[256];
+	//char						*pData;
 	CSessionInfo*				pSessionInfo;
 	DWORD						dwBytesSends;
 	
-	int							nPos;
+	//int							nPos;
 
 	UINT						nIdentity = 0;
 	//MsgHdr.wIdent	= GM_DATA;

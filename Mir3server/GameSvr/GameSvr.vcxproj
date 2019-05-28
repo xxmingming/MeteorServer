@@ -52,8 +52,8 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\github\proto\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\github\proto;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -66,7 +66,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_LOG4CPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\../_Obj_Debug/GameSvr\</AssemblerListingLocation>
       <BrowseInformation>true</BrowseInformation>
       <PrecompiledHeaderOutputFile>.\../_Obj_Debug/GameSvr\GameSvr.pch</PrecompiledHeaderOutputFile>
@@ -156,8 +156,6 @@
     <ClInclude Include="..\Def\Misc.h" />
     <ClInclude Include="ObjectEngine.h" />
     <ClInclude Include="ObjectPlayer.h" />
-    <ClInclude Include="ObjectPlayerClone.h" />
-    <ClInclude Include="ObjectScripter.h" />
     <ClInclude Include="..\Def\Protocol.h" />
     <ClInclude Include="..\Def\_OrzEx\queue.h" />
     <ClInclude Include="..\Def\Queue.h" />
@@ -182,19 +180,12 @@
     <ClCompile Include="GateInfo.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="Handler_CommonDB.cpp" />
-    <ClCompile Include="Handler_Item.cpp" />
     <ClCompile Include="Handler_Map.cpp" />
     <ClCompile Include="MainWndProc.cpp" />
     <ClCompile Include="..\Def\Misc.cpp" />
     <ClCompile Include="ObjectEngine.cpp" />
     <ClCompile Include="ObjectPlayer.cpp" />
-    <ClCompile Include="ObjectPlayerAdmin.cpp" />
-    <ClCompile Include="ObjectPlayerAdminSaid.cpp" />
-    <ClCompile Include="ObjectPlayerClone.cpp" />
-    <ClCompile Include="ObjectPlayerSaid.cpp" />
-    <ClCompile Include="ObjectScripter.cpp" />
     <ClCompile Include="ProcessUserHuman.cpp" />
-    <ClCompile Include="ProcessUserMsg.cpp" />
     <ClCompile Include="SockMsg_DBSrv.cpp" />
     <ClCompile Include="SockMsg_GateComm.cpp" />
     <ClCompile Include="SockMsg_LogSvr.cpp" />
@@ -206,7 +197,6 @@
     </ClCompile>
     <ClCompile Include="ThreadFuncForComm.cpp" />
     <ClCompile Include="UserInfo.cpp" />
-    <ClCompile Include="..\Def\EnDecode.cpp" />
     <ClCompile Include="..\Def\ServerSockHandler.cpp" />
     <ClCompile Include="..\Def\_OrzEx\syncobj.cpp" />
   </ItemGroup>

@@ -191,10 +191,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
 	LoadConfig();
-#ifndef _SOCKET_ASYNC_IO
-	if (CheckAvailableIOCP())
-	{
-#endif
 		if (!InitApplication(hInstance))
 			return (FALSE);
 
@@ -206,27 +202,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-#ifndef _SOCKET_ASYNC_IO
-	}
-	else
-	{
-		TCHAR szMsg[1024];
-
-		LoadString(hInstance, IDS_NOTWINNT, szMsg, sizeof(szMsg));
-		MessageBox(NULL, szMsg, _GAMEGATE_SERVER_TITLE, MB_OK|MB_ICONINFORMATION);
-		
-		return -1;
-	}
-#endif
 	delete g_set;
 	return (msg.wParam);
 }
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
 
 BOOL InitApplication(HANDLE hInstance)
 {
@@ -245,12 +223,6 @@ BOOL InitApplication(HANDLE hInstance)
 
 	return RegisterClass(&wc);
 }
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
 
 BOOL InitInstance(HANDLE hInstance, int nCmdShow)
 {
@@ -323,95 +295,7 @@ BOOL InitInstance(HANDLE hInstance, int nCmdShow)
 
 	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
 		return (FALSE);
-
-	//BYTE	btInstalled;
-
-	//if (!jRegGetKey(_GAMEGATE_SERVER_REGISTRY, _TEXT("Installed"), (LPBYTE)&btInstalled))
-	//	DialogBox(g_hInst, MAKEINTRESOURCE(IDD_CONFIGDLG), NULL, (DLGPROC)ConfigDlgFunc);
-
 	return TRUE;
-}
-
-// **************************************************************************************
-//
-//			
-//
-// **************************************************************************************
-
-int AddNewLogMsg()
-{
-	LV_ITEM		lvi;
-	TCHAR		szText[64];
-
-	int nCount = ListView_GetItemCount(g_hLogMsgWnd);
-
-	if (nCount >= 50)
-	{
-		ListView_DeleteItem(g_hLogMsgWnd, 0);
-		nCount--;
-	}
-
-	lvi.mask		= LVIF_TEXT;
-	lvi.iItem		= nCount;
-	lvi.iSubItem	= 0;
-	
-	_tstrdate(szText);
-
-	lvi.pszText = szText;
-	
-	ListView_InsertItem(g_hLogMsgWnd, &lvi);
-
-	_tstrtime(szText);
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 1, szText);
-
-	return nCount;
-}
-
-void InsertLogMsg(UINT nID)
-{
-	TCHAR	szText[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szText);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsg(LPTSTR lpszMsg)
-{
-	int nCount = AddNewLogMsg();
-
-	ListView_SetItemText(g_hLogMsgWnd, nCount, 2, lpszMsg);
-	ListView_Scroll(g_hLogMsgWnd, 0, 8);
-}
-
-void InsertLogMsgParam(UINT nID, void *pParam, BYTE btFlags)
-{
-	TCHAR	szText[128];
-	TCHAR	szMsg[256];
-
-	int nCount = AddNewLogMsg();
-
-	LoadString(g_hInst, nID, szText, sizeof(szText)/sizeof(TCHAR));
-	
-	switch (btFlags)
-	{
-		case LOGPARAM_STR:
-			_stprintf(szMsg, szText, (LPTSTR)pParam);
-			break;
-		case LOGPARAM_INT:
-			_stprintf(szMsg, szText, *(int *)pParam);
-			break;
-	}
-
-	if (lstrlen(szMsg) <= 256)
-	{
-		ListView_SetItemText(g_hLogMsgWnd, nCount, 2, szMsg);
-		ListView_Scroll(g_hLogMsgWnd, 0, 8);
-	}
 }
 
 
