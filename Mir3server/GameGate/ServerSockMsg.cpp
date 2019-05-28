@@ -10,42 +10,6 @@ extern HANDLE		g_hIOCP;
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
 
-//void UpdateStatusBar(BOOL fGrow)
-//{
-//	static long	nNumOfCurrSession = 0;
-//
-//	TCHAR	szText[20];
-//
-//	(fGrow ? InterlockedIncrement(&nNumOfCurrSession) : InterlockedDecrement(&nNumOfCurrSession));
-//	
-//	wsprintf(szText, _TEXT("%d Sessions"), nNumOfCurrSession);
-//
-//	SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(3, 0), (LPARAM)szText);
-//}
-
-void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2)
-{
-	char		szBuf[1024];
-
-	WSABUF		Buf;
-	DWORD		dwSendBytes;
-
-	memmove(szBuf, lpMsg, sizeof(_TMSGHEADER));
-
-	if (pszData1)
-		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData1, nLen1);
-
-	if (pszData2)
-		memmove(&szBuf[sizeof(_TMSGHEADER) + nLen1], pszData2, nLen2);
-
-	szBuf[sizeof(_TMSGHEADER) + nLen1 + nLen2] = '\0';
-
-	Buf.len = sizeof(_TMSGHEADER) + nLen1 + nLen2;
-	Buf.buf = szBuf;
-
-	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
-}
-
 //向游戏服发一个消息，告知游戏客户端怎么了
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
 {
