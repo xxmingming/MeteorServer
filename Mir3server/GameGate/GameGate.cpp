@@ -24,13 +24,13 @@ HWND			g_hMainWnd = NULL;			// Main window handle
 HWND			g_hLogMsgWnd = NULL;
 HWND			g_hToolBar = NULL;
 HWND			g_hStatusBar = NULL;
-
+CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 BOOL			g_fTerminated = FALSE;
 
-//ÐÂÔö 2016-winson  begin
+//ï¿½ï¿½ï¿½ï¿½ 2016-winson  begin
 
-short			g_localPort = 7200;//¶ÔÍâ ½ÓÊÜ¿Í»§¶ËÁ¬½Ó
-short			g_GameSvrPort = 5000;//¶ÔÄÚ ÍùÓÎÏ··þ×ª·¢Êý¾Ý.
+short			g_localPort = 7200;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ü¿Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+short			g_GameSvrPort = 5000;//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 string			g_strGameSvrIP;
 
 Setting *		g_set = NULL;
@@ -78,7 +78,7 @@ BOOL PreventSetUnhandledExceptionFilter()
 		pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten);
 	return bRet;
 }
-//Éú²úDUMPÎÄ¼þ
+//ï¿½ï¿½ï¿½ï¿½DUMPï¿½Ä¼ï¿½
 int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHAR pwAppName)
 {
 	//::MessageBoxA(0, "a", "b", MB_OK);
@@ -114,7 +114,7 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 			SYSTEMTIME stLocalTime;
 
 			GetModuleFileName(NULL, szPath, MAX_PATH);
-			(_tcsrchr(szPath, _T('\\')))[1] = 0; // É¾³ýÎÄ¼þÃû£¬Ö»»ñµÃÂ·¾¶×Ö´®
+			(_tcsrchr(szPath, _T('\\')))[1] = 0; // É¾ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Ö´ï¿½
 			GetLocalTime(&stLocalTime);
 			StringCchPrintf(szFileName, MAX_PATH, L"%s%s_%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
 				szPath, szAppName, szVersion,
@@ -165,18 +165,18 @@ LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS lpExceptionInfo)
 log4cpp::Category* main_log = &log4cpp::Category::getInstance("log");
 void LogInit()
 {
-	//1. ³õÊ¼»¯Layout¶ÔÏó
+	//1. ï¿½ï¿½Ê¼ï¿½ï¿½Layoutï¿½ï¿½ï¿½ï¿½
 	log4cpp::PatternLayout* pLayout = new log4cpp::PatternLayout();
 	pLayout->setConversionPattern("%d: %p %c %x: %m%n");
-	// 2. ³õÊ¼»¯Ò»¸öappender ¶ÔÏó    
+	// 2. ï¿½ï¿½Ê¼ï¿½ï¿½Ò»ï¿½ï¿½appender ï¿½ï¿½ï¿½ï¿½    
 	log4cpp::Appender* appender = new log4cpp::FileAppender("FileAppender", "./gamegate.log");
-	// 3. °Ñlayout¶ÔÏó¸½×ÅÔÚappender¶ÔÏóÉÏ    
+	// 3. ï¿½ï¿½layoutï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½appenderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½    
 	appender->setLayout(pLayout);
-	// 5. ÉèÖÃadditivityÎªfalse£¬Ìæ»»ÒÑÓÐµÄappender           
+	// 5. ï¿½ï¿½ï¿½ï¿½additivityÎªfalseï¿½ï¿½ï¿½æ»»ï¿½ï¿½ï¿½Ðµï¿½appender           
 	main_log->setAdditivity(false);
-	// 5. °Ñappender¶ÔÏó¸½µ½categoryÉÏ    
+	// 5. ï¿½ï¿½appenderï¿½ï¿½ï¿½ó¸½µï¿½categoryï¿½ï¿½    
 	main_log->setAppender(appender);
-	// 6. ÉèÖÃcategoryµÄÓÅÏÈ¼¶£¬µÍÓÚ´ËÓÅÏÈ¼¶µÄÈÕÖ¾²»±»¼ÇÂ¼    
+	// 6. ï¿½ï¿½ï¿½ï¿½categoryï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼    
 	main_log->setPriority(log4cpp::Priority::DEBUG);
 }
 #endif
@@ -188,7 +188,7 @@ int main()
 	print("gamegate start");
 #endif
     MSG msg;
-	//¼ÓÈë±ÀÀ£dumpÎÄ¼þ¹¦ÄÜ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dumpï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
 	LoadConfig();
@@ -200,14 +200,14 @@ int main()
 	timer.SetTimer(_ID_TIMER_CONNECTSERVER, 5000);
 	DWORD tick = ::GetTickCount();
 	
-	//Ö÷Ïß³ÌÖ÷Òª¸ºÔð
+	//ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½
 	while (true)
 	{
 		int elapsed = ::GetTickCount() - tick;
 		tick = ::GetTickCount();
 		timer.Update(elapsed);
-		//Ö÷Òª¶¨Ê±Æ÷1£¬Á´½Óµ½ÓÎÏ··þ£¬2£¬·¢ËÍÐÄÌø°üµ½ÓÎÏ··þ
-		//3Æô¶¯IOCPÏß³Ì»ñÈ¡Íê³É¶Ë¿Ú¶ÔÓ¦µÄÏûÏ¢£¬4Æô¶¯acceptÏß³Ì¼àÌý¿Í»§¶ËµÄÁ´½Ó
+		//ï¿½ï¿½Òªï¿½ï¿½Ê±ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½
+		//3ï¿½ï¿½ï¿½ï¿½IOCPï¿½ß³Ì»ï¿½È¡ï¿½ï¿½É¶Ë¿Ú¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½acceptï¿½ß³Ì¼ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½
 		Sleep(1);
 		
 	}

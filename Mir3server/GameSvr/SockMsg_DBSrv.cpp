@@ -268,17 +268,18 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 }
 
 //VOID WINAPI OnProcessUserHuman(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
-//
-////ÓÎÏ··þ´¦ÀíÊý¾Ý¿â·þ·¢À´µÄÏûÏ¢£¬µ±Á¬½ÓÊý¾Ý¿â·þÎñÆ÷³É¹¦Ê±.
+
+//ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½Ê±.
 //LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
 //{
 //	switch (WSAGETSELECTEVENT(lParam))
 //	{
 //		case FD_CONNECT:
 //		{
-//			//µ±ÓëÊý¾Ý¿â·þÁ´½ÓOKºó£¬Æô¶¯·þÎñ¶ËÏß³Ì.
+//			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½OKï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½.
 //			if (CheckSocketError(lParam))
 //			{
+//				InsertLogMsg(IDS_CONNECT_DBSERVER);
 //				KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
 //				UINT			dwThreadIDForMsg = 0;
 //				unsigned long	hThreadForMsg = 0;
@@ -289,7 +290,8 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 //					//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
 //				//}
 //
-//				InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
+//				InitServerSocket(g_ssock, &g_saddr, _IDM_SERVERSOCK_MSG, g_nLocalPort, 1);
+//				InsertLogMsg(IDS_STARTSERVICE);
 //				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(0, 0), (LPARAM)_T("Ready"));
 //			}
 //			else
@@ -306,6 +308,9 @@ void ProcReceiveBuffer(char *pszPacket, int nRecv)
 //		{
 //			closesocket(g_csock);
 //			g_csock = INVALID_SOCKET;
+//
+//			InsertLogMsg(IDS_DISCONNECT_DBSERVER);
+//
 //			break;
 //		}
 //		case FD_READ:

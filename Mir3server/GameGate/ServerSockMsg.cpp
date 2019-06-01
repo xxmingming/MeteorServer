@@ -10,11 +10,11 @@ extern HANDLE		g_hIOCP;
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
 
-//ÏòÓÎÏ··þ·¢Ò»¸öÏûÏ¢£¬¸æÖªÓÎÏ·¿Í»§¶ËÔõÃ´ÁË
+//ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Öªï¿½ï¿½Ï·ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
 {
 	_TMSGHEADER	msg;
-	char		szBuf[1024];
+	char		szBuf[DATA_BUFSIZE];
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
@@ -29,11 +29,13 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 	if (pszData)
 		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData, nLen);
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
+	if (Buf.len > DATA_BUFSIZE)
+		print("Buf.len > DATA_BUFSIZE");
 	Buf.buf = szBuf;
 	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
 }
 
-//½ÓÊÕ¿Í»§¶ËµÄÁ´½Ó¡£
+//ï¿½ï¿½ï¿½Õ¿Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ó¡ï¿½
 DWORD WINAPI AcceptThread(LPVOID lpParameter)
 {
 	int							nLen = sizeof(SOCKADDR_IN);
@@ -70,10 +72,6 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
 			// Make packet and send to login server.
-			//wsprintf(szAddress, _TEXT("%d.%d.%d.%d"), Address.sin_addr.s_net, Address.sin_addr.s_host,
-			//	Address.sin_addr.s_lh, Address.sin_addr.s_impno);
-			//nCvtLen = WideCharToMultiByte(CP_ACP, 0, szAddress, -1, szMsg, sizeof(szMsg), NULL, NULL);
-			//¿Í»§¶ËÁ´½Óµ½Íø¹ØÊ±£¬ÔÚÓÎÏ··þÍ¬²½´´½¨Ò»¸öÓÃ»§£¬°ÑÓÃ»§ID¸øÍø¹Ø
 			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL);
 		}
 	}
@@ -83,14 +81,14 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 void CloseSession(CSessionInfo* pSessionInfo)
 {
-	//¶ÔÏó³ØÒªÖØ¸´Ê¹ÓÃÇ°ÐèÒªÖØÖÃ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø¸ï¿½Ê¹ï¿½ï¿½Ç°ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½
 	if (pSessionInfo != NULL)
 		pSessionInfo->Reset();
 	g_UserInfoArray.SetEmptyElement(pSessionInfo->nSessionIndex, pSessionInfo);
 	closesocket(pSessionInfo->sock);
 }
 
-//Ö»´¦Àí¿Í»§¶Ë·¢À´µÄÏûÏ¢.
+//Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢.
 DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 {
 	DWORD					dwBytesTransferred;
@@ -122,10 +120,16 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			pSessionInfo->bufLen += dwBytesTransferred;
 			while (pSessionInfo->HasCompletionPacket())
 			{
-				_LPTSENDBUFF pSendData = new _TSENDBUFF;
+				int k = g_memPool.GetAvailablePosition();
+				if (k < 0)
+				{
+					print("no more memory");
+				}
+
+				_LPTSENDBUFF pSendData = g_memPool.GetEmptyElement(k);
 				if (!pSendData)
 					break;
-
+				pSendData->nIndex = k;
 				pSendData->sock				= pSessionInfo->sock;
 				pSendData->nSessionIndex	= pSessionInfo->nSessionIndex;
 				pSendData->nLength			= pSessionInfo->ExtractPacket(pSendData->szData, pSendData->nMessage);
@@ -138,8 +142,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 				{
 					if (!g_SendToServerQ.PushQ((BYTE *)pSendData))
 					{
-						print("pushQ failed");
-						delete pSendData;
+						g_memPool.SetEmptyElement(pSendData->nIndex, pSendData);
 					}
 				}
 			}

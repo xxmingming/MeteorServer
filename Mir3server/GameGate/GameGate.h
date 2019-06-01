@@ -2,13 +2,13 @@
 #ifndef _GAMEGATE_DEFINE
 #define _GAMEGATE_DEFINE
 
-//Íø¹ØÓë¿Í»§¶ËµÄÁ´½Ó
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½
 class CSessionInfo
 {
 public:
 	SOCKET			sock;
-	WORD			nServerUserIndex;//ÓÎÏ··þ£¬¸Ã¿Í»§¶Ë¶ÔÓ¦µÄÓÃ»§ÏÂ±ê
-	WORD			nSessionIndex;//µ¥¸öÍø¹Ø·þÏÂµÄÐòºÅ£¬[0-500)
+	WORD			nServerUserIndex;//ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿Í»ï¿½ï¿½Ë¶ï¿½Ó¦ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Â±ï¿½
+	WORD			nSessionIndex;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½Âµï¿½ï¿½ï¿½Å£ï¿½[0-500)
 	CIntLock		SendBuffLock;
 	CHAR			SendBuffer[DATA_PACKETMAX];
 	int				nSendBufferLen;
@@ -43,7 +43,7 @@ public:
 		return WSARecv( sock, &DataBuf, 1, &nRecvBytes, &nFlags, &Overlapped, 0 );
 	}
 
-	//¿Í»§¶Ë·¢À´µÄ°ü£¬4×Ö½Ú³¤¶È 4×Ö½ÚÏûÏ¢£¬Èç¹û³¤¶È>8ºóÃæµÄÈ«²¿Îª¸ÃÏûÏ¢´øµÄ²ÎÊý.
+	//ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½Ä°ï¿½ï¿½ï¿½4ï¿½Ö½Ú³ï¿½ï¿½ï¿½ 4ï¿½Ö½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½>8ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½.
 	bool HasCompletionPacket()
 	{
 		if (bufLen < 8)
@@ -51,14 +51,14 @@ public:
 		return bufLen >= ntohl(*(int*)Buffer);
 	}
 
-	// ½â¿Í»§¶Ë·¢À´µÄ°ü.Ç°8×Ö½Ú4×Ö½Ú³¤¶È£¬4×Ö½ÚMessageºÅ
+	// ï¿½ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½Ä°ï¿½.Ç°8ï¿½Ö½ï¿½4ï¿½Ö½Ú³ï¿½ï¿½È£ï¿½4ï¿½Ö½ï¿½Messageï¿½ï¿½
 	int ExtractPacket(char *pPacket, int & message)
 	{
 		int packetLen = ntohl(*(int*)Buffer);
 		message = ntohl(*(int*)(Buffer + 4));
 		if (packetLen < 8 || packetLen > DATA_BUFSIZE)
 		{
-			//°ü·Ç·¨£¬¶Ï¿ªÁ¬½Ó
+			//ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½
 			return -1;
 		}
 		memcpy(pPacket, Buffer + 8, packetLen - 8);
@@ -72,15 +72,15 @@ typedef struct tag_TSENDBUFF
 {
 	SOCKET			sock;
 	int				nSessionIndex;
-	int				nMessage;
-	int				nLength;//szDataµÄÓÐÐ§ÇøÓò.
-	char			szData[DATA_BUFSIZE];
+	int				nMessage;//ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Ï¢ID
+	int				nLength;//szDataï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½.ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
+	int				nIndex;//ï¿½Ú´ï¿½ï¿½ï¿½Â±ï¿½
+	char			szData[DATA_BUFSIZE];//ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ØµÄ£ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 }_TSENDBUFF, *_LPTSENDBUFF;
 
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-void SendSocketMsgS (_LPTMSGHEADER lpMsg, int nLen1, char *pszData1, int nLen2, char *pszData2);
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData);
 
 extern BOOL	g_fTerminated;
@@ -94,4 +94,5 @@ extern SOCKET					g_csock;
 extern SOCKET					g_ssock;
 extern SOCKADDR_IN					g_caddr;
 extern SOCKADDR_IN					g_saddr;
+extern CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 #endif //_GAMEGATE_DEFINE

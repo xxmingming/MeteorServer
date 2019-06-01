@@ -52,8 +52,8 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\github\proto\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\github\proto;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -154,7 +154,6 @@
     <ClInclude Include="..\Def\Misc.h" />
     <ClInclude Include="ObjectEngine.h" />
     <ClInclude Include="ObjectPlayer.h" />
-    <ClInclude Include="ObjectPlayerClone.h" />
     <ClInclude Include="..\Def\Protocol.h" />
     <ClInclude Include="..\Def\_OrzEx\queue.h" />
     <ClInclude Include="..\Def\Queue.h" />
@@ -182,9 +181,7 @@
     <ClCompile Include="Handler_Map.cpp" />
     <ClCompile Include="ObjectEngine.cpp" />
     <ClCompile Include="ObjectPlayer.cpp" />
-    <ClCompile Include="ObjectPlayerClone.cpp" />
     <ClCompile Include="ProcessUserHuman.cpp" />
-    <ClCompile Include="ProcessUserMsg.cpp" />
     <ClCompile Include="SockMsg_DBSrv.cpp" />
     <ClCompile Include="SockMsg_GateComm.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -195,7 +192,6 @@
     </ClCompile>
     <ClCompile Include="ThreadFuncForComm.cpp" />
     <ClCompile Include="UserInfo.cpp" />
-    <ClCompile Include="..\Def\EnDecode.cpp" />
     <ClCompile Include="..\Def\ServerSockHandler.cpp" />
   </ItemGroup>
   <ItemGroup>

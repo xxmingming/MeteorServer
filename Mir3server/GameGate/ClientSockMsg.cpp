@@ -15,96 +15,152 @@ int								g_nRemainBuffLen = 0;
 
 WSAEVENT						g_ClientIoEvent;
 
+#pragma pack(8)
+struct CMsg
+{
+	uint32_t Size;
+	uint32_t Message;
+};
+#pragma pack()
 
+void ProcessGameSvrBoardCastPacket(BYTE *lpMsg)
+{
+	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
+	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	{
+		if (lpMsgHeader->wUserList[i] == -1)
+			continue;
+		CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wUserList[i]);
+		if (!pSessionInfo)
+		{
+			//print("pSessionInfo == null");
+			continue;
+		}
+		pSessionInfo->SendBuffLock.Lock();
+		if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
+		{
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½Ä°ï¿½
+			vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
+			pSessionInfo->SendBuffLock.Unlock();
+			continue;
+		}
+
+		char * pszData = &pSessionInfo->SendBuffer[pSessionInfo->nSendBufferLen];
+		CMsg msg;
+		msg.Size = htonl(lpMsgHeader->nLength + (int)sizeof(CMsg));
+		msg.Message = htonl(lpMsgHeader->nMessage);
+		memmove(pszData, &msg, sizeof(CMsg));
+		memmove(pszData + sizeof(CMsg), lpMsg + (int)sizeof(_TMSGHEADER), lpMsgHeader->nLength);
+		pSessionInfo->nSendBufferLen += (lpMsgHeader->nLength + (int)sizeof(CMsg));
+		pSessionInfo->SendBuffLock.Unlock();
+	}
+}
 
 void ProcessGameSvrPacket(BYTE *lpMsg)
 {
-	_LPTMSGHEADER lpMsgHeader = (_LPTMSGHEADER)lpMsg;
+	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
+
 	CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);
-	CMsg * msg = new CMsg();
-	msg->Size = htonl(lpMsgHeader->nLength + sizeof(CMsg));
-	msg->Message = htonl(lpMsgHeader->wIdent);
-	memmove(msg->Data, lpMsg + sizeof(_TMSGHEADER), lpMsgHeader->nLength);
-	pSessionInfo->m_xSendBuffQ.PushQ((BYTE*)msg);
+
+	if (!pSessionInfo)
+	{
+		//print("pSessionInfo == null");
+		return;
+	}
+
+	pSessionInfo->SendBuffLock.Lock();
+	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
+	{
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½Ä°ï¿½
+		vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
+		pSessionInfo->SendBuffLock.Unlock();
+		return;
+	}
+
+	char * pszData = &pSessionInfo->SendBuffer[pSessionInfo->nSendBufferLen];
+	CMsg msg;
+	msg.Size = htonl(lpMsgHeader->nLength + (int)sizeof(CMsg));
+	msg.Message = htonl(lpMsgHeader->wIdent);
+	memmove(pszData, &msg, sizeof(CMsg));
+	memmove(pszData + sizeof(CMsg), lpMsg + (int)sizeof(_TMSGHEADER), lpMsgHeader->nLength);
+	pSessionInfo->nSendBufferLen += (lpMsgHeader->nLength + (int)sizeof(CMsg));
+	pSessionInfo->SendBuffLock.Unlock();
 }
 
-//´¦ÀíÓÎÏ··þ·¢À´µÄÏûÏ¢.
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢.
 bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 	int limit = nRecv + g_nRemainBuffLen;
+	int tid = GetCurrentThreadId();
 	if (limit > DATA_BUFSIZE)
 	{
-		print("limit > 2 * DATA_BUFSIZE");
+		vprint("recv total size:%d > DATA_BUFSIZE:%d !!!!", limit, DATA_BUFSIZE);
+		vprint("ProcReceiveBuffer return false reason %d", 0);
+		g_nRemainBuffLen = 0;
 		return FALSE;
 	}
-	int				nLen = nRecv;
 	int				nNext = 0;
-	BYTE			szBuff[2 * DATA_BUFSIZE];
-	BYTE			*pszData = &szBuff[0];
+	BYTE			*pszData = (BYTE*)&g_szRemainBuff[0];
 	_LPTMSGHEADER	lpMsgHeader;
+	memmove(pszData + g_nRemainBuffLen, pszPacket, nRecv);
 
-	if (g_nRemainBuffLen > 0)
-		memmove(szBuff, g_szRemainBuff, g_nRemainBuffLen);
+	g_nRemainBuffLen += nRecv;
 
-	memmove(&szBuff[g_nRemainBuffLen], pszPacket, nLen);
-
-	nLen += g_nRemainBuffLen;
-
-	while (nLen >= (int)sizeof(_TMSGHEADER))
+	while (g_nRemainBuffLen >= (int)sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
-		if (nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
+		//ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢IDï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
+		vprint("recv message:%d serialize size:%d, g_nRemainBufflen:%d", lpMsgHeader->wIdent, lpMsgHeader->nLength, g_nRemainBuffLen);
+		if (g_nRemainBuffLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
 		{
-			//print("nLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength)");
+			vprint("remain len: %d extract packet failed! wait for more info current serialize size:%d", g_nRemainBuffLen, lpMsgHeader->nLength);
 			break;
 		}
-		//if ((int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength) > DATA_BUFSIZE)
-		//{
-		//	//¼«¶ËÇé¿ö£¬µ¥¸ö°ü´óÓÚ8192;
-		//}
+		if ((int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength) > DATA_BUFSIZE)
+		{
+			vprint("packet size > DATA_BUFSIZE  ï¿½ï¿½Ï¢id:%d tid:%d, serailize size:%d", lpMsgHeader->wIdent, tid, lpMsgHeader->nLength);
+			g_nRemainBuffLen = 0;
+			vprint("ProcReceiveBuffer return false reason %d", 1);
+			return FALSE;
+		}
+
 		switch (lpMsgHeader->wIdent)
 		{
-			case GM_CHECKSERVER:
-				SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(2, 0), (LPARAM)_TEXT("Activation"));	// Received keep alive check code from game server 
+			case BOARDCASTS2G:
+				ProcessGameSvrBoardCastPacket(pszData);
 				break;
-			case GM_SERVERUSERINDEX://ÓÎÏ··þÏòÍø¹Ø·¢À´µÄÐòºÅºÍÓÎÏ··þ½ÇÉ«¶ÔÓ¦¹ØÏµ.
+			case GM_CHECKSERVER:
+				//SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(2, 0), (LPARAM)_TEXT("Activation"));	// Received keep alive check code from game server 
+				break;
+			case GM_SERVERUSERINDEX://ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½Ó¦ï¿½ï¿½Ïµ.
 			{
 				CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);
 				if (pSessionInfo)
 					pSessionInfo->nServerUserIndex = lpMsgHeader->wUserListIndex;
 				break;
 			}
-			default://ÓÎÏ··þ·¢ÏòÍø¹Ø£¬ÈÃÍø¹Ø·¢¸ø¿Í»§¶ËµÄÏûÏ¢.
+			default://ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½Ï¢.
 				ProcessGameSvrPacket(pszData);
 				break;
 		}
-
-		pszData += sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
-		nLen -= sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength);
-		if (nLen < 0)
-		{
-			char buff[64];
-			sprintf(buff, "message id:%d nLen < 0", lpMsgHeader->wIdent);
-			print(buff);
-		}
+		g_nRemainBuffLen -= (sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength));
+		vprint("process message:%d tid:%d left buff len:%d", lpMsgHeader->wIdent, tid, g_nRemainBuffLen);
+		pszData += (sizeof(_TMSGHEADER) + abs(lpMsgHeader->nLength));
+		
 	} // while
 
-	if (nLen > 0)
+	if (g_nRemainBuffLen > 0)
 	{
-		memmove(g_szRemainBuff, pszData, nLen);
-		g_nRemainBuffLen = nLen;
+		memmove(g_szRemainBuff, pszData, g_nRemainBuffLen);
 		return TRUE;
 	}
-	else if (nLen == 0)
+	else if (g_nRemainBuffLen < 0)
 	{
-		g_nRemainBuffLen = 0;
-		return TRUE;
-	}
-	else if (nLen < 0)
-	{
-		g_nRemainBuffLen = 0;
+		vprint("the buff remains len:%d", g_nRemainBuffLen);
+		vprint("ProcReceiveBuffer return false reason %d", 2);
 		return FALSE;
 	}
+	return TRUE;
 }
 
 BOOL InitServerThreadForMsg()
@@ -123,7 +179,73 @@ BOOL InitServerThreadForMsg()
 	return FALSE;
 }
 
-//ÓÎÏ·Íø¹ØÊÕÈ¡ÓÎÏ··þ´«À´µÄÏûÏ¢.
+LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
+{
+	switch (WSAGETSELECTEVENT(lParam))
+	{
+		case FD_CONNECT:
+		{
+			if (CheckSocketError(lParam))
+			{
+				if (InitServerThreadForMsg())
+				{
+					g_nRemainBuffLen = 0;
+
+					KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
+					
+					SetTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE, 50000, (TIMERPROC)OnTimerProc);
+					SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Connected"));
+
+					//
+					UINT			dwThreadIDForMsg = 0;
+					unsigned long	hThreadForMsg = 0;
+
+					g_ClientIoEvent = WSACreateEvent();
+
+					//hThreadForMsg = _beginthreadex(NULL, 0, ClientWorkerThread, NULL, 0, &dwThreadIDForMsg);
+				}
+			}
+			else
+			{
+				closesocket(g_csock);
+				g_csock = INVALID_SOCKET;
+				if (!g_fTerminated)
+					SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
+			}
+
+			break;
+		}
+		case FD_CLOSE:
+		{
+			closesocket(g_csock);
+			g_csock = INVALID_SOCKET;
+			KillTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE);
+			SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
+			SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Not Connected"));
+			break;
+		}
+		case FD_READ:
+		{
+			char szPacket[1024];
+			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
+			if (nRecv <= 0)
+				break;
+			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
+			if (!processed)
+			{
+				MessageBoxW(NULL, _T("ï¿½Þ·ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢"), _T("Error"), MB_OK);
+				int zero = 0;
+				setsockopt((SOCKET)wParam, SOL_SOCKET, SO_SNDBUF, (char *)&zero, sizeof(zero));
+				ClearSocket((SOCKET)wParam);
+			}
+			break;
+		}
+	}
+
+	return 0L;
+}
+
+//ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢.
 UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 {
 	_TOVERLAPPEDEX		ClientOverlapped;

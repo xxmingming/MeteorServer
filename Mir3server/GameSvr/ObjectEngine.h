@@ -7,14 +7,14 @@
 
 #define DEFSPEED					14
 
-#define _CHAT_COLOR1				0			//RGB(  0,   0,   0); // Åõ°ú»ö.
-#define _CHAT_COLOR2				1			//RGB( 10,  10,  10); // °ËÁ¤»ö.
-#define _CHAT_COLOR3				2			//RGB(255, 255, 255); // Èò»ö.
-#define _CHAT_COLOR4				3			//RGB(255,   0,   0); // »¡°­.
-#define _CHAT_COLOR5				4			//RGB(  0, 255,   0); // ³ì»ö.
-#define _CHAT_COLOR6				5			//RGB(  0,   0, 255); // Çª¸¥»ö
-#define _CHAT_COLOR7				6			//RGB(255, 255,   0); // ³ë¶û»ö.
-#define _CHAT_COLOR8				7			//RGB(255, 128,   0); // ÁÖÈ²»ö
+#define _CHAT_COLOR1				0			//RGB(  0,   0,   0); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR2				1			//RGB( 10,  10,  10); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR3				2			//RGB(255, 255, 255); // ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR4				3			//RGB(255,   0,   0); // ï¿½ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR5				4			//RGB(  0, 255,   0); // ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR6				5			//RGB(  0,   0, 255); // Çªï¿½ï¿½ï¿½ï¿½
+#define _CHAT_COLOR7				6			//RGB(255, 255,   0); // ï¿½ï¿½ï¿½ï¿½ï¿½.
+#define _CHAT_COLOR8				7			//RGB(255, 128,   0); // ï¿½ï¿½È²ï¿½ï¿½
 
 #define DR_UP						0
 #define DR_UPRIGHT					1
@@ -44,7 +44,7 @@
 #define STATE_BUBBLEDEFENCEUP		11
 
 #define	STATE_STONE_MODE			0x00000001;
-#define	STATE_OPENHEATH				0x00000002;  //Ã¼·Â °ø°³»óÅÂ
+#define	STATE_OPENHEATH				0x00000002;  //Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 class CCharObject;
 class CMirMap;
@@ -56,27 +56,25 @@ class CRoomInfo;
 #define _OBJECT_MONSTER			2
 #define _OBJECT_ANIMAL			6
 #define _OBJECT_NPC				8
-
 #pragma pack(1)
 class CObjectAbility
 {
 public:
 	//BYTE	Level;
-	int	HP;//ÆøÑª
-	int	MP;//Å­Æø
-	int	MaxHP;//ÆøÑªÉÏÏÞ
-	int	MaxMP;//Å­ÆøÉÏÏÞ
-	int	Weapon1;//1ºÅÎ»ÎäÆ÷
-	int	Weapon2;//2ºÅÎ»ÎäÆ÷
-	int	Weapon;//µ±Ç°Ö÷ÎäÆ÷
-	int	WeaponPos;//ÎäÆ÷×ËÊÆ
-	int	Model;//Ä£ÐÍID
-	int	Camp;//ÕóÓª0Á÷ÐÇ£¬1ºûµû
-	int	StartPoint;//µØÍ¼Ëæ»ú³öÉúµã.Ã¿½áÊø£¬Ã¿ËÀÍöË¢ÐÂ
-	int	Frame;//¶¯»­Ö¡
-	int	AniSource;//¶¯»­Ô´
+	int	HP;//ï¿½ï¿½Ñª
+	int	MP;//Å­ï¿½ï¿½
+	int	MaxHP;//ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½
+	int	MaxMP;//Å­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int	Weapon1;//1ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
+	int	Weapon2;//2ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
+	int	Weapon;//ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int	WeaponPos;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int	Model;//Ä£ï¿½ï¿½ID
+	int	Camp;//ï¿½ï¿½Óª0ï¿½ï¿½ï¿½Ç£ï¿½1ï¿½ï¿½ï¿½ï¿½
+	int	StartPoint;//ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½
+	int	Frame;//ï¿½ï¿½ï¿½ï¿½Ö¡
+	int	AniSource;//ï¿½ï¿½ï¿½ï¿½Ô´
 };
-
 #pragma pack(8)
 
 class CCharObject
@@ -85,15 +83,11 @@ public:
 	CUserInfo*					m_pUserInfo;
 	Vector3_					m_Pos;
 	Quaternion_					m_nRotation;
-	WORD						m_wObjectType;
-	CWHList<CCharObject*>		m_xCacheObjectList;
 	char						m_szName[20];
 	CObjectAbility				m_Ability;
 	CObjectAbility				m_WAbility;
 	UINT						m_nCharStatusEx;
 	UINT						m_nCharStatus;
-	WORD						m_wStatusArr[MAX_STATUS_ATTRIBUTE];
-	DWORD						m_dwStatusTime[MAX_STATUS_ATTRIBUTE];
 	void						Reset(CUserInfo*pUserInfo)
 	{
 		m_fDeadTick = 0;
@@ -102,20 +96,17 @@ public:
 		m_nCharStatusEx = 0;
 		m_nCharStatus = 0;
 		m_fIsDead = FALSE;
-		ZeroMemory(m_wStatusArr, sizeof(m_wStatusArr));
 		ZeroMemory(m_szName, sizeof(m_szName));
 		m_bWaitReborn = false;
 		m_bNeedSend = false;
 	}
 	BOOL						m_fIsDead;
 	float						m_fDeadTick;
-	BOOL						m_bWaitReborn;//µÈ´ý¿Í»§¶ËÇåÀíÊ¬Ìå£¬²¢¸´»î.
-	BOOL						m_bNeedSend;//ÊÇ·ñÒÑÏò¿Í»§¶Ë·¢ËÍÇåÀíÊ¬Ìå·â°ü
+	BOOL						m_bWaitReborn;//ï¿½È´ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¬ï¿½å£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+	BOOL						m_bNeedSend;//ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¬ï¿½ï¿½ï¿½ï¿½
 public:
 	CCharObject(CUserInfo*	pUserInfo);
 	virtual ~CCharObject();
-	void	SendSocket(char *pszPacket);
 	void	Die();
-	UINT	GetCharStatus();
 	virtual void	GetCharName(char *pszCharName) = 0;
 };

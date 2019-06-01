@@ -74,6 +74,7 @@ short			g_nLocalPort = 5000;
 //BOOL			g_fTestServer = FALSE;
 //char			g_strDBSvrIP[20];
 char			g_strClientPath[MAX_PATH];
+CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 //string			g_strDBSource;
 //string			g_strDBAccount;
 //string			g_strDBPassword;

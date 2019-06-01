@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-void UpdateStatusBarUsers(BOOL fGrow);
 void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
 
 int CUserInfo::KeyMax = 20;
@@ -25,19 +24,15 @@ bool CUserInfo::IsEmpty()
 
 void CUserInfo::SetName(const char * pszName)
 {
-	memcpy(m_szCharName, pszName, min(strlen(pszName), 18));
-	m_szCharName[18] = 0;
-	m_szCharName[19] = 0;
-}
-
-void CUserInfo::ProcessUserMessage(char *pszPacket)
-{
-	
+	int namelen = min(strlen(pszName), 18);
+	memcpy(m_szCharName, pszName, namelen);
+	for (int i = namelen; i < 20; i++)
+		m_szCharName[i] = 0x00;
 }
 
 void CUserInfo::Operate(Input_ * pInput)
 {
-	//°Ñ½ÇÉ«µÄÊäÈëÍ¬²½µ½Êý¾Ý£¬¹ã²¥µ½´Ë·¿¼äµÄËùÓÐÍæ¼Ò
+	//ï¿½Ñ½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ã²¥ï¿½ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for (int i = 0; i < KeyMax; i++)
 	{
 		//pInput->set_c(m_pKeys[i]);
@@ -65,17 +60,6 @@ void CUserInfo::CloseUserHuman()
 	}
 	m_bEmpty = TRUE;
 	Unlock();
-	//UpdateStatusBarUsers(FALSE);
-}
-
-void CUserInfo::CloseAccount(char *pszName, int nCertification)
-{
-
-}
-
-void CUserInfo::DoClientCertification(char *pszPacket)
-{
-	
 }
 
 #define REBORN_DELAY 5000

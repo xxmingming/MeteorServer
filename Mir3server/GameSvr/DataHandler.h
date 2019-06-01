@@ -23,7 +23,7 @@ typedef struct tag_TOSOBJECT
 class CRoomInfo:public CIntLock
 {
 public:
-	const int syncDelta = 20;//同步的帧率为20-50毫秒一次 每秒50-20次
+	const int syncDelta = 50;//同步的帧率为20-50毫秒一次 每秒50-20次
 	CHAR						m_chFlag;
 	BOOL						m_bTurnStart;//在循环同步过程中，只要有人进入房间
 	uint32_t					m_nRoomIndex;//房间编号
@@ -38,6 +38,7 @@ public:
 	uint32_t					m_nMaxPlayer;//最大人数
 	uint32_t					m_nHpMax;//血值上限标准.
 	uint32_t					m_nCount;//当前人数
+
 	int							m_turnTime;//房间单轮时长
 	void						OnNewTurn();
 	BOOL						RemovePlayer(CUserInfo * pUser);

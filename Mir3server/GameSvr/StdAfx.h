@@ -78,6 +78,7 @@ using namespace std;
 #include "..\Def\ServerSockHandler.h"
 #include "..\Def\Queue.h"
 #include "..\Def\List.h"
+#include "..\Def\DynamicArray.h"
 #include "..\Def\StaticArray.h"
 #include "..\Def\Misc.h"
 
@@ -90,8 +91,6 @@ class CObjectAddAbility;
 
 #include "ObjectEngine.h"
 #include "ObjectPlayer.h"
-#include "ObjectPlayerClone.h"
-
 #include "Tables.h"
 #include "DataHandler.h"
 #include "GameSvr.h"

@@ -60,3 +60,4 @@ extern SOCKADDR_IN					g_claddr;
 
 extern HANDLE						g_hThreadForComm;
 extern HANDLE						g_hSvrMsgEvnt;
+extern CWHDynamicArray<tag_TSENDBUFF> g_memPool;

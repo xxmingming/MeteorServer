@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "DynamicArray.h"
 
 CWHDynamicArray::CWHDynamicArray()
 {

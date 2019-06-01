@@ -10,7 +10,6 @@ void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData
 void CPlayerObject::Constructor()
 {
 	m_bEmpty				= true;
-	m_wObjectType			= _OBJECT_HUMAN;
 	m_fIsDead				= FALSE;
 	m_fAdmin				= FALSE;
 	m_dwLastTalkTime = 0;
@@ -86,7 +85,8 @@ void CPlayerObject::GetCharName(char *pszCharName)
 
 void CPlayerObject::SetCharName(const char *pszCharName)
 {
-	strncpy(m_szName, pszCharName, min(18, strlen(pszCharName)));
-	m_szName[18] = 0;
-	m_szName[19] = 0;
+	int namelen = min(18, strlen(pszCharName));
+	strncpy(m_szName, pszCharName, namelen);
+	for (int i = namelen; i < 20; i++)
+		m_szName[i] = 0;
 }

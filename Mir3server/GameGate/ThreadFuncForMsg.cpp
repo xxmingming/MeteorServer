@@ -14,15 +14,15 @@ extern CWHDynamicArray<CSessionInfo>			g_UserInfoArray;
 DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 {
 	int							nCount;
-	int							nBodyLen;
-	_TMSGHEADER					MsgHdr;
-	char						szDecodeSay[256];
-	char						szEncodeSay[256];
-	char						*pData;
+	//int							nBodyLen;
+	//_TMSGHEADER					MsgHdr;
+	//char						szDecodeSay[256];
+	//char						szEncodeSay[256];
+	//char						*pData;
 	CSessionInfo*				pSessionInfo;
 	DWORD						dwBytesSends;
 	
-	int							nPos;
+	//int							nPos;
 
 	UINT						nIdentity = 0;
 	while(TRUE)
@@ -42,7 +42,7 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 					{
 						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData);
 					}
-					delete pSendBuff;
+					g_memPool.SetEmptyElement(pSendBuff->nIndex, pSendBuff);
 				}
 			}
 		}

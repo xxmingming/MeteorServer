@@ -34,7 +34,7 @@ BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
 BOOL ClearSocket(SOCKET &s);
-INT	 CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
+INT  CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
 BOOL InitServerThreadForMsg();
 BOOL InitThread(LPTHREAD_START_ROUTINE lpRoutine);
 

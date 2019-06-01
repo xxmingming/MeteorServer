@@ -52,8 +52,8 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\github\proto\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\github\proto;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Sure\Downloads\protobuffcpp\protobuf_v3.5.1_vs2015_sln\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,9 +139,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Def\protocol.pb.cc" />
     <ClCompile Include="..\Def\setting.cpp" />
     <ClCompile Include="ClientSockMsg.cpp" />
-    <ClCompile Include="..\Def\EnDecode.cpp" />
     <ClCompile Include="GameGate.cpp" />
     <ClCompile Include="MainWndProc.cpp" />
     <ClCompile Include="..\Def\Misc.cpp" />

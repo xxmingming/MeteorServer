@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-LPARAM OnServerSockMsg(WPARAM wParam, LPARAM lParam);
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam);
 
 BOOL CALLBACK ConfigDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);

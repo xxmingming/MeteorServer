@@ -49,9 +49,6 @@
     <ClInclude Include="ObjectPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectPlayerClone.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Def\Protocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -108,13 +105,7 @@
     <ClCompile Include="ObjectPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectPlayerClone.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ProcessUserHuman.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ProcessUserMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockMsg_DBSrv.cpp">
@@ -131,9 +122,6 @@
     </ClCompile>
     <ClCompile Include="UserInfo.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Def\EnDecode.cpp">
-      <Filter>Def</Filter>
     </ClCompile>
     <ClCompile Include="..\Def\ServerSockHandler.cpp">
       <Filter>Def</Filter>
