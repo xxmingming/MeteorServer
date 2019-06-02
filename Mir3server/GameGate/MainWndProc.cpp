@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
 LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam);
-
-BOOL CALLBACK ConfigDlgFunc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 extern HINSTANCE		g_hInst;
 
 extern HWND				g_hMainWnd;

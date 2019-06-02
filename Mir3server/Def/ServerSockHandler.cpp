@@ -1,7 +1,4 @@
 #include "../GameSvr/StdAfx.h"
-
-extern HWND		g_hMainWnd;
-
 #ifndef _SOCKET_ASYNC_IO
 HANDLE			g_hIOCP = NULL;
 
@@ -47,9 +44,6 @@ BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort)
 
 		if ((bind(s, (const struct sockaddr FAR*)addr, sizeof(SOCKADDR_IN))) == SOCKET_ERROR)
 		{
-			char buff[256];
-			sprintf(buff, "�׽��ְ󶨳����������Ƕ˿ڸ��õ��� ������:%d �˿�:%d", WSAGetLastError(), nPort);
-			::MessageBoxA(NULL, buff, "����", MB_OK);
 			return FALSE;
 		}
 
@@ -86,7 +80,7 @@ BOOL ClearSocket(SOCKET &s)
 	return FALSE;
 }
 
-BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerIP, DWORD dwIP, int nPort, long lEvent)
+BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCSTR lpServerIP, DWORD dwIP, int nPort)
 {
 	if (s != INVALID_SOCKET)
 	{
@@ -111,8 +105,8 @@ BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerI
 		addr->sin_addr.s_addr = dwReverseIP;
 	}
 
-	if (WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent) == SOCKET_ERROR)
-		return FALSE;
+	//if (WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent) == SOCKET_ERROR)
+	//	return FALSE;
 
 	if (connect(s, (const struct sockaddr FAR*)addr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
 	{
@@ -124,7 +118,7 @@ BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerI
 }
 
 
-BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServerIP, DWORD dwIP, int nPort, long lEvent)
+BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCTSTR lpServerIP, DWORD dwIP, int nPort)
 {
 	if (s != INVALID_SOCKET)
 	{
@@ -152,8 +146,8 @@ BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServer
 		addr->sin_addr.s_addr	= dwReverseIP;
 	}
 
-	if (WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent) == SOCKET_ERROR)
-		return FALSE;
+	//if (WSAAsyncSelect(s, g_hMainWnd, nMsgID, lEvent) == SOCKET_ERROR)
+	//	return FALSE;
 
 	if (connect(s, (const struct sockaddr FAR*)addr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
 	{
@@ -238,15 +232,12 @@ INT CreateIOCPWorkerThread(int nThread)
 			return -1;
 
 		GetSystemInfo(&SystemInfo);
-		//CPU����x1Ϊ�߳���.
 		for (UINT i = 0; i < 1; i++)
 		{
 			HANDLE ThreadHandle;
 
 			if ((ThreadHandle = CreateThread(NULL, 0, ServerWorkerThread, g_hIOCP, 0, &dwThreadID)) == NULL)
 				return -1;
-			//if ((ThreadHandle = (HANDLE) _beginthreadex(NULL, 0, (ThreadStartRoutine) ServerWorkerThread, g_hIOCP, 0, (UINT *) &dwThreadID)) == NULL )
-			//	return -1;
 
 			CloseHandle(ThreadHandle);
 		}

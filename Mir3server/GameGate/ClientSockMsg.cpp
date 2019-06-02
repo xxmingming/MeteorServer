@@ -1,9 +1,6 @@
 #include "stdafx.h"
 extern SOCKET					g_csock;
 
-extern HWND						g_hMainWnd;
-extern HWND						g_hStatusBar;
-
 extern CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 
 
@@ -179,71 +176,70 @@ BOOL InitServerThreadForMsg()
 	return FALSE;
 }
 
-LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
-{
-	switch (WSAGETSELECTEVENT(lParam))
-	{
-		case FD_CONNECT:
-		{
-			if (CheckSocketError(lParam))
-			{
-				if (InitServerThreadForMsg())
-				{
-					g_nRemainBuffLen = 0;
-
-					KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
-					
-					SetTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE, 50000, (TIMERPROC)OnTimerProc);
-					SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Connected"));
-
-					//
-					UINT			dwThreadIDForMsg = 0;
-					unsigned long	hThreadForMsg = 0;
-
-					g_ClientIoEvent = WSACreateEvent();
-
-					//hThreadForMsg = _beginthreadex(NULL, 0, ClientWorkerThread, NULL, 0, &dwThreadIDForMsg);
-				}
-			}
-			else
-			{
-				closesocket(g_csock);
-				g_csock = INVALID_SOCKET;
-				if (!g_fTerminated)
-					SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
-			}
-
-			break;
-		}
-		case FD_CLOSE:
-		{
-			closesocket(g_csock);
-			g_csock = INVALID_SOCKET;
-			KillTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE);
-			SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
-			SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Not Connected"));
-			break;
-		}
-		case FD_READ:
-		{
-			char szPacket[1024];
-			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
-			if (nRecv <= 0)
-				break;
-			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
-			if (!processed)
-			{
-				MessageBoxW(NULL, _T("�޷���ȷ����������Ϸ����������Ϣ"), _T("Error"), MB_OK);
-				int zero = 0;
-				setsockopt((SOCKET)wParam, SOL_SOCKET, SO_SNDBUF, (char *)&zero, sizeof(zero));
-				ClearSocket((SOCKET)wParam);
-			}
-			break;
-		}
-	}
-
-	return 0L;
-}
+//LPARAM OnClientSockMsg(WPARAM wParam, LPARAM lParam)
+//{
+//	switch (WSAGETSELECTEVENT(lParam))
+//	{
+//		case FD_CONNECT:
+//		{
+//			if (CheckSocketError(lParam))
+//			{
+//				if (InitServerThreadForMsg())
+//				{
+//					g_nRemainBuffLen = 0;
+//
+//					KillTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER);
+//					
+//					SetTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE, 50000, (TIMERPROC)OnTimerProc);
+//					SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Connected"));
+//
+//					//
+//					UINT			dwThreadIDForMsg = 0;
+//					unsigned long	hThreadForMsg = 0;
+//
+//					g_ClientIoEvent = WSACreateEvent();
+//
+//					//hThreadForMsg = _beginthreadex(NULL, 0, ClientWorkerThread, NULL, 0, &dwThreadIDForMsg);
+//				}
+//			}
+//			else
+//			{
+//				closesocket(g_csock);
+//				g_csock = INVALID_SOCKET;
+//				if (!g_fTerminated)
+//					SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
+//			}
+//
+//			break;
+//		}
+//		case FD_CLOSE:
+//		{
+//			closesocket(g_csock);
+//			g_csock = INVALID_SOCKET;
+//			KillTimer(g_hMainWnd, _ID_TIMER_KEEPALIVE);
+//			SetTimer(g_hMainWnd, _ID_TIMER_CONNECTSERVER, 10000, (TIMERPROC)OnTimerProc);
+//			SendMessage(g_hStatusBar, SB_SETTEXT, MAKEWORD(1, 0), (LPARAM)_TEXT("Not Connected"));
+//			break;
+//		}
+//		case FD_READ:
+//		{
+//			char szPacket[4096];
+//			int nRecv = recv((SOCKET)wParam, szPacket, sizeof(szPacket), 0);
+//			if (nRecv <= 0)
+//				break;
+//			BOOL processed = ProcReceiveBuffer(szPacket, nRecv);
+//			if (!processed)
+//			{
+//				int zero = 0;
+//				setsockopt((SOCKET)wParam, SOL_SOCKET, SO_SNDBUF, (char *)&zero, sizeof(zero));
+//				ClearSocket((SOCKET)wParam);
+//			}
+//			break;
+//		}
+//	}
+//
+//	return 0L;
+//}
 
 //��Ϸ������ȡ��Ϸ����������Ϣ.
 UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)

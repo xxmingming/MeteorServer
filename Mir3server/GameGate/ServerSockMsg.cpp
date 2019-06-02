@@ -10,7 +10,6 @@ extern HANDLE		g_hIOCP;
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
 
-//����Ϸ����һ����Ϣ����֪��Ϸ�ͻ�����ô��
 void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
 {
 	_TMSGHEADER	msg;
@@ -35,14 +34,13 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
 }
 
-//���տͻ��˵����ӡ�
 DWORD WINAPI AcceptThread(LPVOID lpParameter)
 {
 	int							nLen = sizeof(SOCKADDR_IN);
-	char						szMsg[64];
-	TCHAR						szAddress[24];
+	//char						szMsg[64];
+	//TCHAR						szAddress[24];
 
-	int							nCvtLen;
+	//int							nCvtLen;
 
 	SOCKET						Accept;
 	SOCKADDR_IN					Address;
@@ -66,7 +64,7 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			pNewSessionInfo->nSessionIndex = nIndex;
 			pNewSessionInfo->nServerUserIndex = 0;
 			// Initializing Session Information
-			pNewSessionInfo->m_xSendBuffQ.ClearAll();
+			pNewSessionInfo->nSendBufferLen = 0;
 			pNewSessionInfo->bufLen = 0;
 
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
@@ -81,14 +79,12 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 
 void CloseSession(CSessionInfo* pSessionInfo)
 {
-	//�����Ҫ�ظ�ʹ��ǰ��Ҫ����
 	if (pSessionInfo != NULL)
 		pSessionInfo->Reset();
 	g_UserInfoArray.SetEmptyElement(pSessionInfo->nSessionIndex, pSessionInfo);
 	closesocket(pSessionInfo->sock);
 }
 
-//ֻ�����ͻ��˷�������Ϣ.
 DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 {
 	DWORD					dwBytesTransferred;

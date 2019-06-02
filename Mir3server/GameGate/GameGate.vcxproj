@@ -133,7 +133,7 @@
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>.\Release\GameGate.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -154,7 +154,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\Def\_OrzEx\syncobj.cpp" />
-    <ClCompile Include="ThreadFuncForComm.cpp" />
     <ClCompile Include="ThreadFuncForMsg.cpp" />
     <ClCompile Include="TimerMng.cpp" />
   </ItemGroup>

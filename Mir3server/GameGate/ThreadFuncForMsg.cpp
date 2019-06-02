@@ -54,12 +54,16 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 			pSessionInfo = g_UserInfoArray.GetData(nLoop);
 			if (pSessionInfo)
 			{
-				CMsg * Buf = (CMsg*)pSessionInfo->m_xSendBuffQ.PopQ();
-				while (Buf != NULL)
+				pSessionInfo->SendBuffLock.Lock();
+				if (pSessionInfo->nSendBufferLen)
 				{
-					WSASend(pSessionInfo->sock, Buf, 1, &dwBytesSends, 0, NULL, NULL);
-					Buf = (WSABUF*)pSessionInfo->m_xSendBuffQ.PopQ();
+					WSABUF Buf;
+					Buf.len = pSessionInfo->nSendBufferLen;
+					Buf.buf = pSessionInfo->SendBuffer;
+					WSASend(pSessionInfo->sock, &Buf, 1, &dwBytesSends, 0, NULL, NULL);
+					pSessionInfo->nSendBufferLen = 0;
 				}
+				pSessionInfo->SendBuffLock.Unlock();
 			}
 		}
 

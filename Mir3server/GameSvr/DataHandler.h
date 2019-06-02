@@ -46,7 +46,7 @@ public:
 	int							m_totalTime;//当前轮次运行时长为多久.当房间内无人时，这个时间凝固.
 	DWORD						m_currentTick;//当前tick
 	void						Update();
-	void						OnUserKeyFrame(KeyFrame * pk);
+	void						OnUserKeyFrame();
 	BOOL						IsEmpty() { return m_nCount == 0; }
 	void						OnAllPlayerLeaved();
 	void						CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int turnTime, int roomIdx);

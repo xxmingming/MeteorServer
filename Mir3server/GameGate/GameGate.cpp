@@ -5,44 +5,13 @@
 #include <DbgHelp.h>
 #include <strsafe.h>
 #include "TimerMng.h"
-// **************************************************************************************
-
-BOOL	InitApplication(HANDLE hInstance);
-BOOL	InitInstance(HANDLE hInstance, int nCmdShow);
-LPARAM	APIENTRY MainWndProc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam);
-
-BOOL	CALLBACK ConfigDlgFunc(HWND hWndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-// **************************************************************************************
-//
-//			Global Variables Definition
-//
-// **************************************************************************************
-
-HINSTANCE		g_hInst = NULL;				// Application instance
-HWND			g_hMainWnd = NULL;			// Main window handle
-HWND			g_hLogMsgWnd = NULL;
-HWND			g_hToolBar = NULL;
-HWND			g_hStatusBar = NULL;
 CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 BOOL			g_fTerminated = FALSE;
-
-//���� 2016-winson  begin
-
 short			g_localPort = 7200;//���� ���ܿͻ�������
 short			g_GameSvrPort = 5000;//���� ����Ϸ��ת������.
 string			g_strGameSvrIP;
-
 Setting *		g_set = NULL;
-//end
-
 static WSADATA	g_wsd;
-
-TBBUTTON tbButtons[] = 
-{
-	{ 0, IDM_STARTSERVICE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0},
-	{ 1, IDM_STOPSERVICE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0}
-};
 
 // **************************************************************************************
 #ifndef _M_IX86
@@ -78,10 +47,9 @@ BOOL PreventSetUnhandledExceptionFilter()
 		pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten);
 	return bRet;
 }
-//����DUMP�ļ�
+
 int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHAR pwAppName)
 {
-	//::MessageBoxA(0, "a", "b", MB_OK);
 	BOOL bOwnDumpFile = FALSE;
 	HANDLE hDumpFile = hFile;
 	MINIDUMP_EXCEPTION_INFORMATION ExpParam;
@@ -114,7 +82,7 @@ int GenerateMiniDump(HANDLE hFile, PEXCEPTION_POINTERS pExceptionPointers, PWCHA
 			SYSTEMTIME stLocalTime;
 
 			GetModuleFileName(NULL, szPath, MAX_PATH);
-			(_tcsrchr(szPath, _T('\\')))[1] = 0; // ɾ���ļ�����ֻ���·���ִ�
+			(_tcsrchr(szPath, _T('\\')))[1] = 0;
 			GetLocalTime(&stLocalTime);
 			StringCchPrintf(szFileName, MAX_PATH, L"%s%s_%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
 				szPath, szAppName, szVersion,
@@ -187,8 +155,6 @@ int main()
 	LogInit();
 	print("gamegate start");
 #endif
-    MSG msg;
-	//�������dump�ļ�����
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
 	LoadConfig();
@@ -200,14 +166,11 @@ int main()
 	timer.SetTimer(_ID_TIMER_CONNECTSERVER, 5000);
 	DWORD tick = ::GetTickCount();
 	
-	//���߳���Ҫ����
 	while (true)
 	{
 		int elapsed = ::GetTickCount() - tick;
 		tick = ::GetTickCount();
 		timer.Update(elapsed);
-		//��Ҫ��ʱ��1�����ӵ���Ϸ����2����������������Ϸ��
-		//3����IOCP�̻߳�ȡ��ɶ˿ڶ�Ӧ����Ϣ��4����accept�̼߳����ͻ��˵�����
 		Sleep(1);
 		
 	}

@@ -79,7 +79,7 @@ extern log4cpp::Category * main_log;
 #define print(s)	main_log->debug("[File:%s/Line:%d]\t%s", __FILE__, __LINE__, s)
 #define vprint(s, ...)   main_log->debug("[File:%s/Line:%d]\t"##s, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define print(s) wprintf(L"%s", s)
+#define print(s)
 #define vprint(s, ...)
 #endif
 //{{AFX_INSERT_LOCATION}}

@@ -1,27 +1,5 @@
 #include "stdafx.h"
 
-// **************************************************************************************
-//
-//			Global Variables Definition
-//
-// **************************************************************************************
-
-HINSTANCE		g_hInst			= NULL;			// Application instance
-HWND			g_hMainWnd		= NULL;			// Main window handle
-HWND			g_hLogMsgWnd	= NULL;
-HWND			g_hToolBar		= NULL;
-
-HWND			g_hStatusBar	= NULL;
-int				g_nStatusPartsWidths[_NUMOFMAX_STATUS_PARTS] = { 10, 10, 10, -1 };
-
-TBBUTTON tbButtons[] = 
-{
-	{ 0, IDM_STARTSERVICE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0},
-	{ 1, IDM_STOPSERVICE,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0},
-	{ 0, 0,					0,					BTNS_SEP,		0L, 0},	
-	{ 2, IDM_SETFONTCOLOR,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0},
-	{ 3, IDM_SETBKGCOLOR,	TBSTATE_ENABLED,	TBSTYLE_BUTTON, 0L, 0}
-};
 
 //CDatabase						g_MirDB;
 //CConnection						*g_pConnCommon;

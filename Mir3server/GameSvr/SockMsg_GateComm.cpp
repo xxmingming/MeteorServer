@@ -56,7 +56,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 		
 		if (g_fTerminated)
 		{
-			//�ر�ʱ,�Է��������.
 			if (g_xRoomList.GetCount())
 			{
 				PLISTNODE pListNode = g_xRoomList.GetHead();
@@ -73,7 +72,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			}
 			return 0L;
 		}
-		//��Ϸ���غ���Ϸ���Ͽ���.֪ͨ�ѿ�ʼ��Ϸ�ķ�������
+
 		if (dwBytesTransferred == 0)
 		{
 			vprint("Gamesvr disconnect with gate !!!  dwBytesTransferred == 0");
@@ -81,7 +80,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 			if (g_xUserInfoList.GetCount())
 			{
 				PLISTNODE pListNode = g_xUserInfoList.GetHead();
-				//�ڵ�ǰ�����ϵ�ȫ���û������ӵ�ͼ���޳�.
 				while (pListNode)
 				{
 					CUserInfo *pUserInfo = g_xUserInfoList.GetData(pListNode);
@@ -130,7 +128,6 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 	return 0;
 }
 
-//8K��С���ֽ�������ȥһ����Ϣͷ.
 BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 {
 	_LPTMSGHEADER pMsgHeader = (_LPTMSGHEADER)pBytes;
@@ -143,12 +140,11 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 		case GM_CHECKCLIENT:
 			pGate->SendGateCheck();
 			break;
-		case GM_OPEN://ĳ���ͻ������������أ����ط�����Ϸ������Ϸ����һ����Ӧ����.
+		case GM_OPEN:
 			pGate->OpenNewUser(pBytes);
 			break;
-		case GM_CLOSE://ĳ���ͻ��˶Ͽ������ط�����Ϸ������Ϸ��ע���˶����뿪���䲻ע������
+		case GM_CLOSE:
 			{
-				//�ڷ����ȴӷ���ɾ��.��ͬ���������������뿪��Ϣ
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 				if (pUserInfo != NULL)
 				{
@@ -165,17 +161,14 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 						pUserInfo->m_pGateInfo = NULL;
 						pUserInfo->Unlock();
 					}
-					//��ȫ��ɾ��.
 					g_xUserInfoList.Lock();
 					g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[pMsgHeader->wUserListIndex]);
 					g_xUserInfoList.Unlock();
 				}
 			}
 			break;
-		//�޲���������ȡ�÷����б�.
 		case MeteorMsg_MsgType_GetRoomReq:
 		{
-			//print("get room req");
 			GetRoomRsp pGetRoomRsp;
 			g_xRoomList.Lock();
 			PLISTNODE pNode = g_xRoomList.GetHead();
@@ -211,7 +204,6 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
 			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
 			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
-			//print("get room rsp");
 		}
 			break;
 		case MeteorMsg_MsgType_CreateRoomReq:
@@ -285,7 +277,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			if (pRoom == NULL)
 			{
 				pJoinRoomRsp.set_result(0);
-				pJoinRoomRsp.set_reason(2);//δ�ҵ�����
+				pJoinRoomRsp.set_reason(2);
 				pJoinRoomRsp.set_levelidx(0);
 				pJoinRoomRsp.set_playerid(0);
 				pJoinRoomRsp.set_roomid(0);
@@ -296,7 +288,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 				if (pUser->m_pRoom)
 				{
 					pJoinRoomRsp.set_result(0);
-					pJoinRoomRsp.set_reason(3);//��ǰ�Ѿ���ĳ���䣬��Ҫ���˳�
+					pJoinRoomRsp.set_reason(3);
 					pJoinRoomRsp.set_levelidx(0);
 					pJoinRoomRsp.set_playerid(0);
 					pJoinRoomRsp.set_roomid(0);
@@ -305,7 +297,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 				if (pRoom->m_nMaxPlayer == pRoom->m_nCount)
 				{
 					pJoinRoomRsp.set_result(0);
-					pJoinRoomRsp.set_reason(1);//����������
+					pJoinRoomRsp.set_reason(1);
 					pJoinRoomRsp.set_levelidx(0);
 					pJoinRoomRsp.set_playerid(0);
 					pJoinRoomRsp.set_roomid(0);
@@ -317,7 +309,6 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pJoinRoomRsp.set_levelidx(pRoom->m_pMap->m_nLevelIdx);
 					pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
 					pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
-					//�����������˷�,�������Լ�.
 					OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
 				}
 			}
@@ -338,14 +329,13 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 		}
 			break;
-		case MeteorMsg_MsgType_UserRebornReq://�û����󸴻�.
+		case MeteorMsg_MsgType_UserRebornReq:
 		{
 			UserId pRebornReq;
 			pRebornReq.ParseFromArray(data, pMsgHeader->nLength);
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 			if (pUser == NULL || pUser->m_pxPlayerObject == NULL || pUser->m_pRoom == NULL)
 			{
-				//�Ѿ����ڽ�ɫ/��δ���뷿��
 				return TRUE;
 			}
 			OnUserReborn(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pRebornReq);
@@ -359,10 +349,8 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 			if (pUser == NULL || pUser->m_pxPlayerObject != NULL || pUser->m_pRoom == NULL)
 			{
-				//�Ѿ����ڽ�ɫ/��δ���뷿��
 				return TRUE;
 			}
-			//�ڷ�������ʼ�������ҵ�������������.��������ֵ��ŭ������ʼ��������Ӫ��ģ�ͱ�š�
 			OnUserEnterLevel(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pEnterLevelReq);
 		}
 			break;
@@ -378,19 +366,19 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pUserInfo->CloseUserHuman();
 			}
 			break;
-		case MeteorMsg_MsgType_InputReq://MeteorMsg_MsgType_SyncInput��Ϣ�ڷ����̴߳���.
+		//case MeteorMsg_MsgType_InputReq://MeteorMsg_MsgType_SyncInput��Ϣ�ڷ����̴߳���.
 
-			break;
+		//	break;
 		case MeteorMsg_MsgType_KeyFrameReq://MeteorMsg_MsgType_SyncKeyFrame��Ϣ�ڷ����̴߳���.
-			CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-			KeyFrame pKeyFrame;
-			pKeyFrame.ParseFromArray(data, pMsgHeader->nLength);
-			if (pUserInfo->m_pRoom != NULL)
-			{
-				//�յ���ɫ���ĵ�ǰ����״̬.
-				//print("user key frame req");
-				pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);//���ý�ɫ���µ�״̬������һ�������������·���
-			}
+			//CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+			//KeyFrame pKeyFrame;
+			//pKeyFrame.ParseFromArray(data, pMsgHeader->nLength);
+			//if (pUserInfo->m_pRoom != NULL)
+			//{
+			//	//�յ���ɫ���ĵ�ǰ����״̬.
+			//	//print("user key frame req");
+			//	pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);//���ý�ɫ���µ�״̬������һ�������������·���
+			//}
 			break;
 	}
 
@@ -407,23 +395,19 @@ void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser
 		pUser->m_pxPlayerObject->Reborn();
 		pUser->CopyTo(player);
 	}
-	//�����˽��뷿���ڵ�ս������֪�������Ѵ��ڵ�������.���˸ý�ɫ�Լ�.
-	//�Լ�������Ҳ�����Լ����ڵ������Լ��ظ��ķ����.
 	PLISTNODE no = pRoom->m_pUserList.GetHead();
 	while (no != NULL)
 	{
 		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
 		if (pUserNode)
 		{
-			//����ս���Ľ�ɫ�����Լ���.
 			CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
 			if (pPlayer != NULL)
 			{
-				//���󷢸���ս����ɫ�ģ�����ս����������ɫ������
 				tag_TMSGHEADER Msg;
 				Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
 				Msg.nSocket = pUserNode->m_sock;
-				Msg.wIdent = MeteorMsg_MsgType_UserRebornSB2C;//�������˽��볡��.
+				Msg.wIdent = MeteorMsg_MsgType_UserRebornSB2C;
 				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
 				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
 				int k = g_memPool.GetAvailablePosition();
@@ -446,7 +430,6 @@ void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser
 	pRoom->Unlock();
 }
 
-//���뷿��ɹ�ʱ
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq)
 {
 	int spawnPoint = rand() % 16;
@@ -467,7 +450,6 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 		//print("nIndex < 0");
 	}
 	pRoom->Lock();
-	//�����˽��뷿���ڵ�ս������֪�������Ѵ��ڵ�������.���˸ý�ɫ�Լ�.
 	OnEnterLevelRsp pOnEnterLevelRsp;
 	if (pRoom->m_nCount != 0)
 	{
@@ -475,7 +457,6 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 		pUser->CopyTo(player);
 	}
 
-	//�Լ�������Ҳ�����Լ����ڵ������Լ��ظ��ķ����.
 	EnterLevelRsp pEnterLevelRsp;
 	Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
 	pUser->CopyTo(pInsertPlayer);
@@ -486,20 +467,18 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
 		if (pUserNode)
 		{
-			//����ս���Ľ�ɫ�����Լ���.
 			if (pUserNode->m_nUserServerIndex != pUser->m_nUserServerIndex)
 			{
 				CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
 				if (pPlayer != NULL)
 				{
-					//���󷢸���ս����ɫ�ģ�����ս����������ɫ������
 					Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
 					pUserNode->CopyTo(pInsertPlayer);
 
 					tag_TMSGHEADER Msg;
 					Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
 					Msg.nSocket = pUserNode->m_sock;
-					Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;//�������˽��볡��.
+					Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;
 					Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
 					Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
 					int k = g_memPool.GetAvailablePosition();
@@ -521,9 +500,6 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 	}
 
 	pRoom->Unlock();
-
-	//�ѳ�����ͼ�еĳ���ͼ��ȫ�����λ�ã���ת�����ݸ��½��������.
-	//ͬʱ���½��������λ����Ϣ����������ɫ��
 	pMsgHeader->wIdent = MeteorMsg_MsgType_EnterLevelRsp;
 	pMsgHeader->nLength = pEnterLevelRsp.ByteSizeLong();
 	int k = g_memPool.GetAvailablePosition();
@@ -540,8 +516,6 @@ void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * p
 	}
 }
 
-//�ڼ��뷿��ʱ��������ҵ��ǳƣ��Լ�����
-//�����뷿�䣬����ѡ���ɫ���������볡��ʱ��������Ϸ��ɫ.
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName)
 {
 	pUserInfo->SetName(szName);
@@ -559,7 +533,7 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 			rsp.set_playernick(GBK2UTF8(string(szName)).c_str());
 			Msg.nLength = rsp.ByteSizeLong();
 			Msg.nSocket = pUserNode->m_sock;
-			Msg.wIdent = MeteorMsg_MsgType_OnJoinRoomRsp;//�����˽��뷿��
+			Msg.wIdent = MeteorMsg_MsgType_OnJoinRoomRsp;
 			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
 			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
 			int k = g_memPool.GetAvailablePosition();
@@ -577,7 +551,7 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 			no = pRoom->m_pUserList.GetNext(no);
 		}
 	}
-	//��Է�����ÿһ�����󶼷���һ��֪ͨ����֪���˽�ȥ�˷���.���ǻ�δ����ս��.�Ѿ���ʼ��ʱ��
+
 	if (pRoom->m_nCount == 0)
 		pRoom->OnNewTurn();
 	pRoom->m_nCount++;

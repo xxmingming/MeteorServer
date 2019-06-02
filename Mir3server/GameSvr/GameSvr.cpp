@@ -65,7 +65,8 @@ BOOL PreventSetUnhandledExceptionFilter()
 
 Setting * g_set;
 //LuaMng				g_xLuaMng;
-//提供给GameSrv的端口7200
+
+//监听5000端口的连接，处理连接进来的网关
 short			g_nLocalPort = 5000;
 //提供给角色网关的端口5100
 //short			g_nDBSrvPort = 6000;
@@ -73,7 +74,7 @@ short			g_nLocalPort = 5000;
 //int				g_nStartGold = 1000;
 //BOOL			g_fTestServer = FALSE;
 //char			g_strDBSvrIP[20];
-char			g_strClientPath[MAX_PATH];
+//char			g_strClientPath[MAX_PATH];
 CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 //string			g_strDBSource;
 //string			g_strDBAccount;
@@ -185,52 +186,6 @@ void LogInit()
 }
 #endif
 
-CMapInfo* InitMapInfo();
-
-void LoadMap(CMapInfo* pMapInfo);
-
-CMapInfo* InitDataInDatabase()
-{
-	return InitMapInfo();
-}
-
-//加载地图数据，地图信息后期不再放在数据库内
-CMapInfo* InitMapInfo()
-{
-	//string s = "sn";
-	g_nNumOfMapInfo = 30;
-	CMapInfo* pMapInfo = new CMapInfo[g_nNumOfMapInfo];
-	char * s = (char*)malloc(14);
-	strcpy(s, "01");
-
-	//s[1] = "钟乳洞";
-	//s[2] = "一线天";
-	for (int i = 0; i < g_nNumOfMapInfo; i++)
-	{
-		pMapInfo[i].m_nLevelIdx = i + 1;//地图ID
-	}
-	return pMapInfo;
-}
-
-void InitRoom()
-{
-	PLISTNODE p = g_xMirMapList.GetHead();
-	while (p != NULL)
-	{
-		CMirMap * pMap = g_xMirMapList.GetData(p);
-		int RoomIdx = g_xRoom.GetFreeKey();
-		//房间数量受数组限制，可能返回RoomIdx重复
-		if (RoomIdx >= 0)
-		{
-			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
-			pRoom->CreateRoom(pMap, 16, 2000, 30 * 60 * 1000, RoomIdx);
-			g_xRoomList.AddNewNode(pRoom);
-		}
-		p = g_xMirMapList.GetNext(p);
-	}
-}
-
-
 UINT WINAPI ProcessRoom(LPVOID lpParameter)
 {
 	PLISTNODE pListNode = NULL;
@@ -264,7 +219,7 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 			{
 				CGateInfo *pGateInfo = g_xGateList.GetData(pListNode);
 
-				if (pGateInfo)
+				if (pGateInfo && !pGateInfo->m_fDoSending)
 					pGateInfo->xSend();
 
 				pListNode = g_xUserInfoList.GetNext(pListNode);
@@ -277,32 +232,11 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 
 UINT WINAPI InitializingServer(LPVOID lpParameter)
 {
-	TCHAR		wszPath[128];
-	TCHAR		wszFullPath[256];
-	DWORD		dwReadLen;
-	//MultiByteToWideChar(CP_ACP, 0, g_strClientPath, -1, wszPath, sizeof(wszPath) / sizeof(TCHAR));
-	CMapInfo* pMapInfo = (CMapInfo*)lpParameter;
-
-	for (int i = 0; i < g_nNumOfMapInfo; i++)
-		LoadMap(&pMapInfo[i]);
-
-	delete[] pMapInfo;
-	pMapInfo = NULL;
-
-	InitRoom();
-
 	UINT			dwThreadIDForMsg = 0;
 	unsigned long	hThreadForMsg = 0;
-	//if (hThreadForMsg = _beginthreadex(NULL, 0, ProcessLogin, NULL, 0, &dwThreadIDForMsg))
-	//{
-	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessUserHuman, NULL, 0, &dwThreadIDForMsg);
 	hThreadForMsg = _beginthreadex(NULL, 0, ProcessRoom, NULL, 0, &dwThreadIDForMsg);
-	//hThreadForMsg = _beginthreadex(NULL, 0, ProcessNPC, NULL, 0, &dwThreadIDForMsg);
-	//}
-
 	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
 
-	//InitAdminCommandList();
 	//连接到数据库服务器 端口6000
 	//ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strDBSvrIP, NULL, g_nDBSrvPort, FD_CONNECT|FD_READ|FD_CLOSE);
 	return 0L;
@@ -320,10 +254,6 @@ int main()
 	//g_xLuaMng.Init();
 	SetUnhandledExceptionFilter(ExceptionFilter);
 	BOOL bRet = PreventSetUnhandledExceptionFilter();
-
-	//SetUnhandledExceptionFilter(ExceptionFilter);
-	//int* p = 0;
-	//*p = 0;
 	LoadConfig();
 	WSADATA	g_wsd;
 	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
@@ -342,11 +272,6 @@ int main()
 	{
 		Sleep(1);
 	}
-		//if (!InitApplication(hInstance))
-		//	return (FALSE);
-
-		//if (!InitInstance(hInstance, nCmdShow))
-		//	return (FALSE);
 
 	delete g_set;
     return 0;

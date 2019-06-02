@@ -38,12 +38,12 @@ void CUserInfo::Operate(Input_ * pInput)
 		//pInput->set_c(m_pKeys[i]);
 	}
 	pInput->set_playerid(m_nUserServerIndex);
-	Vector2_ J = pInput->joystick(); 
-	J.set_x(Jx);
-	J.set_y(Jy);
-	Vector2_ d = pInput->mousedelta();
-	d.set_x(Mx);
-	d.set_y(My);
+	//Vector2_ J = pInput->joystick(); 
+	//J.set_x(Jx);
+	//J.set_y(Jy);
+	//Vector2_ d = pInput->mousedelta();
+	//d.set_x(Mx);
+	//d.set_y(My);
 
 }
 

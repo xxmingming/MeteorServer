@@ -135,7 +135,7 @@
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>.\Release\GameSvr.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -181,7 +181,6 @@
     <ClCompile Include="Handler_Map.cpp" />
     <ClCompile Include="ObjectEngine.cpp" />
     <ClCompile Include="ObjectPlayer.cpp" />
-    <ClCompile Include="ProcessUserHuman.cpp" />
     <ClCompile Include="SockMsg_DBSrv.cpp" />
     <ClCompile Include="SockMsg_GateComm.cpp" />
     <ClCompile Include="StdAfx.cpp">

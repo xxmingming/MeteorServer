@@ -31,8 +31,8 @@ typedef struct tag_TOVERLAPPEDEX
 } _TOVERLAPPEDEX, * _LPTOVERLAPPEDEX;
 
 BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort);
-BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
-BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, UINT nMsgID, LPCTSTR lpServerIP, DWORD dwIP, int nPort, long lEvent);
+BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCSTR lpServerIP, DWORD dwIP, int nPort);
+BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCTSTR lpServerIP, DWORD dwIP, int nPort);
 BOOL ClearSocket(SOCKET &s);
 INT  CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
 BOOL InitServerThreadForMsg();

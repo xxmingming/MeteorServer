@@ -1,22 +1,21 @@
 
 #ifndef _GAMEGATE_DEFINE
 #define _GAMEGATE_DEFINE
-
-//������ͻ��˵�����
+#define MAXSEND 80000
+#define MAXRECV 60000
 class CSessionInfo
 {
 public:
 	SOCKET			sock;
-	WORD			nServerUserIndex;//��Ϸ�����ÿͻ��˶�Ӧ���û��±�
-	WORD			nSessionIndex;//�������ط��µ���ţ�[0-500)
+	WORD			nServerUserIndex;
+	WORD			nSessionIndex;
 	CIntLock		SendBuffLock;
-	CHAR			SendBuffer[DATA_PACKETMAX];
+	CHAR			SendBuffer[MAXSEND];
 	int				nSendBufferLen;
 
-	// For Overlapped I/O
 	OVERLAPPED		Overlapped;
 	WSABUF			DataBuf;
-	CHAR			Buffer[DATA_PACKETMAX];
+	CHAR			Buffer[MAXRECV];
 	INT				bufLen;
 	INT				nOvFlag;
 
@@ -35,7 +34,7 @@ public:
 		nOvFlag = OVERLAPPED_FLAG::OVERLAPPED_RECV;
 		DWORD nRecvBytes = 0, nFlags = 0;
 
-		DataBuf.len = DATA_BUFSIZE - bufLen;
+		DataBuf.len = MAXRECV - bufLen;
 		DataBuf.buf = Buffer + bufLen;
 
 		memset( &Overlapped, 0, sizeof( Overlapped ) );
@@ -43,7 +42,6 @@ public:
 		return WSARecv( sock, &DataBuf, 1, &nRecvBytes, &nFlags, &Overlapped, 0 );
 	}
 
-	//�ͻ��˷����İ���4�ֽڳ��� 4�ֽ���Ϣ���������>8�����ȫ��Ϊ����Ϣ���Ĳ���.
 	bool HasCompletionPacket()
 	{
 		if (bufLen < 8)
@@ -51,14 +49,12 @@ public:
 		return bufLen >= ntohl(*(int*)Buffer);
 	}
 
-	// ��ͻ��˷����İ�.ǰ8�ֽ�4�ֽڳ��ȣ�4�ֽ�Message��
 	int ExtractPacket(char *pPacket, int & message)
 	{
 		int packetLen = ntohl(*(int*)Buffer);
 		message = ntohl(*(int*)(Buffer + 4));
 		if (packetLen < 8 || packetLen > DATA_BUFSIZE)
 		{
-			//���Ƿ����Ͽ�����
 			return -1;
 		}
 		memcpy(pPacket, Buffer + 8, packetLen - 8);
@@ -72,10 +68,10 @@ typedef struct tag_TSENDBUFF
 {
 	SOCKET			sock;
 	int				nSessionIndex;
-	int				nMessage;//�ͻ��˷������ص���ϢID
-	int				nLength;//szData����Ч����.���л�����Ϣ����
-	int				nIndex;//�ڴ���±�
-	char			szData[DATA_BUFSIZE];//�ͻ��˷������صģ����л�����Ϣ
+	int				nMessage;
+	int				nLength;
+	int				nIndex;
+	char			szData[DATA_BUFSIZE];
 }_TSENDBUFF, *_LPTSENDBUFF;
 
 #define LOGPARAM_STR						1

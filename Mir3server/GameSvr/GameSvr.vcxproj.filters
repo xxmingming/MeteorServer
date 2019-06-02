@@ -105,9 +105,6 @@
     <ClCompile Include="ObjectPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProcessUserHuman.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SockMsg_DBSrv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

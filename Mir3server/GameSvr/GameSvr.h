@@ -33,7 +33,7 @@ typedef struct tagOVERLAPPEDEX
 	OVERLAPPED				Overlapped;
 	INT						nOvFlag;
 	WSABUF					DataBuf;
-	CHAR					Buffer[DATA_BUFSIZE];
+	CHAR					Buffer[DATA_BUFSIZE * 128];
 	int						bufLen;
 } OVERLAPPEDEX, *LPOVERLAPPEDEX;
 
@@ -60,7 +60,6 @@ public:
 	void	OpenNewUser(char *pszPacket);
 	void	OnLeaveRoom(CUserInfo * pUser);
 	void	xSend();
-	int		Send(_LPTSENDBUFF lpSendBuff);
 	int		Recv();
 	bool	HasCompletionPacket();
 	int		ExtractPacket(char *pPacket);
