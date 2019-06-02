@@ -19,14 +19,12 @@ typedef struct tag_TOSOBJECT
 	DWORD		dwAddTime;
 } _TOSOBJECT, *_LPTOSOBJECT;
 
-class CRoomInfo:public CIntLock
+class CRoomInfo:public CIntLock, CStaticArray<CRoomInfo>::IArrayData
 {
 public:
 	const int syncDelta = 50;
-	CHAR						m_chFlag;
 	BOOL						m_bTurnStart;
 	uint32_t					m_nRoomIndex;
-	CWHList<_LPTOSOBJECT>*		m_xpObjectList;
 	CWHList<CUserInfo*>			m_pUserList;
 	CHAR						m_szName[20];
 	CHAR						m_szPassword[8];
@@ -51,13 +49,9 @@ public:
 	bool						m_bHasPsd;
 	void						Update();
 	void						OnUserKeyFrame();
-	BOOL						IsEmpty() { return m_nCount == 0; }
-	void						OnAllPlayerLeaved();
-	void						Close() {
-		this->m_bTurnStart = false;
-		this->closed = true;
-	}
-
+	bool						IsEmpty() { return m_nCount == 0; }
+	void						OnPlayerAllLeaved();
+	void						Close();
 	void						NewTurn();
 	void						WaitClose();
 

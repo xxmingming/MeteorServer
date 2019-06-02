@@ -1,8 +1,6 @@
 #pragma once
 #ifndef _DEFAULT_SOCKET_HANDLER
 #define _DEFAULT_SOCKET_HANDLER
-
-//0.5MB,因为最大有40000
 #define DATA_BUFSIZE 512 * 1024
 
 class OVERLAPPED_FLAG
@@ -35,7 +33,6 @@ BOOL InitServerSocket(SOCKET &s, SOCKADDR_IN* addr, int nPort);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCSTR lpServerIP, DWORD dwIP, int nPort);
 BOOL ConnectToServer(SOCKET &s, SOCKADDR_IN* addr, LPCTSTR lpServerIP, DWORD dwIP, int nPort);
 BOOL ClearSocket(SOCKET &s);
-INT  CreateIOCPWorkerThread(HANDLE hCP, LPDWORD lpdwThreadID, LPTHREAD_START_ROUTINE WorkerThreadFunc);
 BOOL InitServerThreadForMsg();
 BOOL InitThread(LPTHREAD_START_ROUTINE lpRoutine);
 

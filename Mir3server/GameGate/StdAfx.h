@@ -57,15 +57,7 @@ using namespace std;
 #define _GAMEGATE_SERVER_CLASS		_TEXT("GameGateServerClass")
 #define _GAMEGATE_SERVER_TITLE		_TEXT("Legend of Mir II - Game Gate Server")
 #define _GAMEGATE_SERVER_REGISTRY	_TEXT("Software\\LegendOfMir\\GameGate")
-
-#define _IDM_SERVERSOCK_MSG			WM_USER + 1000
-#define _IDM_CLIENTSOCK_MSG			_IDM_SERVERSOCK_MSG + 1
-
-#define _IDW_TOOLBAR				_IDM_SERVERSOCK_MSG + 2
-#define _IDW_STATUSBAR				_IDM_SERVERSOCK_MSG + 3
-
-#define _ID_TIMER_KEEPALIVE			_IDM_SERVERSOCK_MSG + 4
-#define _ID_TIMER_CONNECTSERVER		_IDM_SERVERSOCK_MSG + 5
+#define _ID_TIMER_KEEPALIVE			WM_USER + 1004
 #define CFG_GAMEGATE   "GameGate.ini"
 #define DEFAULTSEC	"GameGate"
 
@@ -74,13 +66,14 @@ using namespace std;
 #include "log4cpp/FileAppender.hh"   
 #include "log4cpp/PatternLayout.hh"
 //#include "../Def/LuaMng.h"
+#pragma comment(lib, "log4cppD.lib")
 using namespace log4cpp;
 extern log4cpp::Category * main_log;
 #define print(s)	main_log->debug("[File:%s/Line:%d]\t%s", __FILE__, __LINE__, s)
 #define vprint(s, ...)   main_log->debug("[File:%s/Line:%d]\t"##s, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define print(s)
-#define vprint(s, ...)
+#define print(s) printf(s##"\r\n")
+#define vprint(s, ...) printf(s##"\r\n", __VA_ARGS__)
 #endif
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
@@ -88,7 +81,6 @@ extern log4cpp::Category * main_log;
 #endif // !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)
 DWORD WINAPI	ThreadFuncForMsg(LPVOID lpParameter);
 BOOL			CheckSocketError(LPARAM lParam);
-VOID WINAPI		OnTimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 BOOL InitServerThreadForMsg();
 UINT WINAPI		ClientWorkerThread(LPVOID lpParameter);
 extern WSAEVENT	g_ClientIoEvent;

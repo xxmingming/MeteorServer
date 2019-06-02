@@ -87,42 +87,7 @@ void TimerMng::OnTimerProc(int idEvent)
 		{
 			if (g_csock != INVALID_SOCKET)
 			{
-				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL);
-			}
-			break;
-		}
-		case _ID_TIMER_CONNECTSERVER:
-		{
-			if (g_csock == INVALID_SOCKET)
-			{
-				//ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strGameSvrIP.c_str(), NULL, g_GameSvrPort, FD_CONNECT | FD_READ | FD_CLOSE);
-
-				g_csock = socket(AF_INET, SOCK_STREAM, 0);
-
-				g_caddr.sin_family = AF_INET;
-				g_caddr.sin_port = htons(g_GameSvrPort);
-				g_caddr.sin_addr.s_addr = inet_addr(g_strGameSvrIP.c_str());
-			}
-
-			if (connect(g_csock, (const struct sockaddr FAR*)&g_caddr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
-			{
-				print(L"can not connect to svr");
-			}
-			else
-			{
-				if (InitServerThreadForMsg())
-				{
-					TimerMng::Instance->KillTimer(_ID_TIMER_CONNECTSERVER);
-					TimerMng::Instance->SetTimer(_ID_TIMER_KEEPALIVE, 50000);
-					//链接上了服务器
-					printf("conneted with gamesvr!");
-					UINT			dwThreadIDForMsg = 0;
-					unsigned long	hThreadForMsg = 0;
-					g_ClientIoEvent = WSACreateEvent();
-					hThreadForMsg = _beginthreadex(NULL, 0, ClientWorkerThread, NULL, 0, &dwThreadIDForMsg);
-				}
-
-				InitServerSocket(g_ssock, &g_caddr, g_localPort);
+				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL, NULL);
 			}
 			break;
 		}

@@ -186,8 +186,28 @@ void LogInit()
 }
 #endif
 
-UINT WINAPI ProcessRoom(LPVOID lpParameter)
+int main()
 {
+	//初始化日志系统
+#if defined(_LOG4CPP)
+	LogInit();
+#endif
+
+	print("game svr start");
+	//初始化脚本系统
+	//g_xLuaMng.Init();
+	SetUnhandledExceptionFilter(ExceptionFilter);
+	BOOL bRet = PreventSetUnhandledExceptionFilter();
+	LoadConfig();
+	WSADATA	g_wsd;
+	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
+		return (FALSE);
+
+	g_fTerminated = FALSE;
+	UINT			dwThreadIDForMsg = 0;
+	unsigned long	hThreadForMsg = 0;
+	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
+	//ProcessRooms
 	PLISTNODE pListNode = NULL;
 	while (TRUE)
 	{
@@ -204,12 +224,12 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 
 				if (pRoomInfo && !pRoomInfo->IsEmpty())
 				{
-					pRoomInfo->Update();//第一次是0，第二次开始
+					pRoomInfo->Update();
 				}
 
 				pListNode = g_xRoomList.GetNext(pListNode);
-			} // while
-		} // if g_xReadyUserInfoList.GetCount()
+			}
+		}
 
 		if (g_xGateList.GetCount())
 		{
@@ -222,55 +242,11 @@ UINT WINAPI ProcessRoom(LPVOID lpParameter)
 				if (pGateInfo && !pGateInfo->m_fDoSending)
 					pGateInfo->xSend();
 
-				pListNode = g_xUserInfoList.GetNext(pListNode);
+				pListNode = g_xGateList.GetNext(pListNode);
 			} // while
 		}
 
 		SleepEx(1, TRUE);
-	}
-}
-
-UINT WINAPI InitializingServer(LPVOID lpParameter)
-{
-	UINT			dwThreadIDForMsg = 0;
-	unsigned long	hThreadForMsg = 0;
-	hThreadForMsg = _beginthreadex(NULL, 0, ProcessRoom, NULL, 0, &dwThreadIDForMsg);
-	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
-
-	//连接到数据库服务器 端口6000
-	//ConnectToServer(g_csock, &g_caddr, _IDM_CLIENTSOCK_MSG, g_strDBSvrIP, NULL, g_nDBSrvPort, FD_CONNECT|FD_READ|FD_CLOSE);
-	return 0L;
-}
-
-int main()
-{
-	//初始化日志系统
-#if defined(_LOG4CPP)
-	LogInit();
-#endif
-
-	print(L"game svr start");
-	//初始化脚本系统
-	//g_xLuaMng.Init();
-	SetUnhandledExceptionFilter(ExceptionFilter);
-	BOOL bRet = PreventSetUnhandledExceptionFilter();
-	LoadConfig();
-	WSADATA	g_wsd;
-	if (WSAStartup(MAKEWORD(2, 2), &g_wsd) != 0)
-		return (FALSE);
-
-	g_fTerminated = FALSE;
-
-	CMapInfo* pMapInfo = InitDataInDatabase();
-
-	UINT			dwThreadIDForMsg = 0;
-	unsigned long	hThreadForMsg = 0;
-
-	hThreadForMsg = _beginthreadex(NULL, 0, InitializingServer, pMapInfo, 0, &dwThreadIDForMsg);
-
-	while (1)
-	{
-		Sleep(1);
 	}
 
 	delete g_set;
@@ -290,8 +266,8 @@ void LoadConfig()
 
 	g_set->SetValueInt(DEFAULTSECT, "LocalPort", g_nLocalPort);
 
-	string strRemoteIP;
-	strRemoteIP = g_set->GetValueString(DEFAULTSECT, "DBSvrIP");
+	//string strRemoteIP;
+	//strRemoteIP = g_set->GetValueString(DEFAULTSECT, "DBSvrIP");
 	/*if (strRemoteIP != "")
 		sprintf(g_strDBSvrIP, "%s", strRemoteIP.c_str());
 	else
@@ -301,16 +277,16 @@ void LoadConfig()
 		g_set->SetValueString(DEFAULTSECT, "DBSvrIP", strRemoteIP);
 	}*/
 
-	string strPath;
-	strPath = g_set->GetValueString(DEFAULTSECT, "ClientPath");
-	if (strPath != "")
-		sprintf(g_strClientPath, "%s", strPath.c_str());
-	else
-	{
-		strPath = "D:/Meteor33";
-		sprintf(g_strClientPath, "%s", strPath.c_str());
-		g_set->SetValueString(DEFAULTSECT, "MapPath", strPath);
-	}
+	//string strPath;
+	//strPath = g_set->GetValueString(DEFAULTSECT, "ClientPath");
+	//if (strPath != "")
+	//	sprintf(g_strClientPath, "%s", strPath.c_str());
+	//else
+	//{
+	//	strPath = "D:/Meteor33";
+	//	sprintf(g_strClientPath, "%s", strPath.c_str());
+	//	g_set->SetValueString(DEFAULTSECT, "MapPath", strPath);
+	//}
 
 	//g_strDBSource = g_set->GetValueString(DEFAULTSECT, "DBSource");
 	//g_strDBAccount = g_set->GetValueString(DEFAULTSECT, "DBAccount");
@@ -337,7 +313,7 @@ void SaveConfig()
 		//g_set->SetValueInt(DEFAULTSECT, "DBPort", g_nDBSrvPort);
 		
 		//g_set->SetValueString(DEFAULTSECT, "DBSvrIP", g_strDBSvrIP);
-		g_set->SetValueString(DEFAULTSECT, "ClientPath", g_strClientPath);
+		//g_set->SetValueString(DEFAULTSECT, "ClientPath", g_strClientPath);
 
 		/*g_set->SetValueString(DEFAULTSECT, "DBSource", g_strDBSource);
 		g_set->SetValueString(DEFAULTSECT, "DBAccount", g_strDBAccount);

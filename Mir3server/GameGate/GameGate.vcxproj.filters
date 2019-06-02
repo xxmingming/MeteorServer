@@ -39,20 +39,16 @@
     <ClCompile Include="..\Def\_OrzEx\syncobj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadFuncForComm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadFuncForMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Def\setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="TimerMng.cpp">
-=======
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Def\protocol.pb.cc">
->>>>>>> srv_2
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

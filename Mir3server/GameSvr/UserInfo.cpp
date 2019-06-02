@@ -1,11 +1,4 @@
 #include "stdafx.h"
-
-<<<<<<< HEAD
-void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
-=======
-void UpdateStatusBarUsers(BOOL fGrow);
->>>>>>> master
-
 int CUserInfo::KeyMax = 20;
 CUserInfo::CUserInfo()
 {
@@ -29,42 +22,14 @@ bool CUserInfo::IsEmpty()
 
 void CUserInfo::SetName(const char * pszName)
 {
-<<<<<<< HEAD
 	int namelen = min(strlen(pszName), 18);
 	memcpy(m_szCharName, pszName, namelen);
 	for (int i = namelen; i < 20; i++)
 		m_szCharName[i] = 0x00;
-=======
-	memcpy(m_szCharName, pszName, min(strlen(pszName), 18));
-	m_szCharName[18] = 0;
-	m_szCharName[19] = 0;
-}
-
-void CUserInfo::ProcessUserMessage(char *pszPacket)
-{
-	
->>>>>>> master
 }
 
 void CUserInfo::Operate(Input_ * pInput)
 {
-	//�ѽ�ɫ������ͬ�������ݣ��㲥���˷�����������
-	for (int i = 0; i < KeyMax; i++)
-	{
-		//pInput->set_c(m_pKeys[i]);
-	}
-	pInput->set_playerid(m_nUserServerIndex);
-<<<<<<< HEAD
-	//Vector2_ J = pInput->joystick(); 
-=======
-	//Vector2_ J = pInput->(); 
->>>>>>> master
-	//J.set_x(Jx);
-	//J.set_y(Jy);
-	//Vector2_ d = pInput->mousedelta();
-	//d.set_x(Mx);
-	//d.set_y(My);
-
 }
 
 void CUserInfo::CloseUserHuman()

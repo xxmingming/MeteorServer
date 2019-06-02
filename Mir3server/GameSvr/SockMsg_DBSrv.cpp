@@ -5,9 +5,6 @@
 //UINT WINAPI ProcessLogin(LPVOID lpParameter);
 //UINT WINAPI ProcessUserHuman(LPVOID lpParameter);
 
-char	g_szRemainBuff[DATA_BUFSIZE];
-int		g_nRemainBuffLen = 0;
-
 void ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 //	int					nBuffLen = nRecv;

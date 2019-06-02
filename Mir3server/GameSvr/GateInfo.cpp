@@ -25,13 +25,14 @@ void CGateInfo::SendGateCheck()
 		MsgHdr.wIdent			= GM_CHECKSERVER;
 		MsgHdr.wUserListIndex	= 0;
 		MsgHdr.nLength			= 0;
+		MsgHdr.nMessage			= 0;
 		lpSendBuff->nLen = sizeof(_TMSGHEADER);
 		memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
 		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
 	}
 	else
 	{
-		print(L"Not enough memory");
+		print("Not enough memory");
 	}
 }
 
@@ -73,7 +74,7 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 	}
 	else
 	{
-		pUser->m_pRoom->OnAllPlayerLeaved();
+		pUser->m_pRoom->OnPlayerAllLeaved();
 	}
 }
 
@@ -97,8 +98,8 @@ void CGateInfo::OpenNewUser(char *pszPacket)
 		ZeroMemory(pUserInfo->m_szUserID, sizeof(pUserInfo->m_szUserID));
 		ZeroMemory(pUserInfo->m_szCharName, sizeof(pUserInfo->m_szCharName));
 
-		pUserInfo->m_nCertification		= 0;//未验证是否是合法客户端的
-		pUserInfo->m_nClientVersion		= 0;//未设置版本号的.
+		pUserInfo->m_nCertification		= 0;
+		pUserInfo->m_nClientVersion		= 0;
 		pUserInfo->m_nUserGateIndex		= lpMsgHeader->wSessionIndex;
 		pUserInfo->m_nUserServerIndex	= nIndex;
 		
@@ -143,12 +144,6 @@ void CGateInfo::xSend()
 		{
 			if (dwSend + lpSendBuff->nLen > DATA_BUFSIZE)
 			{
-				if (lpSendBuff->nLen > DATA_BUFSIZE)
-				{
-					vprint("send to gate packet is too long:%d", lpSendBuff->nLen);
-					g_memPool.SetEmptyElement(lpSendBuff->nIndex, lpSendBuff);
-					break;
-				}
 				vprint("send to gate packet is too long 2:%d", lpSendBuff->nLen);
 				m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 				break;
@@ -199,23 +194,18 @@ int CGateInfo::Recv()
 	return WSARecv( m_sock, &OverlappedEx[0].DataBuf, 1, &nRecvBytes, &nFlags, &OverlappedEx[0].Overlapped, 0 );
 }
 
-bool CGateInfo::HasCompletionPacket()
+int CGateInfo::NextPacketOffset(int offset)
+{
+	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(OverlappedEx[0].Buffer + offset);
+	return offset + p->nLength + sizeof(tag_TMSGHEADER);
+}
+
+bool CGateInfo::HasCompletionPacket(int offset)
 {
 	if (OverlappedEx[0].bufLen < sizeof(tag_TMSGHEADER))
 		return false;
-	_LPTMSGHEADER p = (_LPTMSGHEADER)OverlappedEx[0].Buffer;
+	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(OverlappedEx[0].Buffer + offset);
 	if (OverlappedEx[0].bufLen < p->nLength + sizeof(tag_TMSGHEADER))
 		return FALSE;
 	return TRUE;
-}
-
-int CGateInfo::ExtractPacket(char *pPacket)
-{
-	int packetLen = 0;
-	_LPTMSGHEADER p = (_LPTMSGHEADER)OverlappedEx[0].Buffer;
-	packetLen = p->nLength + sizeof(tag_TMSGHEADER);
-	memcpy(pPacket, OverlappedEx[0].Buffer, packetLen);
-	memmove(OverlappedEx[0].Buffer, OverlappedEx[0].Buffer + packetLen, DATA_BUFSIZE - packetLen);
-	OverlappedEx[0].bufLen -= packetLen;
-	return packetLen;
 }

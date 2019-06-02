@@ -35,7 +35,7 @@ BOOL CRoomInfo::RemovePlayer(CUserInfo * pRemoveObject)
 	return TRUE;
 }
 
-void CRoomInfo::OnAllPlayerLeaved()
+void CRoomInfo::OnPlayerAllLeaved()
 {
 	m_bTurnStart = false;
 	m_dwWaitClose = ::GetTickCount();
@@ -97,6 +97,12 @@ void CRoomInfo::WaitClose()
 	{
 		Close();
 	}
+}
+
+void CRoomInfo::Close() 
+{
+	this->m_bTurnStart = false;
+	this->closed = true;
 }
 
 void CRoomInfo::Update()

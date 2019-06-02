@@ -10,34 +10,35 @@ extern HANDLE		g_hIOCP;
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
 
-void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
+void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData, char * pMemory)
 {
 	_TMSGHEADER	msg;
-	char		szBuf[DATA_BUFSIZE];
-
-	WSABUF		Buf;
-	DWORD		dwSendBytes;
-	byte		buff[4096];
+	char		szBuf[4096];
+	char		*pszBuf = NULL;
 	if (pMemory != NULL)
 		pszBuf = pMemory;
 	else
-		pszBuf = &buff[0];
+		pszBuf = szBuf;
 
+	WSABUF		Buf;
+	DWORD		dwSendBytes;
 
 	msg.nSocket			= nSocket;
 	msg.wSessionIndex	= wIndex;
 	msg.wIdent			= nIdent;
 	msg.wUserListIndex	= wSrvIndex;
 	msg.nLength			= nLen;
+	msg.nMessage		= 0;
 	memmove(pszBuf, &msg, sizeof(_TMSGHEADER));
-
 	if (pszData)
 		memmove((byte*)&pszBuf[sizeof(_TMSGHEADER)], pszData, nLen);
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
-	if (Buf.len > DATA_BUFSIZE)
-		print("Buf.len > DATA_BUFSIZE");
-	Buf.buf = szBuf;
-	WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
+	Buf.buf = pszBuf;
+	int s = WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
+	if (s == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
+	{
+		print("send error in SendSocketMsgS");
+	}
 }
 
 DWORD WINAPI AcceptThread(LPVOID lpParameter)
@@ -76,7 +77,7 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
 			// Make packet and send to login server.
-			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL);
+			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL, NULL);
 		}
 	}
 

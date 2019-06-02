@@ -1,13 +1,15 @@
 #include "stdafx.h"
 //global fun
-CMirMap * FindMap(int levelIdx);
 CRoomInfo * FindRoom(int roomIdx);
 BOOL ProcessMessage(CGateInfo * pGate, char * pBytes);
 bool OnProtocolVerify(ProtocolVerifyReq * pReq, int * p_reason);
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName);
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq);
 void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
-
+void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, AudioChatMsg * pMsg);
+void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, ChatMsg * pMsg);
+void ProcessGameGateMsgTail(CGateInfo * pGate, int offset);
+int ProcessGameGateMsg(CGateInfo * pGate, int offset);
 DWORD WINAPI AcceptThread(LPVOID lpParameter)
 {
 	int					nLen = sizeof(SOCKADDR_IN);
@@ -18,8 +20,9 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 	while (TRUE)
 	{
 		nLen	= sizeof( Address );
+		print("wait for gamegate connect");
 		Accept	= WSAAccept( g_ssock, (SOCKADDR *) &Address, &nLen, NULL, 0 );
-
+		print("game gate connected");
 		if (g_fTerminated) return 0L;
 
 		CGateInfo* pGateInfo = new CGateInfo;
@@ -48,31 +51,11 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 	DWORD				dwBytesTransferred;
 	CGateInfo*			pGateInfo;
 	LPOVERLAPPEDEX		lpOverlapped;
-	_LPTMSGHEADER		pMsgHeader;
-	char				completionPacket[DATA_BUFSIZE];
-
 	while (TRUE)
 	{
 		GetQueuedCompletionStatus((HANDLE)CompletionPortID, &dwBytesTransferred, (LPDWORD)&pGateInfo, (LPOVERLAPPED *)&lpOverlapped, INFINITE);
-		
 		if (g_fTerminated)
-		{
-			if (g_xRoomList.GetCount())
-			{
-				PLISTNODE pListNode = g_xRoomList.GetHead();
-
-				while (pListNode)
-				{
-					CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
-					if (pRoomInfo)
-					{
-						pRoomInfo->Close();
-					}
-					pListNode = g_xRoomList.RemoveNode(pListNode);
-				}
-			}
 			return 0L;
-		}
 
 		if (dwBytesTransferred == 0)
 		{
@@ -106,13 +89,19 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 		if (lpOverlapped->nOvFlag == OVERLAPPED_FLAG::OVERLAPPED_RECV)
 		{
 			pGateInfo->OverlappedEx[0].bufLen += dwBytesTransferred;
-
-			while (pGateInfo->HasCompletionPacket())
+			int offset = 0;
+			while (pGateInfo->HasCompletionPacket(offset))
 			{
-				pGateInfo->ExtractPacket(completionPacket);
-				ProcessMessage(pGateInfo, completionPacket);
+				ProcessGameGateMsg(pGateInfo, offset);
+				int nextOffset = pGateInfo->NextPacketOffset(offset);
+				pGateInfo->OverlappedEx[0].bufLen -= (nextOffset - offset);
+				offset = nextOffset;
 			}
-	
+
+			//还有余
+			if (offset != 0)
+				ProcessGameGateMsgTail(pGateInfo, offset);
+
 			if (pGateInfo->Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 				print("pGateInfo->Recv() Failed!!!");
 		}
@@ -146,17 +135,23 @@ void CloseUser(CGateInfo * pGate, CUserInfo * pUserInfo, int userIndex)
 			pUserInfo->m_pGateInfo = NULL;
 			pUserInfo->Unlock();
 		}
-		//��ȫ��ɾ��.
 		g_xUserInfoList.Lock();
 		g_xUserInfoList.RemoveNodeByData(&g_xUserInfoArr[userIndex]);
 		g_xUserInfoList.Unlock();
-		UpdateStatusBarUsers(FALSE);
 	}
 }
 
-BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
+//处理无法解包出的尾部，把尾部内存移动到首
+void ProcessGameGateMsgTail(CGateInfo * pGate, int offset)
 {
-	_LPTMSGHEADER pMsgHeader = (_LPTMSGHEADER)pBytes;
+	memmove(pGate->OverlappedEx[0].Buffer, &pGate->OverlappedEx[0].Buffer[offset], pGate->OverlappedEx[0].bufLen);
+}
+
+//返回下一个包的偏移.
+int ProcessGameGateMsg(CGateInfo * pGate, int offset)
+{
+	char * pBytes = (char*)&pGate->OverlappedEx[0].Buffer[offset];
+	_LPTMSGHEADER pMsgHeader = (_LPTMSGHEADER)(pBytes);
 	CHAR * data = NULL;
 	if (pMsgHeader->nLength != 0)
 		data = (pBytes + sizeof(tag_TMSGHEADER));
@@ -194,38 +189,37 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 		}
 			break;
 		case MeteorMsg_MsgType_ProtocolVerify:
+		{
+			ProtocolVerifyReq pReq;
+			pReq.ParseFromArray(data, pMsgHeader->nLength);
+			ProtocolVerifyRsp pRsp;
+			int reason = 0;
+			bool verifyOK = OnProtocolVerify(&pReq, &reason);
+			if (verifyOK)
 			{
-				ProtocolVerifyReq pReq;
-				pReq.ParseFromArray(data, pMsgHeader->nLength);
-				ProtocolVerifyRsp pRsp;
-				int reason = 0;
-				bool verifyOK = OnProtocolVerify(&pReq, &reason);
-				if (verifyOK)
-				{
-					CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-					pUserInfo->DoClientCertification(pReq.protocol());
-					pRsp.set_result(1);
-					pRsp.set_message("");
-					pRsp.set_secret("");
-				}
-				else
-				{
-					//�رյ��û�
-					CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-					pRsp.set_result(reason);
-					pRsp.set_message("");
-					pRsp.set_secret("");
-				}
-
-				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
-				pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
-				pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
-				pMsgHeader->nLength = pRsp.ByteSize();
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+				pUserInfo->DoClientCertification(pReq.protocol());
+				pRsp.set_result(1);
+				pRsp.set_message("");
+				pRsp.set_secret("");
 			}
-			break;
+			else
+			{
+				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+				pRsp.set_result(reason);
+				pRsp.set_message("");
+				pRsp.set_secret("");
+			}
+
+			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+			pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
+			pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
+			pMsgHeader->nLength = pRsp.ByteSize();
+			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+		}
+		break;
 		case MeteorMsg_MsgType_GetRoomReq:
 		{
 			CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
@@ -252,11 +246,18 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 					pNode = g_xRoomList.GetNext(pNode);
 				}
 				g_xRoomList.Unlock();
-				_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+				int k = g_memPool.GetAvailablePosition();
+				if (k < 0)
+				{
+					print("no more memory");
+				}
+				_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+				if (lpSendBuff != NULL)
+					lpSendBuff->nIndex = k;
 				pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSize();
-				pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_GetRoomRsp;
-				pMsgHeader->nLength = pGetRoomRsp.ByteSize();
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
+				pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
+				pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
 				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
 				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 			}
@@ -265,23 +266,8 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 				CloseUser(pGate, pUserInfo, pMsgHeader->wUserListIndex);
 			}
-			g_xRoomList.Unlock();
-			int k = g_memPool.GetAvailablePosition();
-			if (k < 0)
-			{
-				print("no more memory");
-			}
-			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-			if (lpSendBuff != NULL)
-				lpSendBuff->nIndex = k;
-			pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
-			pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
-			pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
-			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 		}
-			break;
+		break;
 		case MeteorMsg_MsgType_CreateRoomReq:
 		{
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
@@ -308,42 +294,50 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			}
 			else
 			{
-				CreateRoomReq pCreateRoomReq;
-				pCreateRoomReq.ParseFromArray(data, pMsgHeader->nLength);
-				CRoomInfo * pRoom = &g_xRoom[RoomIdx];
-				pRoom->m_nMaxPlayer = min(pCreateRoomReq.maxplayer(), _NUM_OF_MAXPLAYER);
-				pRoom->m_nGroup1 = 0;
-				pRoom->m_nGroup2 = 0;
-				pRoom->m_nHpMax = pCreateRoomReq.hpmax();
-				pRoom->m_nRoomIndex = RoomIdx;
-				pRoom->m_nRule = pCreateRoomReq.rule();
-				strncpy_s(pRoom->m_szName, pCreateRoomReq.roomname().c_str(), min(strlen(pCreateRoomReq.roomname().c_str()), 18));
-				pRoom->m_pMap = FindMap(pCreateRoomReq.levelidx());
-				g_xRoomList.Lock();
-				g_xRoomList.AddNewNode(pRoom);
-				g_xRoomList.Unlock();
-
-				CreateRoomRsp pCreateRoomRsp;
-				pCreateRoomRsp.set_result(1);
-				pCreateRoomRsp.set_roomid(pRoom->m_nRoomIndex);
-				pCreateRoomRsp.set_levelid(pRoom->m_pMap->m_nLevelIdx);
-				pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
-				pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
-				int k = g_memPool.GetAvailablePosition();
-				if (k < 0)
+				int RoomIdx = g_xRoom.GetFreeKey();
+				if (RoomIdx == -1)
 				{
-					print("no more memory");
+					//can not create more room.
 				}
-				_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-				if (lpSendBuff != NULL)
-					lpSendBuff->nIndex = k;
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
-				pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				else
+				{
+					CreateRoomReq pCreateRoomReq;
+					pCreateRoomReq.ParseFromArray(data, pMsgHeader->nLength);
+					CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+					pRoom->m_nMaxPlayer = min(pCreateRoomReq.maxplayer(), _NUM_OF_MAXPLAYER);
+					pRoom->m_nGroup1 = 0;
+					pRoom->m_nGroup2 = 0;
+					pRoom->m_nHpMax = pCreateRoomReq.hpmax();
+					pRoom->m_nRoomIndex = RoomIdx;
+					pRoom->m_nRule = pCreateRoomReq.rule();
+					strncpy_s(pRoom->m_szName, pCreateRoomReq.roomname().c_str(), min(strlen(pCreateRoomReq.roomname().c_str()), 18));
+					pRoom->m_dwMap = pCreateRoomReq.levelidx();
+					g_xRoomList.Lock();
+					g_xRoomList.AddNewNode(pRoom);
+					g_xRoomList.Unlock();
+
+					CreateRoomRsp pCreateRoomRsp;
+					pCreateRoomRsp.set_result(1);
+					pCreateRoomRsp.set_roomid(pRoom->m_nRoomIndex);
+					pCreateRoomRsp.set_levelid(pRoom->m_dwMap);
+					pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
+					pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
+					int k = g_memPool.GetAvailablePosition();
+					if (k < 0)
+					{
+						print("no more memory");
+					}
+					_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+					if (lpSendBuff != NULL)
+						lpSendBuff->nIndex = k;
+					memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
+					pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+					pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				}
 			}
 		}
-			break;
+		break;
 		case MeteorMsg_MsgType_JoinRoomReq:
 		{
 			JoinRoomReq pJoinRoomReq;
@@ -391,13 +385,12 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 						pJoinRoomRsp.set_playerid(pMsgHeader->wUserListIndex);
 						pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
 						pJoinRoomRsp.set_usernick(GBK2UTF8(pUser->m_szCharName));
-						//�����������˷�,�������Լ�.
 						OnUserJoinRoom(pMsgHeader, pGate, pUser, pRoom, UTF82GBK(pJoinRoomReq.usernick()).c_str());
 					}
 					else
 					{
 						pJoinRoomRsp.set_result(0);
-						pJoinRoomRsp.set_reason(4);//���벻��ȷ
+						pJoinRoomRsp.set_reason(4);
 						pJoinRoomRsp.set_levelidx(0);
 						pJoinRoomRsp.set_playerid(0);
 						pJoinRoomRsp.set_roomid(pRoom->m_nRoomIndex);
@@ -443,8 +436,7 @@ BOOL ProcessMessage(CGateInfo * pGate, char * pBytes)
 			}
 			OnUserReborn(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pRebornReq);
 		}
-			break;
-				
+		break;	
 		case MeteorMsg_MsgType_EnterLevelReq:
 		{
 			EnterLevelReq pEnterLevelReq;
@@ -704,7 +696,7 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 			no = pRoom->m_pUserList.GetNext(no);
 		}
 	}
-	//��Է�����ÿһ�����󶼷���һ��֪ͨ����֪���˽�ȥ�˷���.���ǻ�δ����ս��.�Ѿ���ʼ��ʱ��
+
 	pRoom->m_nCount++;
 	if (pRoom->m_nCount != 0)
 		pRoom->OnNewTurn();

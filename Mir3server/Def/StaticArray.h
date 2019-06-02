@@ -10,7 +10,6 @@ template< class T >
 class CStaticArray:public CIntLock
 {
 public:
-	// 클래스 T는 아래 인터페이스를 구현하여야 한다.
 	interface IArrayData
 	{
 		virtual bool IsEmpty() = 0;

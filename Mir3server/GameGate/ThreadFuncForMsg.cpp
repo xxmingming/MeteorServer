@@ -10,21 +10,13 @@ extern CWHQueue					g_SendToServerQ;
 extern BOOL						g_fTerminated;
 extern CWHDynamicArray<CSessionInfo>			g_UserInfoArray;
 
-//����Ϸ������Ϣ���߳�.
 DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 {
 	int							nCount;
-	//int							nBodyLen;
-	//_TMSGHEADER					MsgHdr;
-	//char						szDecodeSay[256];
-	//char						szEncodeSay[256];
-	//char						*pData;
 	CSessionInfo*				pSessionInfo;
 	DWORD						dwBytesSends;
-	
-	//int							nPos;
-
 	UINT						nIdentity = 0;
+	char *						pData = new char[DATA_BUFSIZE];
 	while(TRUE)
 	{
 		if (g_fTerminated) return 0;
@@ -60,7 +52,9 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 					WSABUF Buf;
 					Buf.len = pSessionInfo->nSendBufferLen;
 					Buf.buf = pSessionInfo->SendBuffer;
-					WSASend(pSessionInfo->sock, &Buf, 1, &dwBytesSends, 0, NULL, NULL);
+					int s = WSASend(pSessionInfo->sock, &Buf, 1, &dwBytesSends, 0, NULL, NULL);
+					if (s == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
+						print("Send packet to client error");
 					pSessionInfo->nSendBufferLen = 0;
 				}
 				pSessionInfo->SendBuffLock.Unlock();

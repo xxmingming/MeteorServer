@@ -1,36 +1,14 @@
-
-
 #pragma once
-
 #include "../def/staticArray.h"
 #include "../def/_orzex/syncobj.h"
-
-#define _RUNGATE_STATUS_DISCONNECTED		0
-#define _RUNGATE_STATUS_GOOD				1
-#define _RUNGATE_STATUS_HEAVYTRAFFIC		2
-
-#define LOGPARAM_STR						1
-#define LOGPARAM_INT						2
-
 #define _NUM_OF_MAXROOM						30//最大房间数.
 #define _NUM_OF_MAXPLAYER					16//房间人数上限.
-
-#define HAM_ALL								0
-#define HAM_PEACE							1
-#define HAM_GROUP							2
-#define HAM_GUILD							3
-#define HAM_PKATTACK						4
-
-#define BAGGOLD								5000000
-
-#define USERMODE_LOGIN						1
-
 typedef struct tagOVERLAPPEDEX
 {
 	OVERLAPPED				Overlapped;
 	INT						nOvFlag;
 	WSABUF					DataBuf;
-	CHAR					Buffer[DATA_BUFSIZE * 128];
+	CHAR					Buffer[DATA_BUFSIZE];
 	int						bufLen;
 } OVERLAPPEDEX, *LPOVERLAPPEDEX;
 
@@ -58,8 +36,8 @@ public:
 	void	OnLeaveRoom(CUserInfo * pUser);
 	void	xSend();
 	int		Recv();
-	bool	HasCompletionPacket();
-	int		ExtractPacket(char *pPacket);
+	bool	HasCompletionPacket(int offset);
+	int		NextPacketOffset(int offset);
 };
 
 class CUserInfo	: public CIntLock, CStaticArray< CUserInfo >::IArrayData
@@ -96,7 +74,6 @@ public:
 	void							CloseUserHuman();
 	void							DoClientCertification(UINT32 clientV);
 	void							Operate(Input_ * pInput);
-	void							ProcessUserMessage(char *pszPacket);
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
 	void							Update(Player_ * pPlayer);
@@ -113,7 +90,7 @@ extern Setting			* g_set;
 //extern string			g_strDBAccount;
 //extern string			g_strDBPassword;
 //extern char				g_strDBSvrIP[];
-extern char				g_strClientPath[];
+//extern char				g_strClientPath[];
 //extern int				g_nStartLevel;
 //extern int				g_nStartGold;
 void LoadConfig();

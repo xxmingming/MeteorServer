@@ -113,13 +113,14 @@ class CEvent;
 #include "log4cpp/FileAppender.hh"   
 #include "log4cpp/PatternLayout.hh"
 //#include "../Def/LuaMng.h"
+#pragma comment(lib, "log4cppD.lib")
 using namespace log4cpp;
 extern log4cpp::Category * main_log;
 #define print(s)	main_log->debug("[File:%s/Line:%d]\t%s", __FILE__, __LINE__, s)
 #define vprint(s, ...)   main_log->debug("[File:%s/Line:%d]\t"##s, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define print(s) wprintf(L"%s", s)
-#define vprint(s, ...)
+#define print(s) printf(s##"\r\n")
+#define vprint(s,...) printf(s##"\r\n", __VA_ARGS__)
 #endif
 
 //{{AFX_INSERT_LOCATION}}

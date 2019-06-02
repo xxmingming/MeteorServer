@@ -7,8 +7,8 @@
 #include "TimerMng.h"
 CWHDynamicArray<tag_TSENDBUFF> g_memPool;
 BOOL			g_fTerminated = FALSE;
-short			g_localPort = 7200;//���� ���ܿͻ�������
-short			g_GameSvrPort = 5000;//���� ����Ϸ��ת������.
+short			g_localPort = 7200;
+short			g_GameSvrPort = 5000;
 string			g_strGameSvrIP;
 Setting *		g_set = NULL;
 static WSADATA	g_wsd;
@@ -163,9 +163,37 @@ int main()
 		return (FALSE);
 
 	TimerMng timer;
-	timer.SetTimer(_ID_TIMER_CONNECTSERVER, 5000);
 	DWORD tick = ::GetTickCount();
-	
+
+	if (g_csock == INVALID_SOCKET)
+	{
+		g_csock = socket(AF_INET, SOCK_STREAM, 0);
+		g_caddr.sin_family = AF_INET;
+		g_caddr.sin_port = htons(g_GameSvrPort);
+		g_caddr.sin_addr.s_addr = inet_addr(g_strGameSvrIP.c_str());
+	}
+
+	if (connect(g_csock, (const struct sockaddr FAR*)&g_caddr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
+	{
+		print("can not connect to svr");
+		return -1;
+	}
+	else
+	{
+		if (InitServerThreadForMsg())
+		{
+			TimerMng::Instance->SetTimer(_ID_TIMER_KEEPALIVE, 50000);
+			//链接上了服务器
+			printf("conneted with gamesvr!");
+			UINT			dwThreadIDForMsg = 0;
+			unsigned long	hThreadForMsg = 0;
+			g_ClientIoEvent = WSACreateEvent();
+			hThreadForMsg = _beginthreadex(NULL, 0, ClientWorkerThread, NULL, 0, &dwThreadIDForMsg);
+		}
+
+		InitServerSocket(g_ssock, &g_caddr, g_localPort);
+	}
+
 	while (true)
 	{
 		int elapsed = ::GetTickCount() - tick;
