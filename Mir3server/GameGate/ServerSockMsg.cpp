@@ -17,16 +17,22 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
+	byte		buff[4096];
+	if (pMemory != NULL)
+		pszBuf = pMemory;
+	else
+		pszBuf = &buff[0];
+
 
 	msg.nSocket			= nSocket;
 	msg.wSessionIndex	= wIndex;
 	msg.wIdent			= nIdent;
 	msg.wUserListIndex	= wSrvIndex;
 	msg.nLength			= nLen;
-	memmove(szBuf, &msg, sizeof(_TMSGHEADER));
+	memmove(pszBuf, &msg, sizeof(_TMSGHEADER));
 
 	if (pszData)
-		memmove(&szBuf[sizeof(_TMSGHEADER)], pszData, nLen);
+		memmove((byte*)&pszBuf[sizeof(_TMSGHEADER)], pszData, nLen);
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
 	if (Buf.len > DATA_BUFSIZE)
 		print("Buf.len > DATA_BUFSIZE");
@@ -106,7 +112,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 		if (g_fTerminated) return 0;
 		if (dwBytesTransferred == 0)
 		{
-			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL);
+			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL, NULL);
 			CloseSession(pSessionInfo);
 			continue;
 		}

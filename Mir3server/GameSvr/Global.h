@@ -35,29 +35,14 @@ extern int							g_nMirDayTime;
 
 
 // General Standard Data
-extern CWHList<CMirMap*>			g_xMirMapList;
 extern CWHList<CRoomInfo*>			g_xRoomList;
-extern int							g_nNumOfMoveMapEventInfo;
-extern int							g_nNumOfMagicInfo;
-extern int							g_nNumOfMonGenInfo;
-extern int							g_nNumOfMonRaceInfo;
-extern int							g_nStdItemSpecial;
-extern int							g_nStdItemEtc;
-extern int							g_nNumOfMurchantInfo;
-extern int							g_nNumOfMapInfo;
-
 extern BOOL							g_fTerminated;
-
 extern SOCKET						g_ssock;
 extern SOCKADDR_IN					g_saddr;
-
 extern SOCKET						g_csock;
 extern SOCKADDR_IN					g_caddr;
-
 extern SOCKET						g_clsock;
 extern SOCKADDR_IN					g_claddr;
-
-
 extern HANDLE						g_hThreadForComm;
 extern HANDLE						g_hSvrMsgEvnt;
 extern CWHDynamicArray<tag_TSENDBUFF> g_memPool;

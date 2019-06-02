@@ -1,5 +1,4 @@
 #include "stdafx.h"
-CMirMap*		GetMap(char *pszMapName);
 
 CCharObject::CCharObject(CUserInfo*	pUserInfo)
 { 

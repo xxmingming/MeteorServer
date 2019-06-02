@@ -1,53 +1,18 @@
 #include "stdafx.h"
-
-//global function def
-void LoadMap(CMapInfo* pMapInfo)
-{
-	int			nLen = memlen(pMapInfo->szMapFileName);
-	int			nLen2 = memlen(pMapInfo->szMapName);
-	CMirMap*	pMirMap = new CMirMap;
-	if (pMirMap)
-	{
-		memcpy(pMirMap->m_szMapName, pMapInfo->szMapFileName, nLen);
-		memcpy(pMirMap->m_szMapTextName, pMapInfo->szMapName, nLen2);
-		pMirMap->m_nLevelIdx = pMapInfo->m_nLevelIdx;
-		if (pMirMap->LoadMapData(pMapInfo->szMapFileName))
-			g_xMirMapList.AddNewNode(pMirMap);
-	}
-}
-
-CMirMap* GetMap(char *pszMapName)
-{
-	PLISTNODE		pListNode;
-	CMirMap*		pMirMap = NULL;
-
-	if (g_xMirMapList.GetCount())
-	{
-		pListNode = g_xMirMapList.GetHead();
-
-		while (pListNode)
-		{
-			pMirMap = g_xMirMapList.GetData(pListNode);
-
-			if (memcmp(pMirMap->m_szMapName, pszMapName, memlen(pszMapName) - 1) == 0)
-				return pMirMap;
-			pListNode = g_xMirMapList.GetNext(pListNode);
-		}
-	}
-	return NULL;
-}
-
-/* **************************************************************************************
-		CRoomInfo Class Members
-   **************************************************************************************/
 CRoomInfo::CRoomInfo()
 {
 	memset(m_szName, 0, 20);
 	memset(m_szPassword, 0, 8);
+	m_bHasPsd = false;
 	m_nCount = 0;
 	m_nGroup1 = m_nGroup2 = m_nHpMax = m_nMaxPlayer = m_nRoomIndex = 0;
 	m_nRule = 1;
-	m_pMap = NULL;
+	m_dwTurnIndex = 0;
+	m_totalTime = 0;
+	m_turnTime = 0;
+	m_bTurnStart = false;
+	m_currentTick = 0;
+	m_delta = 0;
 }
 
 CRoomInfo::~CRoomInfo()
@@ -73,24 +38,7 @@ BOOL CRoomInfo::RemovePlayer(CUserInfo * pRemoveObject)
 void CRoomInfo::OnAllPlayerLeaved()
 {
 	m_bTurnStart = false;
-}
-
-void CRoomInfo::CreateRoom(CMirMap * map, int maxPlayer, int hpMax, int turnTime, int roomIdx)
-{
-	if (m_pMap != NULL)
-		return;
-	m_pMap = map;
-	m_nMaxPlayer = maxPlayer;
-	m_nCount = 0;
-	m_nRoomIndex = roomIdx;
-	m_nHpMax = hpMax;
-	strncpy(m_szName, map->m_szMapTextName, min(18, strlen(map->m_szMapTextName)));
-	m_szName[18] = 0;
-	m_szName[19] = 0;
-	m_currentTick = ::GetTickCount();
-	m_turnTime = turnTime;
-	m_totalTime = turnTime;
-	m_delta = 0;
+	m_dwWaitClose = ::GetTickCount();
 }
 
 void CRoomInfo::OnNewTurn()
@@ -99,15 +47,16 @@ void CRoomInfo::OnNewTurn()
 	m_totalTime = m_turnTime;
 	m_delta = 0;
 	m_bTurnStart = true;
+	closed = false;
 }
 
 void CRoomInfo::OnUserKeyFrame()
 {
-	//ÊÕµ½Íæ¼ÒµÄÖ¡Í¬²½ÐÅÏ¢.
+	//ï¿½Õµï¿½ï¿½ï¿½Òµï¿½Ö¡Í¬ï¿½ï¿½ï¿½ï¿½Ï¢.
 	//PLISTNODE pListNode = NULL;
 	//if (m_pUserList.GetCount())
 	//{
-	//	//µÚÒ»´Î±éÀúÌî³äËùÓÐ½ÇÉ«µÄÊäÈëÐÅÏ¢µ½Õû¸öÏûÏ¢
+	//	//ï¿½ï¿½Ò»ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 	//	pListNode = m_pUserList.GetHead();
 	//	while (pListNode)
 	//	{
@@ -138,16 +87,22 @@ void CRoomInfo::OnUserKeyFrame()
 
 void CRoomInfo::NewTurn()
 {
-	//¸ø·¿¼äËùÓÐÍæ¼Ò·¢ËÍÏûÏ¢£¬ÈÃ½øÈë½áÊø½çÃæ£¬ÍË³ö½áÊø½çÃæºó£¬ÖØÐÂÑ¡ÈËºÍÎäÆ÷£¬¿ªÊ¼ÐÂÒ»ÂÖ.
 	OnNewTurn();
+}
+
+void CRoomInfo::WaitClose()
+{
+	DWORD t = ::GetTickCount();
+	if (t - m_dwWaitClose >= 30000)
+	{
+		Close();
+	}
 }
 
 void CRoomInfo::Update()
 {
-	//´ËÂÖÓÎÏ·»¹Î´¿ªÊ¼.
 	if (!m_bTurnStart)
 		return;
-	//´¦ÀíÈ«²¿½ÇÉ«¼äµÄÊäÈëÍ¬²½.
 	DWORD t = ::GetTickCount();
 	m_delta += (t - m_currentTick);
 	m_totalTime -= (t - m_currentTick);
@@ -159,12 +114,10 @@ void CRoomInfo::Update()
 	}
 
 	_TMSGHEADER MsgHeader;
-	//´¦ÀíËÀÍöÏûÏ¢£¬¸üÐÂÃ¿¸ö½ÇÉ«
 	PLISTNODE pListNode = NULL;
 	if (m_pUserList.GetCount())
 	{
 		UserId id;
-		//µÚÒ»´Î±éÀúÌî³äËùÓÐ½ÇÉ«µÄÊäÈëÐÅÏ¢µ½Õû¸öÏûÏ¢
 		pListNode = m_pUserList.GetHead();
 		while (pListNode)
 		{
@@ -172,7 +125,6 @@ void CRoomInfo::Update()
 			if (pUserInfo)
 			{
 				pUserInfo->Lock();
-				//ÈôÍæ¼Ò»¹Î´½ø³¡/»òÍæ¼ÒÔÚ·¿¼äµÄ½ÇÉ«×¢Ïú.
 				if (!pUserInfo->m_bDirty)
 				{
 					if (pUserInfo->m_pxPlayerObject != NULL)
@@ -215,7 +167,6 @@ void CRoomInfo::Update()
 				if (pUserInfo)
 				{
 					pUserInfo->Lock();
-					//ÈôÍæ¼Ò»¹Î´½ø³¡/»òÍæ¼ÒÔÚ·¿¼äµÄ½ÇÉ«×¢Ïú.
 					if (!pUserInfo->m_bDirty)
 					{
 						if (pUserInfo->m_pxPlayerObject != NULL)
@@ -250,7 +201,7 @@ void CRoomInfo::Update()
 					id.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
 					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + id.ByteSizeLong();
 					MsgHeader.nMessage = MeteorMsg_MsgType_UserDeadSB2C;
-					MsgHeader.wIdent = BOARDCASTS2G;//ÇåÀíËÀÍö½ÇÉ«/ÇåÀí×Ô¼ºµÄ½ÇÉ«£¬²¢Ïò·þÎñ¶Ë·¢ËÍÉêÇë¸´»îÏûÏ¢.
+					MsgHeader.wIdent = BOARDCASTS2G;
 					MsgHeader.nLength = id.ByteSizeLong();
 					MsgHeader.nSocket = 0;
 					MsgHeader.wSessionIndex = 0;
@@ -265,7 +216,7 @@ void CRoomInfo::Update()
 
 	if (m_delta > syncDelta)
 	{
-		//ÊÕµ½Íæ¼ÒµÄÖ¡Í¬²½ÐÅÏ¢.
+		//ï¿½Õµï¿½ï¿½ï¿½Òµï¿½Ö¡Í¬ï¿½ï¿½ï¿½ï¿½Ï¢.
 		//KeyFrame rsp;
 		//rsp.Clear();
 		//
@@ -279,7 +230,7 @@ void CRoomInfo::Update()
 		//		user[i] = -1;
 		//	CGateInfo * gate = NULL;
 		//	int userIndexOffset = 0;
-		//	//µÚÒ»´Î±éÀúÌî³äËùÓÐ½ÇÉ«µÄÊäÈëÐÅÏ¢µ½Õû¸öÏûÏ¢
+		//	//ï¿½ï¿½Ò»ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 		//	pListNode = m_pUserList.GetHead();
 		//	while (pListNode)
 		//	{
@@ -287,7 +238,7 @@ void CRoomInfo::Update()
 		//		if (pUserInfo)
 		//		{
 		//			pUserInfo->Lock();
-		//			//ÈôÍæ¼Ò»¹Î´½ø³¡/»òÍæ¼ÒÔÚ·¿¼äµÄ½ÇÉ«×¢Ïú.
+		//			//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î´ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½Ä½ï¿½É«×¢ï¿½ï¿½.
 		//			if (!pUserInfo->m_bDirty)
 		//			{
 		//				if (pUserInfo->m_pxPlayerObject != NULL)
@@ -309,7 +260,7 @@ void CRoomInfo::Update()
 		//		pListNode = m_pUserList.GetNext(pListNode);
 		//	}
 
-		//	//ÒªÍ¬²½µÄ½ÇÉ«ÊýÁ¿²»Îª0,
+		//	//ÒªÍ¬ï¿½ï¿½ï¿½Ä½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0,
 		//	if (rsp.players_size() != 0)
 		//	{
 		//		pListNode = m_pUserList.GetHead();
@@ -342,7 +293,7 @@ void CRoomInfo::Update()
 		//				rsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
 		//				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + rsp.ByteSizeLong();
 		//				vprint("key frame bytes len:%d, totallen:%d, datamax size:%d, player count:%d roomid:%d r player count:%d", rsp.ByteSizeLong(), lpSendBuff->nLen, DATA_BUFSIZE, rsp.players_size(), m_nRoomIndex, m_nCount);
-		//				//»º³åÇø²»×ã£¬ÎÞ·¨ÈÝÄÉÕâÃ´¶àÍæ¼ÒµÄÐÅÏ¢
+		//				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã£¬ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ï¢
 		//				if (rsp.ByteSizeLong() > (DATA_BUFSIZE - sizeof(tag_TMSGHEADER)))
 		//				{
 		//					vprint("the key sync packet occur error player count:%d", rsp.players_size());

@@ -82,6 +82,9 @@
     <ClInclude Include="..\Def\MiniDumper.h">
       <Filter>Def</Filter>
     </ClInclude>
+    <ClInclude Include="..\Def\ikcp.h">
+      <Filter>Def</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Def\_OrzEx\database.cpp">
@@ -135,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="..\Def\Misc.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Def\ikcp.c">
+      <Filter>Def</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

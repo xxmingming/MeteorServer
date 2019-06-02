@@ -1,12 +1,5 @@
 #include "stdafx.h"
 
-#define _MSG_GOOD		"+GOOD/"
-#define _MSG_FAIL		"+FAIL/"
-
-CMirMap*		GetMap(char *pszMapName);
-CPlayerObject*	GetUserHuman(char *pszCharName);
-void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
-
 void CPlayerObject::Constructor()
 {
 	m_bEmpty				= true;

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 
+<<<<<<< HEAD
 void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData2Len);
+=======
+void UpdateStatusBarUsers(BOOL fGrow);
+>>>>>>> master
 
 int CUserInfo::KeyMax = 20;
 CUserInfo::CUserInfo()
@@ -15,6 +19,7 @@ CUserInfo::CUserInfo()
 		m_pKeys[i] = false;
 	}
 	m_pRoom = NULL;
+	m_nCertification = 0;
 }
 
 bool CUserInfo::IsEmpty()
@@ -24,10 +29,21 @@ bool CUserInfo::IsEmpty()
 
 void CUserInfo::SetName(const char * pszName)
 {
+<<<<<<< HEAD
 	int namelen = min(strlen(pszName), 18);
 	memcpy(m_szCharName, pszName, namelen);
 	for (int i = namelen; i < 20; i++)
 		m_szCharName[i] = 0x00;
+=======
+	memcpy(m_szCharName, pszName, min(strlen(pszName), 18));
+	m_szCharName[18] = 0;
+	m_szCharName[19] = 0;
+}
+
+void CUserInfo::ProcessUserMessage(char *pszPacket)
+{
+	
+>>>>>>> master
 }
 
 void CUserInfo::Operate(Input_ * pInput)
@@ -38,7 +54,11 @@ void CUserInfo::Operate(Input_ * pInput)
 		//pInput->set_c(m_pKeys[i]);
 	}
 	pInput->set_playerid(m_nUserServerIndex);
+<<<<<<< HEAD
 	//Vector2_ J = pInput->joystick(); 
+=======
+	//Vector2_ J = pInput->(); 
+>>>>>>> master
 	//J.set_x(Jx);
 	//J.set_y(Jy);
 	//Vector2_ d = pInput->mousedelta();
@@ -60,6 +80,12 @@ void CUserInfo::CloseUserHuman()
 	}
 	m_bEmpty = TRUE;
 	Unlock();
+}
+
+void CUserInfo::DoClientCertification(UINT32 clientV)
+{
+	m_nCertification = 1;
+	m_nClientVersion = clientV;
 }
 
 #define REBORN_DELAY 5000
@@ -93,7 +119,6 @@ void CUserInfo::Update(Player_ * pPlayer)
 		return;
 	}
 
-	int hp = m_pxPlayerObject->m_Ability.HP;
 	m_pxPlayerObject->m_Ability.MP = pPlayer->angry();
 	m_pxPlayerObject->m_Ability.HP = pPlayer->hp();
 	m_pxPlayerObject->m_Ability.Weapon = pPlayer->weapon();

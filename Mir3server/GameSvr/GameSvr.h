@@ -12,7 +12,7 @@
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-#define _NUM_OF_MAXROOM						48//最大房间数.
+#define _NUM_OF_MAXROOM						30//最大房间数.
 #define _NUM_OF_MAXPLAYER					16//房间人数上限.
 
 #define HAM_ALL								0
@@ -23,10 +23,7 @@
 
 #define BAGGOLD								5000000
 
-#define USERMODE_PLAYGAME					1
-#define USERMODE_LOGIN						2
-#define USERMODE_LOGOFF						3
-#define USERMODE_NOTICE						4
+#define USERMODE_LOGIN						1
 
 typedef struct tagOVERLAPPEDEX
 {
@@ -85,7 +82,6 @@ public:
 	CPlayerObject*					m_pxPlayerObject;
 	CGateInfo*						m_pGateInfo;
 	CRoomInfo*						m_pRoom;
-	BYTE							m_btCurrentMode;
 	//按键输入
 	byte*							m_pKeys;
 	//摇杆
@@ -97,15 +93,15 @@ public:
 public:
 	CUserInfo();
 	bool IsEmpty();
-	void							CloseAccount(char *pszName, int nCertification);
 	void							CloseUserHuman();
-	void							DoClientCertification(char *pszPacket);
+	void							DoClientCertification(UINT32 clientV);
 	void							Operate(Input_ * pInput);
 	void							ProcessUserMessage(char *pszPacket);
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
 	void							Update(Player_ * pPlayer);
 	BOOL							NeedReborn(float delta);
+	_inline bool					ClientSafe() { return m_nCertification == 1; }
 };
 
 //提供给GameSrv的端口7200

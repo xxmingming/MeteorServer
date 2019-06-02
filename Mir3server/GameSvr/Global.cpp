@@ -5,27 +5,48 @@
 //CConnection						*g_pConnCommon;
 //CConnection						*g_pConnGame;
 
-CWHList<char *>					g_xAdminCommandList;
-CWHList<char *>					g_xUserCommandList;
+//CWHList<char *>					g_xAdminCommandList;
+//CWHList<char *>					g_xUserCommandList;
+//
+//CWHList<CEvent*>				g_xEventList;
+//CWHList<CEvent*>				g_xEventCloseList;
 
-CWHList<CUserInfo*>				g_xLoginOutUserInfo;
-CWHList<CReadyUserInfo*>		g_xReadyUserInfoList;
-CWHList<CReadyUserInfo2*>		g_xReadyUserInfoList2;
+
+
+//CWHList<CUserInfo*>				g_xLoginOutUserInfo;
+//CWHList<CReadyUserInfo*>		g_xReadyUserInfoList;
+//CWHList<CReadyUserInfo2*>		g_xReadyUserInfoList2;
+//
+//BOOL							g_fInitMerchant = FALSE;
+
 CWHList<CUserInfo*>				g_xReadyList;
-CWHList<CGateInfo*>				g_xGateList;//Íø¹ØÁÐ±í.¶àÍø¹Ø£¬Óë¶àÓÎÏ··þÖ®¼äµÄ»¥Í¨.
+CWHList<CGateInfo*>				g_xGateList;//ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½Ö®ï¿½ï¿½Ä»ï¿½Í¨.
 CStaticArray<CUserInfo>			g_xUserInfoArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
 CStaticArray<CPlayerObject>		g_xPlayerObjectArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
-CStaticArray<CRoomInfo>			g_xRoom(_NUM_OF_MAXROOM);//×î´ó16¸ö·¿¼ä
+CStaticArray<CRoomInfo>			g_xRoom(_NUM_OF_MAXROOM);//ï¿½ï¿½ï¿½16ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 CWHList<CUserInfo*>				g_xUserInfoList;
 
 int								g_nMirDayTime = 1;
 
 
 // General Standard Data
-CWHList<CMirMap*>			g_xMirMapList;					// Map List
+//CWHList<CMirMap*>			g_xMirMapList;					// Map List
 CWHList<CRoomInfo*>			g_xRoomList;
-
-int							g_nNumOfMapInfo;
+//CMoveMapEventInfo*			g_pMoveMapEventInfo = NULL;		// Map Event List
+//int							g_nNumOfMoveMapEventInfo = 0;
+////CMagicInfo*					g_pMagicInfo = NULL;			// Magic List
+//int							g_nNumOfMagicInfo = 0;
+//CMonsterGenInfo*			g_pMonGenInfo = NULL;			// Monster Gen List
+//int							g_nNumOfMonGenInfo = 0;
+//CMonRaceInfo*				g_pMonRaceInfo = NULL;			// Monster List
+//int							g_nNumOfMonRaceInfo = 0;
+//CStdItemSpecial*			g_pStdItemSpecial = NULL;		// Standard Item List
+//int							g_nStdItemSpecial = 0;
+//CStdItem*					g_pStdItemEtc = NULL;			// Standard General Item list
+//int							g_nStdItemEtc = 0;
+//CMerchantInfo*				g_pMerchantInfo = NULL;			// Merchant List
+//int							g_nNumOfMurchantInfo = 0;
+//int							g_nNumOfMapInfo;
 
 BOOL						g_fTerminated = FALSE;
 

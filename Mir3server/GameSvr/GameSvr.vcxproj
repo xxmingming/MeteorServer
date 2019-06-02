@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Def\ikcp.h" />
     <ClInclude Include="..\Def\MiniDumper.h" />
     <ClInclude Include="..\Def\protocol.pb.h" />
     <ClInclude Include="..\Def\Setting.h" />
@@ -169,6 +170,7 @@
     <CustomBuild Include="Res\toolbar.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Def\ikcp.c" />
     <ClCompile Include="..\Def\LuaMng.cpp" />
     <ClCompile Include="..\Def\Misc.cpp" />
     <ClCompile Include="..\Def\protocol.pb.cc" />

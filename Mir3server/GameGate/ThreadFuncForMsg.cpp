@@ -10,7 +10,7 @@ extern CWHQueue					g_SendToServerQ;
 extern BOOL						g_fTerminated;
 extern CWHDynamicArray<CSessionInfo>			g_UserInfoArray;
 
-//ÏòÓÎÏ··þ·¢ÏûÏ¢µÄÏß³Ì.
+//ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ß³ï¿½.
 DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 {
 	int							nCount;
@@ -40,7 +40,7 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 				{
 					if (pSessionInfo = g_UserInfoArray.GetData(pSendBuff->nSessionIndex))
 					{
-						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData);
+						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData, pData);
 					}
 					g_memPool.SetEmptyElement(pSendBuff->nIndex, pSendBuff);
 				}

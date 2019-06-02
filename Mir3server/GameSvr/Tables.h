@@ -1,6 +1,3 @@
-
-#define _MAKEITEMINDEX	12
-
 class CMapInfo
 {
 public:

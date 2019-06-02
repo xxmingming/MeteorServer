@@ -30,13 +30,11 @@ void ProcessGameSvrBoardCastPacket(BYTE *lpMsg)
 		CSessionInfo* pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wUserList[i]);
 		if (!pSessionInfo)
 		{
-			//print("pSessionInfo == null");
 			continue;
 		}
 		pSessionInfo->SendBuffLock.Lock();
-		if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
+		if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > 128 * DATA_BUFSIZE)
 		{
-			//������һ����Ϸ���İ�
 			vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
 			pSessionInfo->SendBuffLock.Unlock();
 			continue;
@@ -66,9 +64,8 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 	}
 
 	pSessionInfo->SendBuffLock.Lock();
-	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > DATA_BUFSIZE)
+	if ((pSessionInfo->nSendBufferLen + lpMsgHeader->nLength + (int)sizeof(CMsg)) > 128 * DATA_BUFSIZE)
 	{
-		//������һ����Ϸ���İ�
 		vprint("discard packet serialize size:%d", lpMsgHeader->nLength);
 		pSessionInfo->SendBuffLock.Unlock();
 		return;
@@ -84,7 +81,6 @@ void ProcessGameSvrPacket(BYTE *lpMsg)
 	pSessionInfo->SendBuffLock.Unlock();
 }
 
-//������Ϸ����������Ϣ.
 bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 {
 	int limit = nRecv + g_nRemainBuffLen;
@@ -106,7 +102,6 @@ bool ProcReceiveBuffer(char *pszPacket, int nRecv)
 	while (g_nRemainBuffLen >= (int)sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
-		//�յ�����ϢID�����л���Ϣ����
 		vprint("recv message:%d serialize size:%d, g_nRemainBufflen:%d", lpMsgHeader->wIdent, lpMsgHeader->nLength, g_nRemainBuffLen);
 		if (g_nRemainBuffLen < (int)(sizeof(_TMSGHEADER) + lpMsgHeader->nLength))
 		{
@@ -241,7 +236,6 @@ BOOL InitServerThreadForMsg()
 //	return 0L;
 //}
 
-//��Ϸ������ȡ��Ϸ����������Ϣ.
 UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 {
 	_TOVERLAPPEDEX		ClientOverlapped;
@@ -249,7 +243,8 @@ UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 	DWORD				dwBytesTransferred;
 	DWORD				dwFlags;
 	DWORD				dwRecvBytes;
-		
+	
+	BYTE*				pMemory = new byte[DATA_BUFSIZE + sizeof(_TMSGHEADER)];
 //	char				*pszPos;
 //	int					nSocket;
 
@@ -282,7 +277,7 @@ UINT WINAPI	ClientWorkerThread(LPVOID lpParameter)
 		if (dwBytesTransferred == 0)
 			break;
 
-		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred);
+		ProcReceiveBuffer(ClientOverlapped.DataBuf.buf, dwBytesTransferred, pMemory);
 		dwFlags = 0;
 
 		ZeroMemory(&(ClientOverlapped.Overlapped), sizeof(OVERLAPPED));

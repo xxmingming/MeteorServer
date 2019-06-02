@@ -11,15 +11,12 @@ public:
 	int						m_nArrIndex;
 	BOOL					m_fIsAlive;
 	BOOL					m_fAdmin;
-	DWORD					m_dwLastTalkTime;//最后一次说话Tick
-	//CWHList<CCharObject*>	m_xSlaveObjList;//宝宝
+	DWORD					m_dwLastTalkTime;
 public:
 	void		Constructor();
 	bool		IsEmpty();
-
 	CPlayerObject();
 	CPlayerObject(CUserInfo* pUserInfo);
-
 	void		Spawn(int startPoint, int camp, int model, int weapon);
 	void		Reborn();
 	void		SetPosition(float x, float y, float z);
