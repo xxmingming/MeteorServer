@@ -46,7 +46,7 @@
 
 // For Game Gate
 #define GM_OPEN					1
-#define GM_CLOSE				2
+#define GM_CLOSE				2			//从网关发向游戏服-表示客户端主动断开，从游戏服发向网关-表示服务端协议已不支持当前客户端.
 #define	GM_CHECKSERVER			3			// Send check signal to Server
 #define GM_CHECKCLIENT			4			// Send check signal to Client
 #define BOARDCASTS2G			5			//从游戏服到网关的广播消息.

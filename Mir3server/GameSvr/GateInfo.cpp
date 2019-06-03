@@ -7,6 +7,35 @@ CGateInfo::CGateInfo()
 	memset( &OverlappedEx, 0, sizeof( OverlappedEx ) );
 }
 
+//服务端强制客户端断开连接.
+void CGateInfo::DisconnectClient(int client)
+{
+	int k = g_memPool.GetAvailablePosition();
+	if (k < 0)
+	{
+		print("no more memory");
+	}
+	_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+	if (lpSendBuff)
+	{
+		lpSendBuff->nIndex = k;
+		_TMSGHEADER		MsgHdr;
+		MsgHdr.nSocket = 0;
+		MsgHdr.wSessionIndex = client;
+		MsgHdr.wIdent = GM_CLOSE;
+		MsgHdr.wUserListIndex = 0;
+		MsgHdr.nLength = 0;
+		MsgHdr.nMessage = 0;
+		lpSendBuff->nLen = sizeof(_TMSGHEADER);
+		memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
+		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
+	}
+	else
+	{
+		print("Not enough memory");
+	}
+}
+
 ///向网关发送保活回执.
 void CGateInfo::SendGateCheck()
 {
@@ -43,7 +72,7 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 	pUser->m_pRoom->RemovePlayer(pUser);
 	if (pUser->m_pRoom->m_pUserList.GetCount() != 0)
 	{
-		PLISTNODE no = pUser->m_pRoom->m_pUserList.GetHead();
+		/*PLISTNODE no = pUser->m_pRoom->m_pUserList.GetHead();
 		while (no != NULL)
 		{
 			CUserInfo * pRoomUser = pUser->m_pRoom->m_pUserList.GetData(no);
@@ -70,7 +99,7 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 				m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
 			}
 			no = pUser->m_pRoom->m_pUserList.GetNext(no);
-		}
+		}*/
 	}
 	else
 	{
@@ -142,7 +171,7 @@ void CGateInfo::xSend()
 
 		while (lpSendBuff)
 		{
-			if (dwSend + lpSendBuff->nLen > DATA_BUFSIZE)
+			if (dwSend + lpSendBuff->nLen > DATA_GATE_SIZE)
 			{
 				vprint("send to gate packet is too long 2:%d", lpSendBuff->nLen);
 				m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
@@ -186,7 +215,7 @@ int CGateInfo::Recv()
 	DWORD nRecvBytes = 0, nFlags = 0;
 
 	OverlappedEx[0].nOvFlag		= OVERLAPPED_FLAG::OVERLAPPED_RECV;
-	OverlappedEx[0].DataBuf.len = DATA_BUFSIZE - OverlappedEx[0].bufLen;
+	OverlappedEx[0].DataBuf.len = DATA_GATE_SIZE - OverlappedEx[0].bufLen;
 	OverlappedEx[0].DataBuf.buf = OverlappedEx[0].Buffer + OverlappedEx[0].bufLen;
 
 	memset( &OverlappedEx[0].Overlapped, 0, sizeof( OverlappedEx[0].Overlapped ) );

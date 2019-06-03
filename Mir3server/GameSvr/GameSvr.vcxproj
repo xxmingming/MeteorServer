@@ -66,7 +66,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_LOG4CPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\../_Obj_Debug/GameSvr\</AssemblerListingLocation>
       <BrowseInformation>true</BrowseInformation>
       <PrecompiledHeaderOutputFile>.\../_Obj_Debug/GameSvr\GameSvr.pch</PrecompiledHeaderOutputFile>
@@ -153,6 +153,7 @@
     <ClInclude Include="..\Def\_OrzEx\list.h" />
     <ClInclude Include="..\Def\List.h" />
     <ClInclude Include="..\Def\Misc.h" />
+    <ClInclude Include="KcpServer.h" />
     <ClInclude Include="ObjectEngine.h" />
     <ClInclude Include="ObjectPlayer.h" />
     <ClInclude Include="..\Def\Protocol.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="GateInfo.cpp" />
     <ClCompile Include="Global.cpp" />
     <ClCompile Include="Handler_Map.cpp" />
+    <ClCompile Include="KcpServer.cpp" />
     <ClCompile Include="ObjectEngine.cpp" />
     <ClCompile Include="ObjectPlayer.cpp" />
     <ClCompile Include="SockMsg_DBSrv.cpp" />

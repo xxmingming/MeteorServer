@@ -20,10 +20,10 @@
 //BOOL							g_fInitMerchant = FALSE;
 
 CWHList<CUserInfo*>				g_xReadyList;
-CWHList<CGateInfo*>				g_xGateList;//�����б�.�����أ������Ϸ��֮��Ļ�ͨ.
+CWHList<CGateInfo*>				g_xGateList;
 CStaticArray<CUserInfo>			g_xUserInfoArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
 CStaticArray<CPlayerObject>		g_xPlayerObjectArr(_NUM_OF_MAXROOM * _NUM_OF_MAXPLAYER);//48*16
-CStaticArray<CRoomInfo>			g_xRoom(_NUM_OF_MAXROOM);//���16������
+CStaticArray<CRoomInfo>			g_xRoom(_NUM_OF_MAXROOM);
 CWHList<CUserInfo*>				g_xUserInfoList;
 
 CWHList<CRoomInfo*>			g_xRoomList;

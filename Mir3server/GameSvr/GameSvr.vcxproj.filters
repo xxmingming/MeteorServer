@@ -85,6 +85,9 @@
     <ClInclude Include="..\Def\ikcp.h">
       <Filter>Def</Filter>
     </ClInclude>
+    <ClInclude Include="KcpServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Def\_OrzEx\database.cpp">
@@ -138,6 +141,9 @@
     </ClCompile>
     <ClCompile Include="..\Def\ikcp.c">
       <Filter>Def</Filter>
+    </ClCompile>
+    <ClCompile Include="KcpServer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

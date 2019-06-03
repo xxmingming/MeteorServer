@@ -3,12 +3,13 @@
 #include "../def/_orzex/syncobj.h"
 #define _NUM_OF_MAXROOM						30//最大房间数.
 #define _NUM_OF_MAXPLAYER					16//房间人数上限.
+#define DATA_GATE_SIZE		60000			//游戏服处理每个网关的缓冲区大小，发送和接收
 typedef struct tagOVERLAPPEDEX
 {
 	OVERLAPPED				Overlapped;
 	INT						nOvFlag;
 	WSABUF					DataBuf;
-	CHAR					Buffer[DATA_BUFSIZE];
+	CHAR					Buffer[DATA_GATE_SIZE];
 	int						bufLen;
 } OVERLAPPEDEX, *LPOVERLAPPEDEX;
 
@@ -23,14 +24,12 @@ class CGateInfo:public CIntLock
 {
 public:
 	SOCKET					m_sock;
-
 	BOOL					m_fDoSending;
 	CWHQueue				m_xSendBuffQ;
 	OVERLAPPEDEX			OverlappedEx[2];
-	
 public:
 	CGateInfo();
-
+	void	DisconnectClient(int client);
 	void	SendGateCheck();
 	void	OpenNewUser(char *pszPacket);
 	void	OnLeaveRoom(CUserInfo * pUser);
@@ -73,7 +72,7 @@ public:
 	bool IsEmpty();
 	void							CloseUserHuman();
 	void							DoClientCertification(UINT32 clientV);
-	void							Operate(Input_ * pInput);
+	void							Operate();
 	void							SetName(const char * pszName);
 	void							CopyTo(Player_ * pPlayer);
 	void							Update(Player_ * pPlayer);

@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _DEFAULT_SOCKET_HANDLER
 #define _DEFAULT_SOCKET_HANDLER
-#define DATA_BUFSIZE 512 * 1024
+#define DATA_BUFSIZE 4096
 
 class OVERLAPPED_FLAG
 {

@@ -11,7 +11,7 @@ struct CMsg
 	uint32_t Message;
 };
 #pragma pack()
-
+void CloseSession(CSessionInfo* pSessionInfo);
 void ProcessGameSvrBoardCastPacket(BYTE *lpMsg)
 {
 	_LPTMSGHEADER	lpMsgHeader = (_LPTMSGHEADER)lpMsg;
@@ -80,6 +80,7 @@ bool ProcReceiveBuffer(_LPTOVERLAPPEDEX pOverLapped, int nRecv)
 	int				nNext = 0;
 	BYTE			*pszData = (BYTE*)&pOverLapped->Buffer[0];
 	_LPTMSGHEADER	lpMsgHeader;
+	CSessionInfo * pSessionInfo = NULL;
 	while (pOverLapped->BytesRECV >= (int)sizeof(_TMSGHEADER))
 	{
 		lpMsgHeader = (_LPTMSGHEADER)pszData;
@@ -92,6 +93,11 @@ bool ProcReceiveBuffer(_LPTOVERLAPPEDEX pOverLapped, int nRecv)
 
 		switch (lpMsgHeader->wIdent)
 		{
+			case GM_CLOSE:
+				pSessionInfo = g_UserInfoArray.GetData(lpMsgHeader->wSessionIndex);
+				if (pSessionInfo != NULL)
+					CloseSession(pSessionInfo);
+				break;
 			case BOARDCASTS2G:
 				ProcessGameSvrBoardCastPacket(pszData);
 				break;

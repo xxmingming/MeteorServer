@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "KcpServer.h"
 CRoomInfo::CRoomInfo()
 {
 	memset(m_szName, 0, 20);
@@ -13,6 +14,17 @@ CRoomInfo::CRoomInfo()
 	m_bTurnStart = false;
 	m_currentTick = 0;
 	m_delta = 0;
+}
+
+int CRoomInfo::InitKcpServer()
+{
+	if (m_pKcpServer == NULL)
+	{
+		m_pKcpServer = new KcpServer(m_nRoomIndex);
+		m_pKcpServer->InitKcp();
+		return m_pKcpServer->port;
+	}
+	return -1;
 }
 
 CRoomInfo::~CRoomInfo()
@@ -119,106 +131,106 @@ void CRoomInfo::Update()
 		return;
 	}
 
-	_TMSGHEADER MsgHeader;
-	PLISTNODE pListNode = NULL;
-	if (m_pUserList.GetCount())
-	{
-		UserId id;
-		pListNode = m_pUserList.GetHead();
-		while (pListNode)
-		{
-			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-			if (pUserInfo)
-			{
-				pUserInfo->Lock();
-				if (!pUserInfo->m_bDirty)
-				{
-					if (pUserInfo->m_pxPlayerObject != NULL)
-					{
-						if (pUserInfo->NeedReborn(m_delta))
-						{
-							//print("some one need reborn");
-							if (pUserInfo->m_pxPlayerObject->m_bNeedSend)
-							{
-								id.add_player(pUserInfo->m_nUserServerIndex);
-								pUserInfo->m_pxPlayerObject->m_bNeedSend = FALSE;
-							}
-						}
-					}
-					else
-					{
-						//print("pUserInfo->m_pxPlayerObject == NULL");
-					}
-				}
-				else
-				{
-					//////print("pUserInfo->m_bDirty");
-				}
-				pUserInfo->Unlock();
-			}
-			pListNode = m_pUserList.GetNext(pListNode);
-		}
+	//_TMSGHEADER MsgHeader;
+	//PLISTNODE pListNode = NULL;
+	//if (m_pUserList.GetCount())
+	//{
+	//	UserId id;
+	//	pListNode = m_pUserList.GetHead();
+	//	while (pListNode)
+	//	{
+	//		CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+	//		if (pUserInfo)
+	//		{
+	//			pUserInfo->Lock();
+	//			if (!pUserInfo->m_bDirty)
+	//			{
+	//				if (pUserInfo->m_pxPlayerObject != NULL)
+	//				{
+	//					if (pUserInfo->NeedReborn(m_delta))
+	//					{
+	//						//print("some one need reborn");
+	//						if (pUserInfo->m_pxPlayerObject->m_bNeedSend)
+	//						{
+	//							id.add_player(pUserInfo->m_nUserServerIndex);
+	//							pUserInfo->m_pxPlayerObject->m_bNeedSend = FALSE;
+	//						}
+	//					}
+	//				}
+	//				else
+	//				{
+	//					//print("pUserInfo->m_pxPlayerObject == NULL");
+	//				}
+	//			}
+	//			else
+	//			{
+	//				//////print("pUserInfo->m_bDirty");
+	//			}
+	//			pUserInfo->Unlock();
+	//		}
+	//		pListNode = m_pUserList.GetNext(pListNode);
+	//	}
 
-		WORD user[_NUM_OF_MAXPLAYER];
-		for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
-			user[i] = -1;
-		CGateInfo * gate = NULL;
-		int userIndexOffset = 0;
-		if (id.player_size() != 0)
-		{
-			pListNode = m_pUserList.GetHead();
-			while (pListNode)
-			{
-				CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-				if (pUserInfo)
-				{
-					pUserInfo->Lock();
-					if (!pUserInfo->m_bDirty)
-					{
-						if (pUserInfo->m_pxPlayerObject != NULL)
-						{
-							user[userIndexOffset++] = pUserInfo->m_nUserGateIndex;
-							if (gate == NULL)
-								gate = pUserInfo->m_pGateInfo;
-						}
-						else
-						{
-							//print("pUserInfo->m_pxPlayerObject == NULL");
-						}
-					}
-					else
-					{
-						//////print("pUserInfo->m_bDirty");
-					}
-					pUserInfo->Unlock();
-				}
-				pListNode = m_pUserList.GetNext(pListNode);
-			}
+	//	WORD user[_NUM_OF_MAXPLAYER];
+	//	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	//		user[i] = -1;
+	//	CGateInfo * gate = NULL;
+	//	int userIndexOffset = 0;
+	//	if (id.player_size() != 0)
+	//	{
+	//		pListNode = m_pUserList.GetHead();
+	//		while (pListNode)
+	//		{
+	//			CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
+	//			if (pUserInfo)
+	//			{
+	//				pUserInfo->Lock();
+	//				if (!pUserInfo->m_bDirty)
+	//				{
+	//					if (pUserInfo->m_pxPlayerObject != NULL)
+	//					{
+	//						user[userIndexOffset++] = pUserInfo->m_nUserGateIndex;
+	//						if (gate == NULL)
+	//							gate = pUserInfo->m_pGateInfo;
+	//					}
+	//					else
+	//					{
+	//						//print("pUserInfo->m_pxPlayerObject == NULL");
+	//					}
+	//				}
+	//				else
+	//				{
+	//					//////print("pUserInfo->m_bDirty");
+	//				}
+	//				pUserInfo->Unlock();
+	//			}
+	//			pListNode = m_pUserList.GetNext(pListNode);
+	//		}
 
-			if (gate != NULL)
-			{
-				int k = g_memPool.GetAvailablePosition();
-				if (k < 0)
-					print("no more memory");
-				_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-				if (lpSendBuff != NULL)
-				{
-					lpSendBuff->nIndex = k;
-					id.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + id.ByteSizeLong();
-					MsgHeader.nMessage = MeteorMsg_MsgType_UserDeadSB2C;
-					MsgHeader.wIdent = BOARDCASTS2G;
-					MsgHeader.nLength = id.ByteSizeLong();
-					MsgHeader.nSocket = 0;
-					MsgHeader.wSessionIndex = 0;
-					MsgHeader.wUserListIndex = 0;
-					memmove(&MsgHeader.wUserList, user, sizeof(user));
-					memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
-					gate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
-				}
-			}
-		}
-	}
+	//		if (gate != NULL)
+	//		{
+	//			int k = g_memPool.GetAvailablePosition();
+	//			if (k < 0)
+	//				print("no more memory");
+	//			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+	//			if (lpSendBuff != NULL)
+	//			{
+	//				lpSendBuff->nIndex = k;
+	//				id.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+	//				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + id.ByteSizeLong();
+	//				MsgHeader.nMessage = MeteorMsg_MsgType_UserDeadSB2C;
+	//				MsgHeader.wIdent = BOARDCASTS2G;
+	//				MsgHeader.nLength = id.ByteSizeLong();
+	//				MsgHeader.nSocket = 0;
+	//				MsgHeader.wSessionIndex = 0;
+	//				MsgHeader.wUserListIndex = 0;
+	//				memmove(&MsgHeader.wUserList, user, sizeof(user));
+	//				memmove(lpSendBuff->szData, &MsgHeader, sizeof(tag_TMSGHEADER));
+	//				gate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+	//			}
+	//		}
+	//	}
+	//}
 
 	if (m_delta > syncDelta)
 	{

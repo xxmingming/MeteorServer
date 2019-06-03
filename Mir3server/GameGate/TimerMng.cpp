@@ -87,7 +87,7 @@ void TimerMng::OnTimerProc(int idEvent)
 		{
 			if (g_csock != INVALID_SOCKET)
 			{
-				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL, NULL);
+				SendSocketMsgS(GM_CHECKCLIENT, 0, 0, 0, 0, NULL);
 			}
 			break;
 		}

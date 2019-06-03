@@ -19,12 +19,14 @@ typedef struct tag_TOSOBJECT
 	DWORD		dwAddTime;
 } _TOSOBJECT, *_LPTOSOBJECT;
 
+class KcpServer;
 class CRoomInfo:public CIntLock, CStaticArray<CRoomInfo>::IArrayData
 {
 public:
 	const int syncDelta = 50;
 	BOOL						m_bTurnStart;
 	uint32_t					m_nRoomIndex;
+	KcpServer *					m_pKcpServer;
 	CWHList<CUserInfo*>			m_pUserList;
 	CHAR						m_szName[20];
 	CHAR						m_szPassword[8];
@@ -54,7 +56,7 @@ public:
 	void						Close();
 	void						NewTurn();
 	void						WaitClose();
-
+	int							InitKcpServer();
 	CRoomInfo();
 	~CRoomInfo();
 };

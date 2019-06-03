@@ -77,7 +77,7 @@ typedef struct tag_TSENDBUFF
 #define LOGPARAM_STR						1
 #define LOGPARAM_INT						2
 
-void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData, char * pMemory);
+void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData);
 
 extern BOOL	g_fTerminated;
 void LoadConfig();

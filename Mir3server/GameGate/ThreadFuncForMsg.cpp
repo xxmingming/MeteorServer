@@ -16,7 +16,6 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 	CSessionInfo*				pSessionInfo;
 	DWORD						dwBytesSends;
 	UINT						nIdentity = 0;
-	char *						pData = new char[DATA_BUFSIZE];
 	while(TRUE)
 	{
 		if (g_fTerminated) return 0;
@@ -32,7 +31,7 @@ DWORD WINAPI ThreadFuncForMsg(LPVOID lpParameter)
 				{
 					if (pSessionInfo = g_UserInfoArray.GetData(pSendBuff->nSessionIndex))
 					{
-						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData, pData);
+						SendSocketMsgS(pSendBuff->nMessage, pSendBuff->nSessionIndex, pSendBuff->sock, pSessionInfo->nServerUserIndex, pSendBuff->nLength, pSendBuff->szData);
 					}
 					g_memPool.SetEmptyElement(pSendBuff->nIndex, pSendBuff);
 				}

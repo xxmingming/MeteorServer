@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "../Def/protocol.pb.h"
-extern HWND			g_hStatusBar;
-	
 extern SOCKET		g_ssock;
 extern SOCKET		g_csock;
 
@@ -9,16 +7,13 @@ extern HANDLE		g_hIOCP;
 
 CWHDynamicArray<CSessionInfo>	g_UserInfoArray;
 CWHQueue						g_SendToServerQ;
-
-void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData, char * pMemory)
+void CloseSession(CSessionInfo* pSessionInfo);
+void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int nLen, char *pszData)
 {
 	_TMSGHEADER	msg;
-	char		szBuf[4096];
+	char		szBuf[DATA_BUFSIZE];
 	char		*pszBuf = NULL;
-	if (pMemory != NULL)
-		pszBuf = pMemory;
-	else
-		pszBuf = szBuf;
+	pszBuf				= szBuf;
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
@@ -77,7 +72,7 @@ DWORD WINAPI AcceptThread(LPVOID lpParameter)
 			CreateIoCompletionPort((HANDLE)Accept, g_hIOCP, (DWORD)pNewSessionInfo, 0);
 			pNewSessionInfo->Recv();
 			// Make packet and send to login server.
-			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL, NULL);
+			SendSocketMsgS(GM_OPEN, pNewSessionInfo->nSessionIndex, (int)pNewSessionInfo->sock, 0, 0, NULL);
 		}
 	}
 
@@ -113,7 +108,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 		if (g_fTerminated) return 0;
 		if (dwBytesTransferred == 0)
 		{
-			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL, NULL);
+			SendSocketMsgS(GM_CLOSE, pSessionInfo->nSessionIndex, pSessionInfo->sock, pSessionInfo->nServerUserIndex, 0, NULL);
 			CloseSession(pSessionInfo);
 			continue;
 		}

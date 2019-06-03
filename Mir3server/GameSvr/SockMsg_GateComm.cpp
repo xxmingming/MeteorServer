@@ -1,11 +1,10 @@
 #include "stdafx.h"
 //global fun
 CRoomInfo * FindRoom(int roomIdx);
-BOOL ProcessMessage(CGateInfo * pGate, char * pBytes);
 bool OnProtocolVerify(ProtocolVerifyReq * pReq, int * p_reason);
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName);
 void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq);
-void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
+//void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq);
 void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, AudioChatMsg * pMsg);
 void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, ChatMsg * pMsg);
 void ProcessGameGateMsgTail(CGateInfo * pGate, int offset);
@@ -98,7 +97,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 				offset = nextOffset;
 			}
 
-			//还有余
+			//还有余下的数据，不足以解开包，把剩余数据移到缓冲区首部.
 			if (offset != 0)
 				ProcessGameGateMsgTail(pGateInfo, offset);
 
@@ -199,19 +198,27 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			{
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 				pUserInfo->DoClientCertification(pReq.protocol());
-				pRsp.set_result(1);
-				pRsp.set_message("");
-				pRsp.set_secret("");
+				//pRsp.set_result(1);
+				//pRsp.set_message("");
+				//pRsp.set_secret("");
 			}
 			else
 			{
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-				pRsp.set_result(reason);
-				pRsp.set_message("");
-				pRsp.set_secret("");
+				CloseUser(pGate, pUserInfo, pMsgHeader->wUserListIndex);
+				pGate->DisconnectClient(pMsgHeader->wSessionIndex);
+				return TRUE;
 			}
 
-			_LPTSENDBUFF lpSendBuff = new _TSENDBUFF;
+			int k = g_memPool.GetAvailablePosition();
+			if (k < 0)
+			{
+				print("no more memory");
+			}
+			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+			if (lpSendBuff != NULL)
+				lpSendBuff->nIndex = k;
+
 			pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
 			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
 			pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
@@ -223,49 +230,41 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 		case MeteorMsg_MsgType_GetRoomReq:
 		{
 			CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-			if (pUserInfo->ClientSafe())
+			GetRoomRsp pGetRoomRsp;
+			g_xRoomList.Lock();
+			PLISTNODE pNode = g_xRoomList.GetHead();
+			while (pNode != NULL)
 			{
-				GetRoomRsp pGetRoomRsp;
-				g_xRoomList.Lock();
-				PLISTNODE pNode = g_xRoomList.GetHead();
-				while (pNode != NULL)
+				CRoomInfo * pRoom = g_xRoomList.GetData(pNode);
+				if (pRoom != NULL)
 				{
-					CRoomInfo * pRoom = g_xRoomList.GetData(pNode);
-					if (pRoom != NULL)
-					{
-						RoomInfo * room = pGetRoomRsp.add_roominlobby();
-						room->set_roomid(pRoom->m_nRoomIndex);
-						room->set_roomname(GBK2UTF8(string(pRoom->m_szName)).c_str());
-						room->set_rule((RoomInfo_RoomRule)pRoom->m_nRule);
-						room->set_levelidx(pRoom->m_dwMap);
-						room->set_group1(pRoom->m_nGroup1);
-						room->set_group2(pRoom->m_nGroup2);
-						room->set_maxplayer(pRoom->m_nMaxPlayer);
-						room->set_playercount(pRoom->m_nCount);
-					}
-					pNode = g_xRoomList.GetNext(pNode);
+					RoomInfo * room = pGetRoomRsp.add_roominlobby();
+					room->set_roomid(pRoom->m_nRoomIndex);
+					room->set_roomname(GBK2UTF8(string(pRoom->m_szName)).c_str());
+					room->set_rule((RoomInfo_RoomRule)pRoom->m_nRule);
+					room->set_levelidx(pRoom->m_dwMap);
+					room->set_group1(pRoom->m_nGroup1);
+					room->set_group2(pRoom->m_nGroup2);
+					room->set_maxplayer(pRoom->m_nMaxPlayer);
+					room->set_playercount(pRoom->m_nCount);
 				}
-				g_xRoomList.Unlock();
-				int k = g_memPool.GetAvailablePosition();
-				if (k < 0)
-				{
-					print("no more memory");
-				}
-				_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-				if (lpSendBuff != NULL)
-					lpSendBuff->nIndex = k;
-				pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
-				pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
-				pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				pNode = g_xRoomList.GetNext(pNode);
 			}
-			else
+			g_xRoomList.Unlock();
+			int k = g_memPool.GetAvailablePosition();
+			if (k < 0)
 			{
-				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-				CloseUser(pGate, pUserInfo, pMsgHeader->wUserListIndex);
+				print("no more memory");
 			}
+			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+			if (lpSendBuff != NULL)
+				lpSendBuff->nIndex = k;
+			pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
+			pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
+			pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
+			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
 		}
 		break;
 		case MeteorMsg_MsgType_CreateRoomReq:
@@ -273,6 +272,7 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 			if (pUser->m_pRoom)
 			{
+				//当前已经在房间内，需要先退出房间。
 				CreateRoomRsp pCreateRoomRsp;
 				pCreateRoomRsp.set_result(0);
 				pCreateRoomRsp.set_levelid(0);
@@ -284,20 +284,42 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 				}
 				_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 				if (lpSendBuff != NULL)
+				{
 					lpSendBuff->nIndex = k;
-				pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
-				pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
-				pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
-				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+					pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
+					pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
+					pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
+					memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+					pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				}
 			}
 			else
 			{
 				int RoomIdx = g_xRoom.GetFreeKey();
 				if (RoomIdx == -1)
 				{
+					CreateRoomRsp pCreateRoomRsp;
+					pCreateRoomRsp.set_result(0);
+					pCreateRoomRsp.set_levelid(0);
+					pCreateRoomRsp.set_roomid(0);
 					//can not create more room.
+					int k = g_memPool.GetAvailablePosition();
+					if (k < 0)
+					{
+						print("no more memory");
+					}
+					_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+					if (lpSendBuff != NULL)
+					{
+						lpSendBuff->nIndex = k;
+						pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+						lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
+						pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
+						pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
+						memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+						pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+					}
 				}
 				else
 				{
@@ -312,6 +334,7 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 					pRoom->m_nRule = pCreateRoomReq.rule();
 					strncpy_s(pRoom->m_szName, pCreateRoomReq.roomname().c_str(), min(strlen(pCreateRoomReq.roomname().c_str()), 18));
 					pRoom->m_dwMap = pCreateRoomReq.levelidx();
+					pRoom->InitKcpServer();
 					g_xRoomList.Lock();
 					g_xRoomList.AddNewNode(pRoom);
 					g_xRoomList.Unlock();
@@ -329,18 +352,20 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 					}
 					_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 					if (lpSendBuff != NULL)
+					{
 						lpSendBuff->nIndex = k;
-					memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-					lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
-					pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-					pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+						memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+						lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pCreateRoomRsp.ByteSizeLong();
+						pCreateRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+						pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+					}
 				}
 			}
 		}
 		break;
 		case MeteorMsg_MsgType_JoinRoomReq:
 		{
-			JoinRoomReq pJoinRoomReq;
+			/*JoinRoomReq pJoinRoomReq;
 			pJoinRoomReq.ParseFromArray(data, pMsgHeader->nLength);
 			CRoomInfo * pRoom = FindRoom(pJoinRoomReq.roomid());
 			JoinRoomRsp pJoinRoomRsp;
@@ -422,22 +447,22 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
 			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pJoinRoomRsp.ByteSizeLong();
 			pJoinRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);*/
 		}
 			break;
-		case MeteorMsg_MsgType_UserRebornReq:
-		{
-			UserId pRebornReq;
-			pRebornReq.ParseFromArray(data, pMsgHeader->nLength);
-			CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
-			if (pUser == NULL || pUser->m_pxPlayerObject == NULL || pUser->m_pRoom == NULL)
-			{
-				return TRUE;
-			}
-			OnUserReborn(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pRebornReq);
-		}
-		break;	
-		case MeteorMsg_MsgType_EnterLevelReq:
+		//case MeteorMsg_MsgType_UserRebornReq:
+		//{
+		//	UserId pRebornReq;
+		//	pRebornReq.ParseFromArray(data, pMsgHeader->nLength);
+		//	CUserInfo * pUser = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
+		//	if (pUser == NULL || pUser->m_pxPlayerObject == NULL || pUser->m_pRoom == NULL)
+		//	{
+		//		return TRUE;
+		//	}
+		//	OnUserReborn(pMsgHeader, pGate, pUser, pUser->m_pRoom, &pRebornReq);
+		//}
+		//break;	
+		/*case MeteorMsg_MsgType_EnterLevelReq:
 		{
 			EnterLevelReq pEnterLevelReq;
 			pEnterLevelReq.ParseFromArray(data, pMsgHeader->nLength);
@@ -460,11 +485,11 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 				if (pUserInfo->m_pxPlayerObject != NULL)
 					pUserInfo->CloseUserHuman();
 			}
-			break;
+			break;*/
 		//case MeteorMsg_MsgType_InputReq://MeteorMsg_MsgType_SyncInput
 
 		//	break;
-		case MeteorMsg_MsgType_KeyFrameReq://MeteorMsg_MsgType_SyncKeyFrame
+		//case MeteorMsg_MsgType_KeyFrameReq://MeteorMsg_MsgType_SyncKeyFrame
 			//CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 			//KeyFrame pKeyFrame;
 			//pKeyFrame.ParseFromArray(data, pMsgHeader->nLength);
@@ -473,143 +498,146 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			//	//print("user key frame req");
 			//	pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);
 			//}
-			break;
+		//	break;
 	}
 
 	return TRUE;
 }
 
-void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq)
-{
-	pRoom->Lock();
-	OnEnterLevelRsp pOnEnterLevelRsp;
-	if (pRoom->m_nCount != 0)
-	{
-		Player_ * player = pOnEnterLevelRsp.mutable_player();
-		pUser->m_pxPlayerObject->Reborn();
-		pUser->CopyTo(player);
-	}
-	PLISTNODE no = pRoom->m_pUserList.GetHead();
-	while (no != NULL)
-	{
-		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
-		if (pUserNode)
-		{
-			CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
-			if (pPlayer != NULL)
-			{
-				tag_TMSGHEADER Msg;
-				Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
-				Msg.nSocket = pUserNode->m_sock;
-				Msg.wIdent = MeteorMsg_MsgType_UserRebornSB2C;
-				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
-				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
-				int k = g_memPool.GetAvailablePosition();
-				if (k < 0)
-				{
-					print("no more memory");
-				}
-				_LPTSENDBUFF pBuffer = g_memPool.GetEmptyElement(k);
-				if (pBuffer != NULL)
-					pBuffer->nIndex = k;
-				pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSizeLong();
-				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
-				pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
-				pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
-			}
-		}
-		no = pRoom->m_pUserList.GetNext(no);
-	}
+//广播
+//void OnUserReborn(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, UserId * pRebornReq)
+//{
+//	pRoom->Lock();
+//	OnEnterLevelRsp pOnEnterLevelRsp;
+//	if (pRoom->m_nCount != 0)
+//	{
+//		Player_ * player = pOnEnterLevelRsp.mutable_player();
+//		pUser->m_pxPlayerObject->Reborn();
+//		pUser->CopyTo(player);
+//	}
+//	PLISTNODE no = pRoom->m_pUserList.GetHead();
+//	while (no != NULL)
+//	{
+//		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+//		if (pUserNode)
+//		{
+//			CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
+//			if (pPlayer != NULL)
+//			{
+//				tag_TMSGHEADER Msg;
+//				Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
+//				Msg.nSocket = pUserNode->m_sock;
+//				Msg.wIdent = MeteorMsg_MsgType_UserRebornSB2C;
+//				Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+//				Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+//				int k = g_memPool.GetAvailablePosition();
+//				if (k < 0)
+//				{
+//					print("no more memory");
+//				}
+//				_LPTSENDBUFF pBuffer = g_memPool.GetEmptyElement(k);
+//				if (pBuffer != NULL)
+//					pBuffer->nIndex = k;
+//				pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSizeLong();
+//				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+//				pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
+//				pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
+//			}
+//		}
+//		no = pRoom->m_pUserList.GetNext(no);
+//	}
+//
+//	pRoom->Unlock();
+//}
+//
+////广播
+//void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq)
+//{
+//	int spawnPoint = rand() % 16;
+//	int nIndex = g_xPlayerObjectArr.GetFreeKey();
+//	if (nIndex >= 0)
+//	{
+//		pUser->m_pxPlayerObject = &g_xPlayerObjectArr[nIndex];
+//		pUser->m_pxPlayerObject->Lock();
+//		pUser->m_pxPlayerObject->Reset(pUser);
+//		pUser->m_pxPlayerObject->m_bEmpty = false;
+//		pUser->m_pxPlayerObject->m_nArrIndex = nIndex;
+//		pUser->m_pxPlayerObject->SetCharName(pUser->m_szCharName);
+//		pUser->m_pxPlayerObject->Spawn(spawnPoint, pEnterLevelReq->camp(), pEnterLevelReq->model(), pEnterLevelReq->weapon());
+//		pUser->m_pxPlayerObject->Unlock();
+//	}
+//	else
+//	{
+//		//print("nIndex < 0");
+//	}
+//	pRoom->Lock();
+//	OnEnterLevelRsp pOnEnterLevelRsp;
+//	if (pRoom->m_nCount != 0)
+//	{
+//		Player_ * player = pOnEnterLevelRsp.mutable_player();
+//		pUser->CopyTo(player);
+//	}
+//
+//	EnterLevelRsp pEnterLevelRsp;
+//	Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
+//	pUser->CopyTo(pInsertPlayer);
+//
+//	PLISTNODE no = pRoom->m_pUserList.GetHead();
+//	while (no != NULL)
+//	{
+//		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
+//		if (pUserNode)
+//		{
+//			if (pUserNode->m_nUserServerIndex != pUser->m_nUserServerIndex)
+//			{
+//				CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
+//				if (pPlayer != NULL)
+//				{
+//					Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
+//					pUserNode->CopyTo(pInsertPlayer);
+//
+//					tag_TMSGHEADER Msg;
+//					Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
+//					Msg.nSocket = pUserNode->m_sock;
+//					Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;
+//					Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
+//					Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
+//					int k = g_memPool.GetAvailablePosition();
+//					if (k < 0)
+//						print("no more memory");
+//					_LPTSENDBUFF pBuffer = g_memPool.GetEmptyElement(k);
+//					if (pBuffer != NULL)
+//					{
+//						pBuffer->nIndex = k;
+//						pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSizeLong();
+//						memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+//						pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
+//						pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
+//					}
+//				}
+//			}
+//		}
+//		no = pRoom->m_pUserList.GetNext(no);
+//	}
+//
+//	pRoom->Unlock();
+//	pMsgHeader->wIdent = MeteorMsg_MsgType_EnterLevelRsp;
+//	pMsgHeader->nLength = pEnterLevelRsp.ByteSizeLong();
+//	int k = g_memPool.GetAvailablePosition();
+//	if (k < 0)
+//		print("no more memory");
+//	_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
+//	if (lpSendBuff != NULL)
+//	{
+//		lpSendBuff->nIndex = k;
+//		memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+//		lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pEnterLevelRsp.ByteSizeLong();
+//		pEnterLevelRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+//		pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+//	}
+//}
 
-	pRoom->Unlock();
-}
-
-void OnUserEnterLevel(_LPTMSGHEADER pMsgHeader, CGateInfo * pGate, CUserInfo * pUser, CRoomInfo * pRoom, EnterLevelReq * pEnterLevelReq)
-{
-	int spawnPoint = rand() % 16;
-	int nIndex = g_xPlayerObjectArr.GetFreeKey();
-	if (nIndex >= 0)
-	{
-		pUser->m_pxPlayerObject = &g_xPlayerObjectArr[nIndex];
-		pUser->m_pxPlayerObject->Lock();
-		pUser->m_pxPlayerObject->Reset(pUser);
-		pUser->m_pxPlayerObject->m_bEmpty = false;
-		pUser->m_pxPlayerObject->m_nArrIndex = nIndex;
-		pUser->m_pxPlayerObject->SetCharName(pUser->m_szCharName);
-		pUser->m_pxPlayerObject->Spawn(spawnPoint, pEnterLevelReq->camp(), pEnterLevelReq->model(), pEnterLevelReq->weapon());
-		pUser->m_pxPlayerObject->Unlock();
-	}
-	else
-	{
-		//print("nIndex < 0");
-	}
-	pRoom->Lock();
-	OnEnterLevelRsp pOnEnterLevelRsp;
-	if (pRoom->m_nCount != 0)
-	{
-		Player_ * player = pOnEnterLevelRsp.mutable_player();
-		pUser->CopyTo(player);
-	}
-
-	EnterLevelRsp pEnterLevelRsp;
-	Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
-	pUser->CopyTo(pInsertPlayer);
-
-	PLISTNODE no = pRoom->m_pUserList.GetHead();
-	while (no != NULL)
-	{
-		CUserInfo * pUserNode = pRoom->m_pUserList.GetData(no);
-		if (pUserNode)
-		{
-			if (pUserNode->m_nUserServerIndex != pUser->m_nUserServerIndex)
-			{
-				CPlayerObject * pPlayer = pUserNode->m_pxPlayerObject;
-				if (pPlayer != NULL)
-				{
-					Player_ * pInsertPlayer = pEnterLevelRsp.mutable_scene()->add_players();
-					pUserNode->CopyTo(pInsertPlayer);
-
-					tag_TMSGHEADER Msg;
-					Msg.nLength = pOnEnterLevelRsp.ByteSizeLong();
-					Msg.nSocket = pUserNode->m_sock;
-					Msg.wIdent = MeteorMsg_MsgType_OnEnterLevelRsp;
-					Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
-					Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
-					int k = g_memPool.GetAvailablePosition();
-					if (k < 0)
-						print("no more memory");
-					_LPTSENDBUFF pBuffer = g_memPool.GetEmptyElement(k);
-					if (pBuffer != NULL)
-					{
-						pBuffer->nIndex = k;
-						pBuffer->nLen = sizeof(_TMSGHEADER) + pOnEnterLevelRsp.ByteSizeLong();
-						memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
-						pOnEnterLevelRsp.SerializeToArray(pBuffer->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
-						pGate->m_xSendBuffQ.PushQ((BYTE *)pBuffer);
-					}
-				}
-			}
-		}
-		no = pRoom->m_pUserList.GetNext(no);
-	}
-
-	pRoom->Unlock();
-	pMsgHeader->wIdent = MeteorMsg_MsgType_EnterLevelRsp;
-	pMsgHeader->nLength = pEnterLevelRsp.ByteSizeLong();
-	int k = g_memPool.GetAvailablePosition();
-	if (k < 0)
-		print("no more memory");
-	_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-	if (lpSendBuff != NULL)
-	{
-		lpSendBuff->nIndex = k;
-		memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-		lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pEnterLevelRsp.ByteSizeLong();
-		pEnterLevelRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-		pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
-	}
-}
-
+//广播
 void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, AudioChatMsg * pMsg)
 {
 	pRoom->Lock();
@@ -622,20 +650,28 @@ void OnUserAudioChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* 
 			tag_TMSGHEADER Msg;
 			Msg.nLength = pMsg->ByteSize();
 			Msg.nSocket = pUserNode->m_sock;
-			Msg.wIdent = MeteorMsg_MsgType_AudioChat;
+			Msg.wIdent = BOARDCASTS2G;
+			Msg.nMessage = MeteorMsg_MsgType_AudioChat;
 			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
 			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
-			_LPTSENDBUFF pBuffer = new _TSENDBUFF;
-			pBuffer->nLen = sizeof(_TMSGHEADER) + pMsg->ByteSize();
-			memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
-			pMsg->SerializeToArray(pBuffer->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)pBuffer);
+			int k = g_memPool.GetAvailablePosition();
+			if (k < 0)
+				print("no more memory");
+			_LPTSENDBUFF pBuffer = g_memPool.GetEmptyElement(k);
+			if (pBuffer != NULL)
+			{
+				pBuffer->nLen = sizeof(_TMSGHEADER) + pMsg->ByteSize();
+				memmove(pBuffer->szData, (char *)&Msg, sizeof(_TMSGHEADER));
+				pMsg->SerializeToArray(pBuffer->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				pGate->m_xSendBuffQ.PushQ((BYTE*)pBuffer);
+			}
 			no = pRoom->m_pUserList.GetNext(no);
 		}
 	}
 	pRoom->Unlock();
 }
 
+//广播
 void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUserInfo, CRoomInfo * pRoom, ChatMsg * pMsg)
 {
 	pRoom->Lock();
@@ -648,7 +684,8 @@ void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUser
 			tag_TMSGHEADER Msg;
 			Msg.nLength = pMsg->ByteSize();
 			Msg.nSocket = pUserNode->m_sock;
-			Msg.wIdent = MeteorMsg_MsgType_ChatInRoomRsp;
+			Msg.wIdent = BOARDCASTS2G;
+			Msg.nMessage = MeteorMsg_MsgType_ChatInRoomRsp;
 			Msg.wSessionIndex = pUserNode->m_nUserGateIndex;
 			Msg.wUserListIndex = pUserNode->m_nUserServerIndex;
 			_LPTSENDBUFF pBuffer = new _TSENDBUFF;
@@ -662,9 +699,10 @@ void OnUserChatInRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate, CUserInfo* pUser
 	pRoom->Unlock();
 }
 
+//广播
 void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserInfo, CRoomInfo * pRoom, const char * szName)
 {
-	pUserInfo->SetName(szName);
+	/*pUserInfo->SetName(szName);
 	pUserInfo->m_pRoom = pRoom;
 	pRoom->Lock();
 	PLISTNODE no = pRoom->m_pUserList.GetHead();
@@ -701,7 +739,7 @@ void OnUserJoinRoom(_LPTMSGHEADER msgHead, CGateInfo * pGate,  CUserInfo* pUserI
 	if (pRoom->m_nCount != 0)
 		pRoom->OnNewTurn();
 	pRoom->m_pUserList.AddNewNode(pUserInfo);
-	pRoom->Unlock();
+	pRoom->Unlock();*/
 }
 
 bool OnProtocolVerify(ProtocolVerifyReq * pReq, int * p_reason)
