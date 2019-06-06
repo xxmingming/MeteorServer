@@ -31,6 +31,9 @@ public:
 	CHAR						m_szName[20];
 	CHAR						m_szPassword[8];
 	uint32_t					m_nRule;
+	uint32_t					m_nPattern;//重播数据-每个玩家来之后都下载录像数据播放，就与房间无关了.
+	uint32_t                    m_nVersion;//版本107/907
+	char *						m_pRecordData;//录像数据.
 	uint32_t					m_nGroup1;
 	uint32_t					m_nGroup2;
 	uint32_t					m_nMaxPlayer;
@@ -39,7 +42,7 @@ public:
 
 	int							m_turnTime;
 	bool						closed;
-	DWORD						m_dwMap;
+	DWORD						m_dwMap;//章节号 × 1000 + 关卡在章节里的序号
 	DWORD						m_dwOwnerId;
 	void						OnNewTurn();
 	BOOL						RemovePlayer(CUserInfo * pUser);

@@ -145,6 +145,7 @@
     <ClInclude Include="..\Def\MiniDumper.h" />
     <ClInclude Include="..\Def\protocol.pb.h" />
     <ClInclude Include="..\Def\Setting.h" />
+    <ClInclude Include="CGroup.h" />
     <ClInclude Include="DataHandler.h" />
     <ClInclude Include="..\Def\EnDecode.h" />
     <ClInclude Include="FrontEngine.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="..\Def\setting.cpp" />
     <ClCompile Include="..\Def\_OrzEx\database.cpp" />
     <ClCompile Include="..\Def\_OrzEx\syncobj.cpp" />
+    <ClCompile Include="CGroup.cpp" />
     <ClCompile Include="GameSvr.cpp" />
     <ClCompile Include="GateInfo.cpp" />
     <ClCompile Include="Global.cpp" />

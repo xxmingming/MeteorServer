@@ -88,6 +88,9 @@
     <ClInclude Include="KcpServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Def\_OrzEx\database.cpp">
@@ -143,6 +146,9 @@
       <Filter>Def</Filter>
     </ClCompile>
     <ClCompile Include="KcpServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,7 +20,7 @@ extern CWHList<char *>				g_xAdminCommandList;
 extern CWHList<char *>				g_xUserCommandList;
 
 
-extern CWHList<CUserInfo*>			g_xLoginOutUserInfo;
+//extern CWHList<CUserInfo*>			g_xLoginOutUserInfo;
 extern CWHList<CUserInfo*>			g_xReadyList;
 extern CWHList<CUserInfo*>			g_xUserInfoList;
 extern CStaticArray<CUserInfo>		g_xUserInfoArr;

@@ -59,24 +59,12 @@ public:
 	CPlayerObject*					m_pxPlayerObject;
 	CGateInfo*						m_pGateInfo;
 	CRoomInfo*						m_pRoom;
-	//°´¼üÊäÈë
-	byte*							m_pKeys;
-	//Ò¡¸Ë
-	float							Jx;
-	float							Jy;
-	//´¥ÆÁ
-	float							Mx;//´¥ÃþÆÁx delta
-	float							My;//´¥ÃþÆÁy delta
 public:
 	CUserInfo();
 	bool IsEmpty();
 	void							CloseUserHuman();
 	void							DoClientCertification(UINT32 clientV);
-	void							Operate();
 	void							SetName(const char * pszName);
-	void							CopyTo(Player_ * pPlayer);
-	void							Update(Player_ * pPlayer);
-	BOOL							NeedReborn(float delta);
 	_inline bool					ClientSafe() { return m_nCertification == 1; }
 };
 

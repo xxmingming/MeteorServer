@@ -198,9 +198,6 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			{
 				CUserInfo * pUserInfo = &g_xUserInfoArr[pMsgHeader->wUserListIndex];
 				pUserInfo->DoClientCertification(pReq.protocol());
-				//pRsp.set_result(1);
-				//pRsp.set_message("");
-				//pRsp.set_secret("");
 			}
 			else
 			{
@@ -217,14 +214,15 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			}
 			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 			if (lpSendBuff != NULL)
+			{
 				lpSendBuff->nIndex = k;
-
-			pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
-			pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
-			pMsgHeader->nLength = pRsp.ByteSize();
-			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				pRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pRsp.ByteSize();
+				pMsgHeader->wIdent = (WORD)MeteorMsg_MsgType_ProtocolVerify;
+				pMsgHeader->nLength = pRsp.ByteSize();
+				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			}
 		}
 		break;
 		case MeteorMsg_MsgType_GetRoomReq:
@@ -258,13 +256,15 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			}
 			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
 			if (lpSendBuff != NULL)
+			{
 				lpSendBuff->nIndex = k;
-			pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
-			lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
-			pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
-			pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
-			memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
-			pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+				pGetRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(tag_TMSGHEADER), DATA_BUFSIZE - sizeof(tag_TMSGHEADER));
+				lpSendBuff->nLen = sizeof(tag_TMSGHEADER) + pGetRoomRsp.ByteSizeLong();
+				pMsgHeader->wIdent = MeteorMsg_MsgType_GetRoomRsp;
+				pMsgHeader->nLength = pGetRoomRsp.ByteSizeLong();
+				memmove(lpSendBuff->szData, pMsgHeader, sizeof(tag_TMSGHEADER));
+				pGate->m_xSendBuffQ.PushQ((BYTE*)lpSendBuff);
+			}
 		}
 		break;
 		case MeteorMsg_MsgType_CreateRoomReq:
@@ -332,9 +332,13 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 					pRoom->m_nHpMax = pCreateRoomReq.hpmax();
 					pRoom->m_nRoomIndex = RoomIdx;
 					pRoom->m_nRule = pCreateRoomReq.rule();
+					pRoom->m_nPattern = pCreateRoomReq.pattern();
+					pRoom->m_nVersion = pCreateRoomReq.version();
+					//pRoom->m_pRecordData = new char[];
 					strncpy_s(pRoom->m_szName, pCreateRoomReq.roomname().c_str(), min(strlen(pCreateRoomReq.roomname().c_str()), 18));
 					pRoom->m_dwMap = pCreateRoomReq.levelidx();
-					pRoom->InitKcpServer();
+					int port = pRoom->InitKcpServer();
+
 					g_xRoomList.Lock();
 					g_xRoomList.AddNewNode(pRoom);
 					g_xRoomList.Unlock();
@@ -343,6 +347,7 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 					pCreateRoomRsp.set_result(1);
 					pCreateRoomRsp.set_roomid(pRoom->m_nRoomIndex);
 					pCreateRoomRsp.set_levelid(pRoom->m_dwMap);
+					pCreateRoomRsp.set_port(port);
 					pMsgHeader->wIdent = MeteorMsg_MsgType_CreateRoomRsp;
 					pMsgHeader->nLength = pCreateRoomRsp.ByteSizeLong();
 					int k = g_memPool.GetAvailablePosition();
@@ -499,6 +504,12 @@ int ProcessGameGateMsg(CGateInfo * pGate, int offset)
 			//	pUserInfo->m_pRoom->OnUserKeyFrame(&pKeyFrame);
 			//}
 		//	break;
+		//角色请求进入排队
+		case MeteorMsg_MsgType_EnterQueueReq:
+			break;
+		//角色请求退出排队
+		case MeteorMsg_MsgType_ExitQueueReq:
+			break;
 	}
 
 	return TRUE;

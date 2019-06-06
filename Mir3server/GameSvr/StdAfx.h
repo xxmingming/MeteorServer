@@ -95,6 +95,7 @@ class CEvent;
 
 
 #include "global.h"
+#include "CGroup.h"
 
 #pragma comment (lib, "ws2_32.lib")
 #pragma comment (lib, "comctl32.lib")

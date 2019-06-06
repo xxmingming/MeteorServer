@@ -18,7 +18,8 @@ CRoomInfo::CRoomInfo()
 
 int CRoomInfo::InitKcpServer()
 {
-	if (m_pKcpServer == NULL)
+	//只要是非重播的就建立KCP服务
+	if (m_pKcpServer == NULL && m_nPattern != RoomInfo_RoomPattern__Replay)
 	{
 		m_pKcpServer = new KcpServer(m_nRoomIndex);
 		m_pKcpServer->InitKcp();

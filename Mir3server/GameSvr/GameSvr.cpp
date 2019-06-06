@@ -207,6 +207,7 @@ int main()
 	UINT			dwThreadIDForMsg = 0;
 	unsigned long	hThreadForMsg = 0;
 	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
+
 	//ProcessRooms
 	PLISTNODE pListNode = NULL;
 	while (TRUE)
