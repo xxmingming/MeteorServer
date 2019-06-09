@@ -1,6 +1,7 @@
 #pragma once
 #include "../def/staticArray.h"
 #include "../def/_orzex/syncobj.h"
+#include "../Def/ikcp.h"
 #define _NUM_OF_MAXROOM						30//最大房间数.
 #define _NUM_OF_MAXPLAYER					16//房间人数上限.
 #define DATA_GATE_SIZE		60000			//游戏服处理每个网关的缓冲区大小，发送和接收
@@ -12,6 +13,7 @@ typedef struct tagOVERLAPPEDEX
 	CHAR					Buffer[DATA_GATE_SIZE];
 	int						bufLen;
 } OVERLAPPEDEX, *LPOVERLAPPEDEX;
+
 
 typedef struct tag_TSENDBUFF
 {
@@ -42,7 +44,6 @@ public:
 class CUserInfo	: public CIntLock, CStaticArray< CUserInfo >::IArrayData
 {
 public:
-	static int KeyMax;
 	bool							m_bEmpty;
 	bool							m_bDirty;//数据还未由客户端同步初始化。需要等待
 	int								m_sock;
@@ -63,9 +64,22 @@ public:
 	CUserInfo();
 	bool IsEmpty();
 	void							CloseUserHuman();
-	void							DoClientCertification(UINT32 clientV);
+	void							DoClientCertification(UINT32 clientV, std::string name);
 	void							SetName(const char * pszName);
 	_inline bool					ClientSafe() { return m_nCertification == 1; }
+	KcpServer*						m_pKcpSvr;
+	ikcpcb*							m_pKcp;
+	int								m_nKcpReveivedBytes;//接收到的KCP数据长度
+	CHAR							m_pKcpBuffer[DATA_BUFSIZE];
+	sockaddr_in						m_remoteaddr;//kcp对端地址
+	int								m_nremoteaddrlen;//对端地址长度
+	void							KcpRelease();//清理掉KCP
+	void							KcpUpdate(int mill);
+	void							InitKcp(KcpServer * pServer);
+	int								KcpInput(char * buffer, int size);
+	void							OnReceivedMsg();
+	void							ExtractPacket();
+	void							OnEnterLevel(char * pData, int size);
 };
 
 //提供给GameSrv的端口7200

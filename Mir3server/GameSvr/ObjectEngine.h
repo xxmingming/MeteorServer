@@ -14,7 +14,6 @@ class CObjectAbility
 {
 public:
 	int	Weapon;
-	int	WeaponPos;
 	int	Model;
 	int	Camp;
 };

@@ -10,109 +10,147 @@ KcpServer::KcpServer(int roomIdx)
 	port = KCP_PORTBASE + roomIdx;
 	srvIndex = roomIdx;
 	millisec = 0;
-	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
-	{
-		len[i] = 0;
-		memset(&addr[i], 0x00, sizeof(sockaddr_in));
-		kcp[i] = NULL;
-		kcpBuffer[i] = new char[KCP_PACKET_SIZE];
-		kcpLen[i] = 0;
-	}
+	logicFrame = 0;
 }
 
 KcpServer::~KcpServer()
 {
 	//遍历所有kcp对象，释放
-	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	PLISTNODE p = users.GetHead();
+	while (p != NULL)
 	{
-		if (kcp[i] != NULL)
+		CUserInfo * pUser = users.GetData(p);
+		if (pUser != NULL)
 		{
-			ikcp_release(kcp[i]);
-			kcp[i] = NULL;
+			pUser->KcpRelease();
 		}
+		p = users.GetNext(p);
 	}
 }
 
 void KcpServer::Update()
 {
 	millisec += 20;
-	//从头到尾，遍历所有kcp对象，每个都update一次
-	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	logicFrame += 1;
+	PLISTNODE p = users.GetHead();
+	while (p != NULL)
 	{
-		if (kcp[i] != NULL)
+		CUserInfo * pUser = users.GetData(p);
+		if (pUser != NULL)
 		{
-			ikcp_update(kcp[i], millisec);
+			pUser->KcpUpdate(millisec, frame);
 		}
+		p = users.GetNext(p);
 	}
+	frames.AddNewNode(frame);
+	frame = new GameFrames();
 }
 
-void KcpServer::OnPlayerEnter(int player)
+void KcpServer::OnPlayerLeave(CUserInfo * player)
 {
-	ikcpcb *kcpPlayer = ikcp_create(player, (void*)this);
+	if (player->m_pRoom != NULL)
+	{
+		player->m_pGateInfo->OnLeaveRoom(player);
+		player->m_pRoom = NULL;
+	}
+	if (player->m_pxPlayerObject != NULL)
+		player->CloseUserHuman();
+	player->KcpRelease();
+	users.RemoveNodeByData(player);
+}
 
-	// 设置kcp的下层输出，这里为 udp_output，模拟udp网络输出函数
-	kcpPlayer->output = udp_output;
-	ikcp_wndsize(kcpPlayer, 128, 128);
-	ikcp_nodelay(kcpPlayer, 1, 10, 2, 0);
-	if (kcp[player] != NULL)
-		printf("already exist player");
-	kcp[player] = kcpPlayer;
+//新一轮开始
+void KcpServer::OnNewTurn()
+{
+	logicFrame = 0;
+	//等待一个时间后，开始新对局，提醒客户端转到结算页面-重新开始新的一轮.
+	PLISTNODE phead = frames.GetHead();
+	while (phead != NULL)
+	{
+		GameFrames * pFrame = frames.GetData(phead);
+		delete pFrame;
+		phead = frames.GetNext(phead);
+	}
+	frames.Clear();
+	PLISTNODE phead = kcpCommand.GetHead();
+	while (phead != NULL)
+	{
+		char * pMemory = kcpCommand.GetData(phead);
+		delete []pMemory;
+		phead = kcpCommand.GetNext(phead);
+	}
+	kcpCommand.Clear();
+	if (frame != NULL)
+	{
+		delete frame;
+		frame = NULL;
+	}
+	frame = new GameFrames();
+	FrameCommand * cmd = frame.add_commands();
+	cmd->set_command(MeteorMsg_Command_SyncRandomSeed);
+	cmd->set_logicframe(1);
+	cmd->set_playerid(0);//id为0时消息为广播.
+	SyncInitData sync;
+	sync.set_randomseed(::GetTickCount());
+	int l = sync.ByteSizeLong();
+	char * buffer = new char[l];
+	sync.SerializeToArray(buffer, l);
+	cmd->set_data(buffer);
+}
+
+//角色在关卡内销毁.-角色主动离开地图时.
+void KcpServer::OnPlayerDestroy(CUserInfo * player, char * data, int size)
+{
+	FrameCommand * cmd = frame.add_commands();
+	cmd->set_command(MeteorMsg_Command_DestroyPlayer);
+	cmd->set_logicframe(logicFrame + 1);
+	cmd->set_playerid(player->m_nUserServerIndex);
+	char * dst = new char[size];
+	memcpy(dst, data, size);
+	kcpCommand.AddNewNode(dst);
+	cmd->set_data(dst);
+	//玩家离开战斗场景，也会导致角色离开房间
+	OnPlayerLeave(player);
+}
+
+//角色进入关卡-当角色加载地图完成时，在服务器当前帧出生
+void KcpServer::OnPlayerSpawn(CUserInfo * player, char * data, int size)
+{
+	FrameCommand * cmd = frame.add_commands();
+	cmd->set_command(MeteorMsg_Command_SpawnPlayer);
+	cmd->set_logicframe(logicFrame + 1);
+	cmd->set_playerid(player->m_nUserServerIndex);
+	char * dst = new char[size];
+	memcpy(dst, data, size);
+	kcpCommand.AddNewNode(dst);
+	cmd->set_data(dst);
+}
+
+//进入房间-还未进入关卡
+void KcpServer::OnPlayerEnter(CUserInfo * player)
+{
+	users.AddNewNode(player);
+	player->InitKcp(this);
+
+	//frames.mutable_frames().;
 }
 
 void KcpServer::OnRecv(int nRecvBytes)
 {
-	for (int i = 0; i < _NUM_OF_MAXPLAYER; i++)
+	PLISTNODE p = users.GetHead();
+	while (p != NULL)
 	{
-		if (kcp[i] != NULL)
+		CUserInfo * pUser = users.GetData(p);
+		if (pUser != NULL)
 		{
-			if (-1 == ikcp_input(kcp[i], Buffer, nRecvBytes))
+			if (pUser->KcpInput(Buffer, nRecvBytes) != -1)
 			{
-
-			}
-			else
-			{
-				//conv相同
-				len[kcp[i]->conv] = fromlen;
-				memmove(&addr[kcp[i]->conv], &from, sizeof(from));
-				int received = ikcp_recv(kcp[i], (char*)(&kcpBuffer[i] + kcpLen[i]), KCP_PACKET_SIZE - kcpLen[i]);
-				kcpLen[i] += received;
-
-				//尝试解出kcp里的消息包
-				//4字节长度-4字节消息ID
-				ExtractPacket(i);
+				pUser->OnReceivedMsg();
 				break;
 			}
 		}
+		p = users.GetNext(p);
 	}
-}
-
-//解对应玩家的包
-void KcpServer::ExtractPacket(int playerId)
-{
-	int offset = 0;
-	while (kcpLen[playerId] > 8)
-	{
-		CMsg * pMsg = (CMsg*)(&kcpBuffer[playerId] + offset);
-		
-		//整个包大小，小于当前已存在数据大小
-		if (pMsg->Size < kcpLen[playerId])
-		{
-			char * pData = ((char*)pMsg) + sizeof(CMsg);
-			//处理包内容
-			switch (pMsg->Message)
-			{
-				//case METEOR_MSG_
-				default:printf("recv kcp message"); break;
-			}
-
-			kcpLen[playerId] -= pMsg->Size;
-			offset += pMsg->Size;
-		}
-	}
-
-	//把尾部内存拷贝到前面来.
-	if (kcpLen[playerId] != 0 && offset != 0)
-		memmove(&kcpBuffer[playerId] + offset, &kcpBuffer[playerId], kcpLen[playerId]);
 }
 
 void KcpServer::InitKcp()
@@ -132,6 +170,7 @@ void KcpServer::InitKcp()
 	}
 	int imode = 1;
 	ioctlsocket(sock, FIONBIO, (u_long*)&imode);//设置为非阻塞
+	vprint("kcp bind port:%d", port);
 	CreateIoCompletionPort((HANDLE)sock, g_KcpIOCP, (DWORD)this, 0);
 	if (Recv() == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 	{
@@ -193,13 +232,6 @@ void KcpServer::InitKcp()
 
 	//ts1 = iclock() - ts1;
 	
-}
-
-int udp_output(const char *buf, int len, ikcpcb *kcp, void *user)
-{
-	KcpServer * pServer = (KcpServer*)user;
-	sendto(pServer->sock, buf, len, 0, (SOCKADDR*)&pServer->addr[kcp->conv], pServer->len[kcp->conv]);
-	return 0;
 }
 
 //kcp线程，处理所有kcpserver套接口上的udp消息接收

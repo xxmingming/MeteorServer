@@ -129,11 +129,6 @@ class JoinRoomRspDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<JoinRoomRsp>
       _instance;
 } _JoinRoomRsp_default_instance_;
-class EnterLevelReqDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<EnterLevelReq>
-      _instance;
-} _EnterLevelReq_default_instance_;
 class Vector2_DefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Vector2_>
@@ -144,11 +139,6 @@ class FrameCommandDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<FrameCommand>
       _instance;
 } _FrameCommand_default_instance_;
-class TurnFramesDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<TurnFrames>
-      _instance;
-} _TurnFrames_default_instance_;
 class GameFramesDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<GameFrames>
@@ -628,27 +618,6 @@ void InitDefaultsJoinRoomRsp() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsJoinRoomRspImpl);
 }
 
-void InitDefaultsEnterLevelReqImpl() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  {
-    void* ptr = &::_EnterLevelReq_default_instance_;
-    new (ptr) ::EnterLevelReq();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::EnterLevelReq::InitAsDefaultInstance();
-}
-
-void InitDefaultsEnterLevelReq() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsEnterLevelReqImpl);
-}
-
 void InitDefaultsVector2_Impl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -691,28 +660,6 @@ void InitDefaultsFrameCommand() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsFrameCommandImpl);
 }
 
-void InitDefaultsTurnFramesImpl() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_protocol_2eproto::InitDefaultsFrameCommand();
-  {
-    void* ptr = &::_TurnFrames_default_instance_;
-    new (ptr) ::TurnFrames();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::TurnFrames::InitAsDefaultInstance();
-}
-
-void InitDefaultsTurnFrames() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsTurnFramesImpl);
-}
-
 void InitDefaultsGameFramesImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -721,7 +668,7 @@ void InitDefaultsGameFramesImpl() {
 #else
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_protocol_2eproto::InitDefaultsTurnFrames();
+  protobuf_protocol_2eproto::InitDefaultsFrameCommand();
   {
     void* ptr = &::_GameFrames_default_instance_;
     new (ptr) ::GameFrames();
@@ -777,7 +724,7 @@ void InitDefaultsAudioChatMsg() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAudioChatMsgImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[29];
+::google::protobuf::Metadata file_level_metadata[27];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[6];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -1000,11 +947,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::CreateRoomRsp, result_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::CreateRoomRsp, roomid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::CreateRoomRsp, levelid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::CreateRoomRsp, playerid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::CreateRoomRsp, port_),
   0,
   1,
   2,
   3,
+  4,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomReq, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomReq, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1026,6 +975,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, levelidx_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, roomid_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, playerid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, port_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, models_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::JoinRoomRsp, weapons_),
   0,
@@ -1033,23 +983,9 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   2,
   3,
   4,
+  5,
   ~0u,
   ~0u,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, player_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, camp_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, model_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, weapon_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::EnterLevelReq, name_),
-  1,
-  2,
-  3,
-  4,
-  0,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Vector2_, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::Vector2_, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1072,21 +1008,12 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   2,
   3,
   0,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::TurnFrames, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::TurnFrames, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::TurnFrames, turnindex_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::TurnFrames, commands_),
-  0,
-  ~0u,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::GameFrames, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::GameFrames, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::GameFrames, frames_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::GameFrames, commands_),
   ~0u,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ChatMsg, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ChatMsg, _internal_metadata_),
@@ -1131,16 +1058,14 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 146, 163, sizeof(::RoomInfo)},
   { 175, 181, sizeof(::GetRoomRsp)},
   { 182, 199, sizeof(::CreateRoomReq)},
-  { 211, 220, sizeof(::CreateRoomRsp)},
-  { 224, 232, sizeof(::JoinRoomReq)},
-  { 235, 247, sizeof(::JoinRoomRsp)},
-  { 254, 264, sizeof(::EnterLevelReq)},
-  { 269, 276, sizeof(::Vector2_)},
-  { 278, 287, sizeof(::FrameCommand)},
-  { 291, 298, sizeof(::TurnFrames)},
-  { 300, 306, sizeof(::GameFrames)},
-  { 307, 315, sizeof(::ChatMsg)},
-  { 318, 326, sizeof(::AudioChatMsg)},
+  { 211, 221, sizeof(::CreateRoomRsp)},
+  { 226, 234, sizeof(::JoinRoomReq)},
+  { 237, 250, sizeof(::JoinRoomRsp)},
+  { 258, 265, sizeof(::Vector2_)},
+  { 267, 276, sizeof(::FrameCommand)},
+  { 280, 286, sizeof(::GameFrames)},
+  { 287, 295, sizeof(::ChatMsg)},
+  { 298, 306, sizeof(::AudioChatMsg)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1166,10 +1091,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::_CreateRoomRsp_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_JoinRoomReq_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_JoinRoomRsp_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_EnterLevelReq_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_Vector2__default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_FrameCommand_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_TurnFrames_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_GameFrames_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_ChatMsg_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_AudioChatMsg_default_instance_),
@@ -1191,105 +1114,102 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 29);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 27);
 }
 
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\016protocol.proto\"\330\007\n\tMeteorMsg\022\037\n\003cmd\030\001 "
-      "\002(\0162\022.MeteorMsg.MsgType\"\375\005\n\007MsgType\022\022\n\016P"
+      "\n\016protocol.proto\"\372\007\n\tMeteorMsg\022\037\n\003cmd\030\001 "
+      "\002(\0162\022.MeteorMsg.MsgType\"\220\006\n\007MsgType\022\022\n\016P"
       "rotocolVerify\020\n\022\016\n\nGetRoomReq\020d\022\016\n\nGetRo"
       "omRsp\020e\022\021\n\rCreateRoomReq\020f\022\021\n\rCreateRoom"
       "Rsp\020g\022\017\n\013JoinRoomReq\020h\022\017\n\013JoinRoomRsp\020i\022"
       "\021\n\rChatInRoomReq\020x\022\021\n\rChatInRoomRsp\020y\022\022\n"
       "\016ChatInLobbyReq\020z\022\022\n\016ChatInLobbyRsp\020{\022\021\n"
       "\rEnterQueueReq\020|\022\021\n\rEnterQueueRsp\020}\022\020\n\014E"
-      "xitQueueReq\020~\022\025\n\021QueueMsgWaitReady\020\177\022\025\n\020"
-      "QueueMsgCanceled\020\200\001\022\025\n\020QueueMsgReadyReq\020"
-      "\201\001\022\022\n\rOnBattleBegin\020\202\001\022\023\n\016OnBattleCancel"
-      "\020\203\001\022\023\n\016UserSelectRole\020\204\001\022\025\n\020OnUserSelect"
-      "Role\020\205\001\022\024\n\017UserSelectSkill\020\206\001\022\026\n\021OnUserS"
-      "electSkill\020\207\001\022\023\n\016UserSelectSkin\020\210\001\022\025\n\020On"
-      "UserSelectSkin\020\211\001\022\r\n\010UserQuit\020\212\001\022\027\n\022OnBa"
-      "ttleEnterLevel\020\213\001\022\024\n\017OnBattleLoading\020\214\001\022"
-      "\022\n\rOnBattleStart\020\215\001\022\023\n\016OnBattleResult\020\216\001"
-      "\022\031\n\024OnBattleResultDetail\020\217\001\022\021\n\014OnPlayerQ"
-      "uit\020\222\001\022\024\n\017OnPlayerReStart\020\223\001\022\027\n\022OnPlayer"
-      "FetchInput\020\224\001\022\026\n\021OnPlayerReConnect\020\225\001\022\016\n"
-      "\tAudioChat\020\226\001\022\020\n\013SyncCommand\020\370\006\"\251\001\n\007Comm"
-      "and\022\022\n\016SyncRandomSeed\020\001\022\013\n\007KeyDown\020\002\022\t\n\005"
-      "KeyUp\020\003\022\017\n\013SpawnPlayer\020\004\022\021\n\rDestroyPlaye"
-      "r\020\005\022\020\n\014JoyStickMove\020d\022\017\n\013EquipWeapon\020e\022\016"
-      "\n\nDropWeapon\020f\022\r\n\010SellItem\020\310\001\022\014\n\007BuyItem"
-      "\020\311\001\"\026\n\007KeyData\022\013\n\003key\030\001 \002(\r\"\"\n\014SyncInitD"
-      "ata\022\022\n\nrandomSeed\030\001 \002(\r\"^\n\017PlayerEventDa"
-      "ta\022\020\n\010playerId\030\001 \002(\r\022\014\n\004camp\030\002 \002(\r\022\r\n\005mo"
-      "del\030\003 \002(\r\022\016\n\006weapon\030\004 \002(\r\022\014\n\004name\030\005 \002(\t\""
-      "H\n\rEnterQueueRsp\022\016\n\006result\030\001 \002(\r\022\020\n\010play"
-      "erId\030\002 \002(\r\022\025\n\rplayerInQueue\030\003 \002(\r\"g\n\rOnB"
-      "attleBegin\022\025\n\rTeamMemberAId\030\001 \003(\r\022\025\n\rTea"
-      "mMemberBId\030\002 \003(\r\022\023\n\013TeamMemberA\030\003 \003(\t\022\023\n"
-      "\013TeamMemberB\030\004 \003(\t\"2\n\016UserSelectRole\022\020\n\010"
-      "playerId\030\001 \002(\r\022\016\n\006HeroId\030\002 \002(\r\"4\n\017UserSe"
-      "lectSkill\022\020\n\010playerId\030\001 \002(\r\022\017\n\007SkillId\030\002"
-      " \002(\r\"0\n\016UserSelectSkin\022\020\n\010playerId\030\001 \002(\r"
-      "\022\014\n\004Skin\030\002 \002(\r\"\"\n\020OnBattleCanceled\022\016\n\006re"
-      "ason\030\001 \002(\r\"4\n\017OnBattleLoading\022\020\n\010playerI"
-      "d\030\001 \003(\r\022\017\n\007percent\030\002 \003(\r\" \n\016OnBattleResu"
-      "lt\022\016\n\006result\030\001 \002(\r\"2\n\016PlayerSellItem\022\020\n\010"
-      "playerId\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"1\n\rPlayer"
-      "BuyItem\022\020\n\010playerId\030\001 \002(\r\022\016\n\006itemId\030\002 \002("
-      "\r\"3\n\021ProtocolVerifyReq\022\020\n\010protocol\030\001 \002(\r"
-      "\022\014\n\004data\030\002 \002(\t\"4\n\021ProtocolVerifyRsp\022\016\n\006r"
-      "esult\030\001 \002(\r\022\017\n\007message\030\002 \002(\t\"\341\004\n\010RoomInf"
-      "o\022\016\n\006roomId\030\001 \002(\r\022\020\n\010roomName\030\002 \002(\t\022 \n\004r"
-      "ule\030\003 \002(\0162\022.RoomInfo.RoomRule\022&\n\007pattern"
-      "\030\004 \002(\0162\025.RoomInfo.RoomPattern\022\020\n\010levelId"
-      "x\030\005 \002(\r\022\r\n\005hpMax\030\006 \002(\r\022\020\n\010password\030\007 \002(\r"
-      "\022(\n\007version\030\010 \002(\0162\027.RoomInfo.MeteorVersi"
-      "on\022\016\n\006Group1\030\t \002(\r\022\016\n\006Group2\030\n \002(\r\022\023\n\013pl"
-      "ayerCount\030\013 \002(\r\022\021\n\tmaxPlayer\030\014 \002(\r\"f\n\010Ro"
-      "omRule\022\006\n\002MZ\020\001\022\007\n\003ROB\020\002\022\013\n\007Defence\020\003\022\016\n\n"
-      "KillTarget\020\004\022\013\n\007Endless\020\005\022\n\n\006Normal\020\006\022\t\n"
-      "\005Story\020\007\022\010\n\004Moba\020\010\"4\n\013RoomPattern\022\013\n\007_No"
-      "rmal\020\001\022\013\n\007_Record\020\002\022\013\n\007_Replay\020\003\"#\n\rMete"
-      "orVersion\022\010\n\004V107\020\001\022\010\n\004V907\020\002\"\200\001\n\tErrorC"
-      "ode\022\020\n\014RoomNotExist\020\001\022\022\n\016RoomPlayerFull\020"
-      "\002\022\024\n\020RoomNeedPassword\020\003\022\022\n\016RoomVersionEr"
-      "r\020\004\022\025\n\021UserInAnotherRoom\020\005\022\014\n\010RoomFull\020\006"
-      "\",\n\nGetRoomRsp\022\036\n\013RoomInLobby\030\001 \003(\0132\t.Ro"
-      "omInfo\"\242\002\n\rCreateRoomReq\022&\n\007pattern\030\001 \002("
-      "\0162\025.RoomInfo.RoomPattern\022\021\n\tmaxPlayer\030\002 "
-      "\002(\r\022\020\n\010levelIdx\030\003 \002(\r\022 \n\004rule\030\004 \002(\0162\022.Ro"
-      "omInfo.RoomRule\022\020\n\010roomName\030\005 \002(\t\022\r\n\005hpM"
-      "ax\030\006 \002(\r\022\021\n\troundTime\030\007 \002(\r\022(\n\007version\030\010"
-      " \002(\0162\027.RoomInfo.MeteorVersion\022\016\n\006secret\030"
-      "\t \001(\t\022\023\n\013replay_data\030\n \001(\014\022\016\n\006models\030\013 \003"
-      "(\r\022\017\n\007weapons\030\014 \003(\r\"N\n\rCreateRoomRsp\022\016\n\006"
-      "result\030\001 \002(\r\022\016\n\006roomId\030\002 \002(\r\022\017\n\007levelId\030"
-      "\003 \002(\r\022\014\n\004port\030\004 \002(\r\"Y\n\013JoinRoomReq\022\016\n\006ro"
-      "omId\030\001 \002(\r\022(\n\007version\030\002 \002(\0162\027.RoomInfo.M"
-      "eteorVersion\022\020\n\010password\030\003 \001(\t\"\202\001\n\013JoinR"
-      "oomRsp\022\016\n\006result\030\001 \002(\r\022\016\n\006reason\030\002 \002(\r\022\020"
-      "\n\010levelIdx\030\003 \002(\r\022\016\n\006roomId\030\004 \002(\r\022\020\n\010play"
-      "erId\030\005 \002(\r\022\016\n\006models\030\006 \003(\r\022\017\n\007weapons\030\007 "
-      "\003(\r\"Z\n\rEnterLevelReq\022\016\n\006player\030\001 \002(\r\022\014\n\004"
-      "camp\030\002 \002(\r\022\r\n\005model\030\003 \002(\r\022\016\n\006weapon\030\004 \002("
-      "\r\022\014\n\004name\030\005 \002(\t\" \n\010Vector2_\022\t\n\001x\030\001 \002(\005\022\t"
-      "\n\001y\030\002 \002(\005\"g\n\014FrameCommand\022\022\n\nLogicFrame\030"
-      "\001 \002(\r\022\020\n\010playerId\030\002 \001(\r\022#\n\007command\030\003 \002(\016"
-      "2\022.MeteorMsg.Command\022\014\n\004data\030\004 \002(\014\"@\n\nTu"
-      "rnFrames\022\021\n\tturnIndex\030\001 \002(\r\022\037\n\010commands\030"
-      "\002 \003(\0132\r.FrameCommand\")\n\nGameFrames\022\033\n\006fr"
-      "ames\030\001 \003(\0132\013.TurnFrames\"E\n\007ChatMsg\022\020\n\010pl"
-      "ayerId\030\001 \002(\r\022\023\n\013channelType\030\002 \002(\r\022\023\n\013cha"
-      "tMessage\030\003 \002(\t\"B\n\014AudioChatMsg\022\020\n\010player"
-      "Id\030\001 \002(\r\022\014\n\004type\030\002 \002(\r\022\022\n\naudio_data\030\003 \002"
-      "(\014"
+      "xitQueueReq\020~\022\020\n\014ExitQueueRsp\020\177\022\026\n\021Queue"
+      "MsgWaitReady\020\200\001\022\025\n\020QueueMsgCanceled\020\201\001\022\025"
+      "\n\020QueueMsgReadyReq\020\202\001\022\022\n\rOnBattleBegin\020\203"
+      "\001\022\023\n\016OnBattleCancel\020\204\001\022\023\n\016UserSelectRole"
+      "\020\205\001\022\025\n\020OnUserSelectRole\020\206\001\022\024\n\017UserSelect"
+      "Skill\020\207\001\022\026\n\021OnUserSelectSkill\020\210\001\022\023\n\016User"
+      "SelectSkin\020\211\001\022\025\n\020OnUserSelectSkin\020\212\001\022\r\n\010"
+      "UserQuit\020\213\001\022\027\n\022OnBattleEnterLevel\020\214\001\022\024\n\017"
+      "OnBattleLoading\020\215\001\022\022\n\rOnBattleStart\020\216\001\022\023"
+      "\n\016OnBattleResult\020\217\001\022\031\n\024OnBattleResultDet"
+      "ail\020\220\001\022\021\n\014OnPlayerQuit\020\222\001\022\024\n\017OnPlayerReS"
+      "tart\020\223\001\022\027\n\022OnPlayerFetchInput\020\224\001\022\026\n\021OnPl"
+      "ayerReConnect\020\225\001\022\016\n\tAudioChat\020\226\001\022\020\n\013Sync"
+      "Command\020\370\006\"\270\001\n\007Command\022\022\n\016SyncRandomSeed"
+      "\020\001\022\013\n\007KeyDown\020\002\022\t\n\005KeyUp\020\003\022\017\n\013SpawnPlaye"
+      "r\020\004\022\021\n\rDestroyPlayer\020\005\022\020\n\014JoyStickMove\020\006"
+      "\022\r\n\tMouseMove\020\007\022\017\n\013EquipWeapon\020e\022\016\n\nDrop"
+      "Weapon\020f\022\r\n\010SellItem\020\310\001\022\014\n\007BuyItem\020\311\001\"\026\n"
+      "\007KeyData\022\013\n\003key\030\001 \002(\r\"\"\n\014SyncInitData\022\022\n"
+      "\nrandomSeed\030\001 \002(\r\"^\n\017PlayerEventData\022\020\n\010"
+      "playerId\030\001 \002(\r\022\014\n\004camp\030\002 \002(\r\022\r\n\005model\030\003 "
+      "\002(\r\022\016\n\006weapon\030\004 \002(\r\022\014\n\004name\030\005 \002(\t\"H\n\rEnt"
+      "erQueueRsp\022\016\n\006result\030\001 \002(\r\022\020\n\010playerId\030\002"
+      " \002(\r\022\025\n\rplayerInQueue\030\003 \002(\r\"g\n\rOnBattleB"
+      "egin\022\025\n\rTeamMemberAId\030\001 \003(\r\022\025\n\rTeamMembe"
+      "rBId\030\002 \003(\r\022\023\n\013TeamMemberA\030\003 \003(\t\022\023\n\013TeamM"
+      "emberB\030\004 \003(\t\"2\n\016UserSelectRole\022\020\n\010player"
+      "Id\030\001 \002(\r\022\016\n\006HeroId\030\002 \002(\r\"4\n\017UserSelectSk"
+      "ill\022\020\n\010playerId\030\001 \002(\r\022\017\n\007SkillId\030\002 \002(\r\"0"
+      "\n\016UserSelectSkin\022\020\n\010playerId\030\001 \002(\r\022\014\n\004Sk"
+      "in\030\002 \002(\r\"\"\n\020OnBattleCanceled\022\016\n\006reason\030\001"
+      " \002(\r\"4\n\017OnBattleLoading\022\020\n\010playerId\030\001 \003("
+      "\r\022\017\n\007percent\030\002 \003(\r\" \n\016OnBattleResult\022\016\n\006"
+      "result\030\001 \002(\r\"2\n\016PlayerSellItem\022\020\n\010player"
+      "Id\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"1\n\rPlayerBuyIte"
+      "m\022\020\n\010playerId\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"3\n\021P"
+      "rotocolVerifyReq\022\020\n\010protocol\030\001 \002(\r\022\014\n\004da"
+      "ta\030\002 \002(\t\"4\n\021ProtocolVerifyRsp\022\016\n\006result\030"
+      "\001 \002(\r\022\017\n\007message\030\002 \002(\t\"\341\004\n\010RoomInfo\022\016\n\006r"
+      "oomId\030\001 \002(\r\022\020\n\010roomName\030\002 \002(\t\022 \n\004rule\030\003 "
+      "\002(\0162\022.RoomInfo.RoomRule\022&\n\007pattern\030\004 \002(\016"
+      "2\025.RoomInfo.RoomPattern\022\020\n\010levelIdx\030\005 \002("
+      "\r\022\r\n\005hpMax\030\006 \002(\r\022\020\n\010password\030\007 \002(\r\022(\n\007ve"
+      "rsion\030\010 \002(\0162\027.RoomInfo.MeteorVersion\022\016\n\006"
+      "Group1\030\t \002(\r\022\016\n\006Group2\030\n \002(\r\022\023\n\013playerCo"
+      "unt\030\013 \002(\r\022\021\n\tmaxPlayer\030\014 \002(\r\"f\n\010RoomRule"
+      "\022\006\n\002MZ\020\001\022\007\n\003ROB\020\002\022\013\n\007Defence\020\003\022\016\n\nKillTa"
+      "rget\020\004\022\013\n\007Endless\020\005\022\n\n\006Normal\020\006\022\t\n\005Story"
+      "\020\007\022\010\n\004Moba\020\010\"4\n\013RoomPattern\022\013\n\007_Normal\020\001"
+      "\022\013\n\007_Record\020\002\022\013\n\007_Replay\020\003\"#\n\rMeteorVers"
+      "ion\022\010\n\004V107\020\001\022\010\n\004V907\020\002\"\200\001\n\tErrorCode\022\020\n"
+      "\014RoomNotExist\020\001\022\022\n\016RoomPlayerFull\020\002\022\024\n\020R"
+      "oomNeedPassword\020\003\022\022\n\016RoomVersionErr\020\004\022\025\n"
+      "\021UserInAnotherRoom\020\005\022\014\n\010RoomFull\020\006\",\n\nGe"
+      "tRoomRsp\022\036\n\013RoomInLobby\030\001 \003(\0132\t.RoomInfo"
+      "\"\242\002\n\rCreateRoomReq\022&\n\007pattern\030\001 \002(\0162\025.Ro"
+      "omInfo.RoomPattern\022\021\n\tmaxPlayer\030\002 \002(\r\022\020\n"
+      "\010levelIdx\030\003 \002(\r\022 \n\004rule\030\004 \002(\0162\022.RoomInfo"
+      ".RoomRule\022\020\n\010roomName\030\005 \002(\t\022\r\n\005hpMax\030\006 \002"
+      "(\r\022\021\n\troundTime\030\007 \002(\r\022(\n\007version\030\010 \002(\0162\027"
+      ".RoomInfo.MeteorVersion\022\016\n\006secret\030\t \001(\t\022"
+      "\023\n\013replay_data\030\n \001(\014\022\016\n\006models\030\013 \003(\r\022\017\n\007"
+      "weapons\030\014 \003(\r\"`\n\rCreateRoomRsp\022\016\n\006result"
+      "\030\001 \002(\r\022\016\n\006roomId\030\002 \002(\r\022\017\n\007levelId\030\003 \002(\r\022"
+      "\020\n\010playerId\030\004 \002(\r\022\014\n\004port\030\005 \002(\r\"Y\n\013JoinR"
+      "oomReq\022\016\n\006roomId\030\001 \002(\r\022(\n\007version\030\002 \002(\0162"
+      "\027.RoomInfo.MeteorVersion\022\020\n\010password\030\003 \001"
+      "(\t\"\220\001\n\013JoinRoomRsp\022\016\n\006result\030\001 \002(\r\022\016\n\006re"
+      "ason\030\002 \002(\r\022\020\n\010levelIdx\030\003 \002(\r\022\016\n\006roomId\030\004"
+      " \002(\r\022\020\n\010playerId\030\005 \002(\r\022\014\n\004port\030\006 \002(\r\022\016\n\006"
+      "models\030\007 \003(\r\022\017\n\007weapons\030\010 \003(\r\" \n\010Vector2"
+      "_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\"g\n\014FrameCommand\022"
+      "\022\n\nLogicFrame\030\001 \002(\r\022\020\n\010playerId\030\002 \001(\r\022#\n"
+      "\007command\030\003 \002(\0162\022.MeteorMsg.Command\022\014\n\004da"
+      "ta\030\004 \002(\014\"-\n\nGameFrames\022\037\n\010commands\030\001 \003(\013"
+      "2\r.FrameCommand\"E\n\007ChatMsg\022\020\n\010playerId\030\001"
+      " \002(\r\022\023\n\013channelType\030\002 \002(\r\022\023\n\013chatMessage"
+      "\030\003 \002(\t\"B\n\014AudioChatMsg\022\020\n\010playerId\030\001 \002(\r"
+      "\022\014\n\004type\030\002 \002(\r\022\022\n\naudio_data\030\003 \002(\014"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3562);
+      descriptor, 3474);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "protocol.proto", &protobuf_RegisterTypes);
 }
@@ -1342,6 +1262,7 @@ bool MeteorMsg_MsgType_IsValid(int value) {
     case 141:
     case 142:
     case 143:
+    case 144:
     case 146:
     case 147:
     case 148:
@@ -1369,6 +1290,7 @@ const MeteorMsg_MsgType MeteorMsg::ChatInLobbyRsp;
 const MeteorMsg_MsgType MeteorMsg::EnterQueueReq;
 const MeteorMsg_MsgType MeteorMsg::EnterQueueRsp;
 const MeteorMsg_MsgType MeteorMsg::ExitQueueReq;
+const MeteorMsg_MsgType MeteorMsg::ExitQueueRsp;
 const MeteorMsg_MsgType MeteorMsg::QueueMsgWaitReady;
 const MeteorMsg_MsgType MeteorMsg::QueueMsgCanceled;
 const MeteorMsg_MsgType MeteorMsg::QueueMsgReadyReq;
@@ -1407,7 +1329,8 @@ bool MeteorMsg_Command_IsValid(int value) {
     case 3:
     case 4:
     case 5:
-    case 100:
+    case 6:
+    case 7:
     case 101:
     case 102:
     case 200:
@@ -1425,6 +1348,7 @@ const MeteorMsg_Command MeteorMsg::KeyUp;
 const MeteorMsg_Command MeteorMsg::SpawnPlayer;
 const MeteorMsg_Command MeteorMsg::DestroyPlayer;
 const MeteorMsg_Command MeteorMsg::JoyStickMove;
+const MeteorMsg_Command MeteorMsg::MouseMove;
 const MeteorMsg_Command MeteorMsg::EquipWeapon;
 const MeteorMsg_Command MeteorMsg::DropWeapon;
 const MeteorMsg_Command MeteorMsg::SellItem;
@@ -8315,6 +8239,7 @@ void CreateRoomRsp::InitAsDefaultInstance() {
 const int CreateRoomRsp::kResultFieldNumber;
 const int CreateRoomRsp::kRoomIdFieldNumber;
 const int CreateRoomRsp::kLevelIdFieldNumber;
+const int CreateRoomRsp::kPlayerIdFieldNumber;
 const int CreateRoomRsp::kPortFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -8383,7 +8308,7 @@ void CreateRoomRsp::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 15u) {
+  if (cached_has_bits & 31u) {
     ::memset(&result_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&port_) -
         reinterpret_cast<char*>(&result_)) + sizeof(port_));
@@ -8444,10 +8369,24 @@ bool CreateRoomRsp::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint32 port = 4;
+      // required uint32 playerId = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
+          set_has_playerid();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &playerid_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required uint32 port = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
           set_has_port();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
@@ -8500,9 +8439,14 @@ void CreateRoomRsp::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->levelid(), output);
   }
 
-  // required uint32 port = 4;
+  // required uint32 playerId = 4;
   if (cached_has_bits & 0x00000008u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->port(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->playerid(), output);
+  }
+
+  // required uint32 port = 5;
+  if (cached_has_bits & 0x00000010u) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->port(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -8535,9 +8479,14 @@ void CreateRoomRsp::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->levelid(), target);
   }
 
-  // required uint32 port = 4;
+  // required uint32 playerId = 4;
   if (cached_has_bits & 0x00000008u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->port(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->playerid(), target);
+  }
+
+  // required uint32 port = 5;
+  if (cached_has_bits & 0x00000010u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->port(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -8573,8 +8522,15 @@ size_t CreateRoomRsp::RequiredFieldsByteSizeFallback() const {
         this->levelid());
   }
 
+  if (has_playerid()) {
+    // required uint32 playerId = 4;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->playerid());
+  }
+
   if (has_port()) {
-    // required uint32 port = 4;
+    // required uint32 port = 5;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
         this->port());
@@ -8591,7 +8547,7 @@ size_t CreateRoomRsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
     // required uint32 result = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -8607,7 +8563,12 @@ size_t CreateRoomRsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
         this->levelid());
 
-    // required uint32 port = 4;
+    // required uint32 playerId = 4;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->playerid());
+
+    // required uint32 port = 5;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
         this->port());
@@ -8645,7 +8606,7 @@ void CreateRoomRsp::MergeFrom(const CreateRoomRsp& from) {
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 15u) {
+  if (cached_has_bits & 31u) {
     if (cached_has_bits & 0x00000001u) {
       result_ = from.result_;
     }
@@ -8656,6 +8617,9 @@ void CreateRoomRsp::MergeFrom(const CreateRoomRsp& from) {
       levelid_ = from.levelid_;
     }
     if (cached_has_bits & 0x00000008u) {
+      playerid_ = from.playerid_;
+    }
+    if (cached_has_bits & 0x00000010u) {
       port_ = from.port_;
     }
     _has_bits_[0] |= cached_has_bits;
@@ -8677,7 +8641,7 @@ void CreateRoomRsp::CopyFrom(const CreateRoomRsp& from) {
 }
 
 bool CreateRoomRsp::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
   return true;
 }
 
@@ -8690,6 +8654,7 @@ void CreateRoomRsp::InternalSwap(CreateRoomRsp* other) {
   swap(result_, other->result_);
   swap(roomid_, other->roomid_);
   swap(levelid_, other->levelid_);
+  swap(playerid_, other->playerid_);
   swap(port_, other->port_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
@@ -9089,6 +9054,7 @@ const int JoinRoomRsp::kReasonFieldNumber;
 const int JoinRoomRsp::kLevelIdxFieldNumber;
 const int JoinRoomRsp::kRoomIdFieldNumber;
 const int JoinRoomRsp::kPlayerIdFieldNumber;
+const int JoinRoomRsp::kPortFieldNumber;
 const int JoinRoomRsp::kModelsFieldNumber;
 const int JoinRoomRsp::kWeaponsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -9110,16 +9076,16 @@ JoinRoomRsp::JoinRoomRsp(const JoinRoomRsp& from)
       weapons_(from.weapons_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&result_, &from.result_,
-    static_cast<size_t>(reinterpret_cast<char*>(&playerid_) -
-    reinterpret_cast<char*>(&result_)) + sizeof(playerid_));
+    static_cast<size_t>(reinterpret_cast<char*>(&port_) -
+    reinterpret_cast<char*>(&result_)) + sizeof(port_));
   // @@protoc_insertion_point(copy_constructor:JoinRoomRsp)
 }
 
 void JoinRoomRsp::SharedCtor() {
   _cached_size_ = 0;
   ::memset(&result_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&playerid_) -
-      reinterpret_cast<char*>(&result_)) + sizeof(playerid_));
+      reinterpret_cast<char*>(&port_) -
+      reinterpret_cast<char*>(&result_)) + sizeof(port_));
 }
 
 JoinRoomRsp::~JoinRoomRsp() {
@@ -9162,10 +9128,10 @@ void JoinRoomRsp::Clear() {
   models_.Clear();
   weapons_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 31u) {
+  if (cached_has_bits & 63u) {
     ::memset(&result_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&playerid_) -
-        reinterpret_cast<char*>(&result_)) + sizeof(playerid_));
+        reinterpret_cast<char*>(&port_) -
+        reinterpret_cast<char*>(&result_)) + sizeof(port_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -9251,16 +9217,30 @@ bool JoinRoomRsp::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated uint32 models = 6;
+      // required uint32 port = 6;
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
+          set_has_port();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &port_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated uint32 models = 7;
+      case 7: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 1, 48u, input, this->mutable_models())));
+                 1, 56u, input, this->mutable_models())));
         } else if (
             static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(58u /* 58 & 0xFF */)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, this->mutable_models())));
@@ -9270,16 +9250,16 @@ bool JoinRoomRsp::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated uint32 weapons = 7;
-      case 7: {
+      // repeated uint32 weapons = 8;
+      case 8: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(56u /* 56 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(64u /* 64 & 0xFF */)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 1, 56u, input, this->mutable_weapons())));
+                 1, 64u, input, this->mutable_weapons())));
         } else if (
             static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(58u /* 58 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(66u /* 66 & 0xFF */)) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, this->mutable_weapons())));
@@ -9341,16 +9321,21 @@ void JoinRoomRsp::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->playerid(), output);
   }
 
-  // repeated uint32 models = 6;
-  for (int i = 0, n = this->models_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(
-      6, this->models(i), output);
+  // required uint32 port = 6;
+  if (cached_has_bits & 0x00000020u) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->port(), output);
   }
 
-  // repeated uint32 weapons = 7;
+  // repeated uint32 models = 7;
+  for (int i = 0, n = this->models_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(
+      7, this->models(i), output);
+  }
+
+  // repeated uint32 weapons = 8;
   for (int i = 0, n = this->weapons_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(
-      7, this->weapons(i), output);
+      8, this->weapons(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -9393,13 +9378,18 @@ void JoinRoomRsp::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->playerid(), target);
   }
 
-  // repeated uint32 models = 6;
-  target = ::google::protobuf::internal::WireFormatLite::
-    WriteUInt32ToArray(6, this->models_, target);
+  // required uint32 port = 6;
+  if (cached_has_bits & 0x00000020u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(6, this->port(), target);
+  }
 
-  // repeated uint32 weapons = 7;
+  // repeated uint32 models = 7;
   target = ::google::protobuf::internal::WireFormatLite::
-    WriteUInt32ToArray(7, this->weapons_, target);
+    WriteUInt32ToArray(7, this->models_, target);
+
+  // repeated uint32 weapons = 8;
+  target = ::google::protobuf::internal::WireFormatLite::
+    WriteUInt32ToArray(8, this->weapons_, target);
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
@@ -9448,6 +9438,13 @@ size_t JoinRoomRsp::RequiredFieldsByteSizeFallback() const {
         this->playerid());
   }
 
+  if (has_port()) {
+    // required uint32 port = 6;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->port());
+  }
+
   return total_size;
 }
 size_t JoinRoomRsp::ByteSizeLong() const {
@@ -9459,7 +9456,7 @@ size_t JoinRoomRsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x0000003f) ^ 0x0000003f) == 0) {  // All required fields are present.
     // required uint32 result = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -9485,10 +9482,15 @@ size_t JoinRoomRsp::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
         this->playerid());
 
+    // required uint32 port = 6;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->port());
+
   } else {
     total_size += RequiredFieldsByteSizeFallback();
   }
-  // repeated uint32 models = 6;
+  // repeated uint32 models = 7;
   {
     size_t data_size = ::google::protobuf::internal::WireFormatLite::
       UInt32Size(this->models_);
@@ -9497,7 +9499,7 @@ size_t JoinRoomRsp::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated uint32 weapons = 7;
+  // repeated uint32 weapons = 8;
   {
     size_t data_size = ::google::protobuf::internal::WireFormatLite::
       UInt32Size(this->weapons_);
@@ -9538,7 +9540,7 @@ void JoinRoomRsp::MergeFrom(const JoinRoomRsp& from) {
   models_.MergeFrom(from.models_);
   weapons_.MergeFrom(from.weapons_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 31u) {
+  if (cached_has_bits & 63u) {
     if (cached_has_bits & 0x00000001u) {
       result_ = from.result_;
     }
@@ -9553,6 +9555,9 @@ void JoinRoomRsp::MergeFrom(const JoinRoomRsp& from) {
     }
     if (cached_has_bits & 0x00000010u) {
       playerid_ = from.playerid_;
+    }
+    if (cached_has_bits & 0x00000020u) {
+      port_ = from.port_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -9573,7 +9578,7 @@ void JoinRoomRsp::CopyFrom(const JoinRoomRsp& from) {
 }
 
 bool JoinRoomRsp::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
+  if ((_has_bits_[0] & 0x0000003f) != 0x0000003f) return false;
   return true;
 }
 
@@ -9590,472 +9595,13 @@ void JoinRoomRsp::InternalSwap(JoinRoomRsp* other) {
   swap(levelidx_, other->levelidx_);
   swap(roomid_, other->roomid_);
   swap(playerid_, other->playerid_);
+  swap(port_, other->port_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata JoinRoomRsp::GetMetadata() const {
-  protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void EnterLevelReq::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int EnterLevelReq::kPlayerFieldNumber;
-const int EnterLevelReq::kCampFieldNumber;
-const int EnterLevelReq::kModelFieldNumber;
-const int EnterLevelReq::kWeaponFieldNumber;
-const int EnterLevelReq::kNameFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-EnterLevelReq::EnterLevelReq()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_protocol_2eproto::InitDefaultsEnterLevelReq();
-  }
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:EnterLevelReq)
-}
-EnterLevelReq::EnterLevelReq(const EnterLevelReq& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.has_name()) {
-    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  ::memcpy(&player_, &from.player_,
-    static_cast<size_t>(reinterpret_cast<char*>(&weapon_) -
-    reinterpret_cast<char*>(&player_)) + sizeof(weapon_));
-  // @@protoc_insertion_point(copy_constructor:EnterLevelReq)
-}
-
-void EnterLevelReq::SharedCtor() {
-  _cached_size_ = 0;
-  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&player_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&weapon_) -
-      reinterpret_cast<char*>(&player_)) + sizeof(weapon_));
-}
-
-EnterLevelReq::~EnterLevelReq() {
-  // @@protoc_insertion_point(destructor:EnterLevelReq)
-  SharedDtor();
-}
-
-void EnterLevelReq::SharedDtor() {
-  name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void EnterLevelReq::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* EnterLevelReq::descriptor() {
-  ::protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const EnterLevelReq& EnterLevelReq::default_instance() {
-  ::protobuf_protocol_2eproto::InitDefaultsEnterLevelReq();
-  return *internal_default_instance();
-}
-
-EnterLevelReq* EnterLevelReq::New(::google::protobuf::Arena* arena) const {
-  EnterLevelReq* n = new EnterLevelReq;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
-
-void EnterLevelReq::Clear() {
-// @@protoc_insertion_point(message_clear_start:EnterLevelReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(!name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-    (*name_.UnsafeRawStringPointer())->clear();
-  }
-  if (cached_has_bits & 30u) {
-    ::memset(&player_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&weapon_) -
-        reinterpret_cast<char*>(&player_)) + sizeof(weapon_));
-  }
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-bool EnterLevelReq::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:EnterLevelReq)
-  for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 player = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          set_has_player();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &player_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // required uint32 camp = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
-          set_has_camp();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &camp_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // required uint32 model = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
-          set_has_model();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &model_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // required uint32 weapon = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
-          set_has_weapon();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &weapon_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // required string name = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_name()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->name().data(), static_cast<int>(this->name().length()),
-            ::google::protobuf::internal::WireFormat::PARSE,
-            "EnterLevelReq.name");
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:EnterLevelReq)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:EnterLevelReq)
-  return false;
-#undef DO_
-}
-
-void EnterLevelReq::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:EnterLevelReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 player = 1;
-  if (cached_has_bits & 0x00000002u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->player(), output);
-  }
-
-  // required uint32 camp = 2;
-  if (cached_has_bits & 0x00000004u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->camp(), output);
-  }
-
-  // required uint32 model = 3;
-  if (cached_has_bits & 0x00000008u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->model(), output);
-  }
-
-  // required uint32 weapon = 4;
-  if (cached_has_bits & 0x00000010u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->weapon(), output);
-  }
-
-  // required string name = 5;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->name().data(), static_cast<int>(this->name().length()),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "EnterLevelReq.name");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      5, this->name(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:EnterLevelReq)
-}
-
-::google::protobuf::uint8* EnterLevelReq::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:EnterLevelReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 player = 1;
-  if (cached_has_bits & 0x00000002u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->player(), target);
-  }
-
-  // required uint32 camp = 2;
-  if (cached_has_bits & 0x00000004u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(2, this->camp(), target);
-  }
-
-  // required uint32 model = 3;
-  if (cached_has_bits & 0x00000008u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->model(), target);
-  }
-
-  // required uint32 weapon = 4;
-  if (cached_has_bits & 0x00000010u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->weapon(), target);
-  }
-
-  // required string name = 5;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->name().data(), static_cast<int>(this->name().length()),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "EnterLevelReq.name");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        5, this->name(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:EnterLevelReq)
-  return target;
-}
-
-size_t EnterLevelReq::RequiredFieldsByteSizeFallback() const {
-// @@protoc_insertion_point(required_fields_byte_size_fallback_start:EnterLevelReq)
-  size_t total_size = 0;
-
-  if (has_name()) {
-    // required string name = 5;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->name());
-  }
-
-  if (has_player()) {
-    // required uint32 player = 1;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->player());
-  }
-
-  if (has_camp()) {
-    // required uint32 camp = 2;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->camp());
-  }
-
-  if (has_model()) {
-    // required uint32 model = 3;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->model());
-  }
-
-  if (has_weapon()) {
-    // required uint32 weapon = 4;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->weapon());
-  }
-
-  return total_size;
-}
-size_t EnterLevelReq::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:EnterLevelReq)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
-    // required string name = 5;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->name());
-
-    // required uint32 player = 1;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->player());
-
-    // required uint32 camp = 2;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->camp());
-
-    // required uint32 model = 3;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->model());
-
-    // required uint32 weapon = 4;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->weapon());
-
-  } else {
-    total_size += RequiredFieldsByteSizeFallback();
-  }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void EnterLevelReq::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:EnterLevelReq)
-  GOOGLE_DCHECK_NE(&from, this);
-  const EnterLevelReq* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const EnterLevelReq>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:EnterLevelReq)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:EnterLevelReq)
-    MergeFrom(*source);
-  }
-}
-
-void EnterLevelReq::MergeFrom(const EnterLevelReq& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:EnterLevelReq)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 31u) {
-    if (cached_has_bits & 0x00000001u) {
-      set_has_name();
-      name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-    }
-    if (cached_has_bits & 0x00000002u) {
-      player_ = from.player_;
-    }
-    if (cached_has_bits & 0x00000004u) {
-      camp_ = from.camp_;
-    }
-    if (cached_has_bits & 0x00000008u) {
-      model_ = from.model_;
-    }
-    if (cached_has_bits & 0x00000010u) {
-      weapon_ = from.weapon_;
-    }
-    _has_bits_[0] |= cached_has_bits;
-  }
-}
-
-void EnterLevelReq::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:EnterLevelReq)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void EnterLevelReq::CopyFrom(const EnterLevelReq& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:EnterLevelReq)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool EnterLevelReq::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
-  return true;
-}
-
-void EnterLevelReq::Swap(EnterLevelReq* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void EnterLevelReq::InternalSwap(EnterLevelReq* other) {
-  using std::swap;
-  name_.Swap(&other->name_);
-  swap(player_, other->player_);
-  swap(camp_, other->camp_);
-  swap(model_, other->model_);
-  swap(weapon_, other->weapon_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
-}
-
-::google::protobuf::Metadata EnterLevelReq::GetMetadata() const {
   protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -10786,296 +10332,10 @@ void FrameCommand::InternalSwap(FrameCommand* other) {
 
 // ===================================================================
 
-void TurnFrames::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int TurnFrames::kTurnIndexFieldNumber;
-const int TurnFrames::kCommandsFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-TurnFrames::TurnFrames()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_protocol_2eproto::InitDefaultsTurnFrames();
-  }
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:TurnFrames)
-}
-TurnFrames::TurnFrames(const TurnFrames& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0),
-      commands_(from.commands_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  turnindex_ = from.turnindex_;
-  // @@protoc_insertion_point(copy_constructor:TurnFrames)
-}
-
-void TurnFrames::SharedCtor() {
-  _cached_size_ = 0;
-  turnindex_ = 0u;
-}
-
-TurnFrames::~TurnFrames() {
-  // @@protoc_insertion_point(destructor:TurnFrames)
-  SharedDtor();
-}
-
-void TurnFrames::SharedDtor() {
-}
-
-void TurnFrames::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* TurnFrames::descriptor() {
-  ::protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const TurnFrames& TurnFrames::default_instance() {
-  ::protobuf_protocol_2eproto::InitDefaultsTurnFrames();
-  return *internal_default_instance();
-}
-
-TurnFrames* TurnFrames::New(::google::protobuf::Arena* arena) const {
-  TurnFrames* n = new TurnFrames;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
-
-void TurnFrames::Clear() {
-// @@protoc_insertion_point(message_clear_start:TurnFrames)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  commands_.Clear();
-  turnindex_ = 0u;
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-bool TurnFrames::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:TurnFrames)
-  for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 turnIndex = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          set_has_turnindex();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &turnindex_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated .FrameCommand commands = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_commands()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:TurnFrames)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:TurnFrames)
-  return false;
-#undef DO_
-}
-
-void TurnFrames::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:TurnFrames)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 turnIndex = 1;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->turnindex(), output);
-  }
-
-  // repeated .FrameCommand commands = 2;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->commands_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->commands(static_cast<int>(i)), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:TurnFrames)
-}
-
-::google::protobuf::uint8* TurnFrames::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:TurnFrames)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 turnIndex = 1;
-  if (cached_has_bits & 0x00000001u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->turnindex(), target);
-  }
-
-  // repeated .FrameCommand commands = 2;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->commands_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        2, this->commands(static_cast<int>(i)), deterministic, target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:TurnFrames)
-  return target;
-}
-
-size_t TurnFrames::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:TurnFrames)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  // required uint32 turnIndex = 1;
-  if (has_turnindex()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->turnindex());
-  }
-  // repeated .FrameCommand commands = 2;
-  {
-    unsigned int count = static_cast<unsigned int>(this->commands_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->commands(static_cast<int>(i)));
-    }
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void TurnFrames::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:TurnFrames)
-  GOOGLE_DCHECK_NE(&from, this);
-  const TurnFrames* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const TurnFrames>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:TurnFrames)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:TurnFrames)
-    MergeFrom(*source);
-  }
-}
-
-void TurnFrames::MergeFrom(const TurnFrames& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:TurnFrames)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  commands_.MergeFrom(from.commands_);
-  if (from.has_turnindex()) {
-    set_turnindex(from.turnindex());
-  }
-}
-
-void TurnFrames::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:TurnFrames)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void TurnFrames::CopyFrom(const TurnFrames& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:TurnFrames)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool TurnFrames::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
-  if (!::google::protobuf::internal::AllAreInitialized(this->commands())) return false;
-  return true;
-}
-
-void TurnFrames::Swap(TurnFrames* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void TurnFrames::InternalSwap(TurnFrames* other) {
-  using std::swap;
-  commands_.InternalSwap(&other->commands_);
-  swap(turnindex_, other->turnindex_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
-}
-
-::google::protobuf::Metadata TurnFrames::GetMetadata() const {
-  protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
 void GameFrames::InitAsDefaultInstance() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int GameFrames::kFramesFieldNumber;
+const int GameFrames::kCommandsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GameFrames::GameFrames()
@@ -11091,7 +10351,7 @@ GameFrames::GameFrames(const GameFrames& from)
       _internal_metadata_(NULL),
       _has_bits_(from._has_bits_),
       _cached_size_(0),
-      frames_(from.frames_) {
+      commands_(from.commands_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:GameFrames)
 }
@@ -11137,7 +10397,7 @@ void GameFrames::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  frames_.Clear();
+  commands_.Clear();
   _has_bits_.Clear();
   _internal_metadata_.Clear();
 }
@@ -11152,11 +10412,11 @@ bool GameFrames::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .TurnFrames frames = 1;
+      // repeated .FrameCommand commands = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_frames()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_commands()));
         } else {
           goto handle_unusual;
         }
@@ -11189,11 +10449,11 @@ void GameFrames::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .TurnFrames frames = 1;
+  // repeated .FrameCommand commands = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->frames_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->commands_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, this->frames(static_cast<int>(i)), output);
+      1, this->commands(static_cast<int>(i)), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -11210,12 +10470,12 @@ void GameFrames::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .TurnFrames frames = 1;
+  // repeated .FrameCommand commands = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->frames_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->commands_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, this->frames(static_cast<int>(i)), deterministic, target);
+        1, this->commands(static_cast<int>(i)), deterministic, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -11235,14 +10495,14 @@ size_t GameFrames::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  // repeated .TurnFrames frames = 1;
+  // repeated .FrameCommand commands = 1;
   {
-    unsigned int count = static_cast<unsigned int>(this->frames_size());
+    unsigned int count = static_cast<unsigned int>(this->commands_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->frames(static_cast<int>(i)));
+          this->commands(static_cast<int>(i)));
     }
   }
 
@@ -11275,7 +10535,7 @@ void GameFrames::MergeFrom(const GameFrames& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  frames_.MergeFrom(from.frames_);
+  commands_.MergeFrom(from.commands_);
 }
 
 void GameFrames::CopyFrom(const ::google::protobuf::Message& from) {
@@ -11293,7 +10553,7 @@ void GameFrames::CopyFrom(const GameFrames& from) {
 }
 
 bool GameFrames::IsInitialized() const {
-  if (!::google::protobuf::internal::AllAreInitialized(this->frames())) return false;
+  if (!::google::protobuf::internal::AllAreInitialized(this->commands())) return false;
   return true;
 }
 
@@ -11303,7 +10563,7 @@ void GameFrames::Swap(GameFrames* other) {
 }
 void GameFrames::InternalSwap(GameFrames* other) {
   using std::swap;
-  frames_.InternalSwap(&other->frames_);
+  commands_.InternalSwap(&other->commands_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);

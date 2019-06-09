@@ -11,13 +11,16 @@ CRoomInfo::CRoomInfo()
 	m_dwTurnIndex = 0;
 	m_totalTime = 0;
 	m_turnTime = 0;
-	m_bTurnStart = false;
+	m_bGameStart = false;
 	m_currentTick = 0;
+	m_dwWaitClose = 0;
 	m_delta = 0;
+	running = false;
 }
 
 int CRoomInfo::InitKcpServer()
 {
+	print("InitKcpServer");
 	//只要是非重播的就建立KCP服务
 	if (m_pKcpServer == NULL && m_nPattern != RoomInfo_RoomPattern__Replay)
 	{
@@ -50,52 +53,18 @@ BOOL CRoomInfo::RemovePlayer(CUserInfo * pRemoveObject)
 
 void CRoomInfo::OnPlayerAllLeaved()
 {
-	m_bTurnStart = false;
+	m_bGameStart = false;
 	m_dwWaitClose = ::GetTickCount();
 }
 
 void CRoomInfo::OnNewTurn()
 {
+	m_dwWaitClose = 0;
 	m_currentTick = ::GetTickCount();
 	m_totalTime = m_turnTime;
 	m_delta = 0;
-	m_bTurnStart = true;
-	closed = false;
-}
-
-void CRoomInfo::OnUserKeyFrame()
-{
-	//�յ���ҵ�֡ͬ����Ϣ.
-	//PLISTNODE pListNode = NULL;
-	//if (m_pUserList.GetCount())
-	//{
-	//	//��һ�α���������н�ɫ��������Ϣ��������Ϣ
-	//	pListNode = m_pUserList.GetHead();
-	//	while (pListNode)
-	//	{
-	//		CUserInfo *pUserInfo = m_pUserList.GetData(pListNode);
-	//		if (pUserInfo != NULL)
-	//		{
-	//			pUserInfo->Lock();
-	//			if (pUserInfo->m_pxPlayerObject != NULL)
-	//			{
-	//				if (pUserInfo->m_nUserServerIndex == pk->mutable_players(0)->id())
-	//				{
-	//					//print("pUserInfo->Update");
-	//					pUserInfo->Update(pk->mutable_players(0));
-	//					pUserInfo->Unlock();
-	//					break;
-	//				}
-	//				else
-	//				{
-	//					//print("pUserInfo->m_nUserServerIndex != pk->mutable_players(0)->id()");
-	//				}
-	//			}
-	//			pUserInfo->Unlock();
-	//		}
-	//		pListNode = m_pUserList.GetNext(pListNode);
-	//	}
-	//}
+	m_bGameStart = true;
+	running = true;
 }
 
 void CRoomInfo::NewTurn()
@@ -114,13 +83,15 @@ void CRoomInfo::WaitClose()
 
 void CRoomInfo::Close() 
 {
-	this->m_bTurnStart = false;
-	this->closed = true;
+	this->m_bGameStart = false;
+	this->running = false;
 }
 
 void CRoomInfo::Update()
 {
-	if (!m_bTurnStart)
+	if (m_dwWaitClose != 0)
+		WaitClose();
+	if (!m_bGameStart)
 		return;
 	DWORD t = ::GetTickCount();
 	m_delta += (t - m_currentTick);
@@ -235,6 +206,8 @@ void CRoomInfo::Update()
 
 	if (m_delta > syncDelta)
 	{
+		if (m_pKcpServer != NULL)
+			m_pKcpServer->Update();
 		//�յ���ҵ�֡ͬ����Ϣ.
 		//KeyFrame rsp;
 		//rsp.Clear();

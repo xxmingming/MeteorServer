@@ -24,12 +24,12 @@ class CRoomInfo:public CIntLock, CStaticArray<CRoomInfo>::IArrayData
 {
 public:
 	const int syncDelta = 50;
-	BOOL						m_bTurnStart;
+	BOOL						m_bGameStart;
 	uint32_t					m_nRoomIndex;
 	KcpServer *					m_pKcpServer;
 	CWHList<CUserInfo*>			m_pUserList;
 	CHAR						m_szName[20];
-	CHAR						m_szPassword[8];
+	CHAR						m_szPassword[8];//密码最大6位，数字
 	uint32_t					m_nRule;
 	uint32_t					m_nPattern;//重播数据-每个玩家来之后都下载录像数据播放，就与房间无关了.
 	uint32_t                    m_nVersion;//版本107/907
@@ -41,7 +41,7 @@ public:
 	uint32_t					m_nCount;
 
 	int							m_turnTime;
-	bool						closed;
+	bool						running;
 	DWORD						m_dwMap;//章节号 × 1000 + 关卡在章节里的序号
 	DWORD						m_dwOwnerId;
 	void						OnNewTurn();
@@ -53,8 +53,7 @@ public:
 	DWORD						m_dwTurnIndex;
 	bool						m_bHasPsd;
 	void						Update();
-	void						OnUserKeyFrame();
-	bool						IsEmpty() { return m_nCount == 0; }
+	bool						IsEmpty() { return m_nCount == 0 && !running; }
 	void						OnPlayerAllLeaved();
 	void						Close();
 	void						NewTurn();

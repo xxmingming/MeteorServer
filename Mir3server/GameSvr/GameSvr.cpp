@@ -206,6 +206,7 @@ int main()
 	g_fTerminated = FALSE;
 	UINT			dwThreadIDForMsg = 0;
 	unsigned long	hThreadForMsg = 0;
+	vprint("accept in port:%d", g_nLocalPort);
 	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
 
 	//ProcessRooms
@@ -217,19 +218,26 @@ int main()
 
 		if (g_xRoomList.GetCount())
 		{
+			g_xRoomList.Lock();
 			pListNode = g_xRoomList.GetHead();
-
+			CWHList<CRoomInfo*> closed;
 			while (pListNode)
 			{
 				CRoomInfo *pRoomInfo = g_xRoomList.GetData(pListNode);
-
 				if (pRoomInfo && !pRoomInfo->IsEmpty())
-				{
 					pRoomInfo->Update();
-				}
-
+				if (!pRoomInfo->running)
+					closed.AddNewNode(pRoomInfo);
 				pListNode = g_xRoomList.GetNext(pListNode);
 			}
+			pListNode = closed.GetHead();
+			while (pListNode != NULL)
+			{
+				CRoomInfo * pRoom = closed.GetData(pListNode);
+				g_xRoomList.RemoveNodeByData(pRoom);
+				pListNode = closed.GetNext(pListNode);
+			}
+			g_xRoomList.Unlock();
 		}
 
 		if (g_xGateList.GetCount())

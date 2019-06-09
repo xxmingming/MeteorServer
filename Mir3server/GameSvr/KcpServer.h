@@ -12,7 +12,7 @@ struct CMsg
 	uint32_t Message;
 };
 #pragma pack()
-
+class CUserInfo;
 class KcpServer : public CIntLock
 {
 public:
@@ -20,22 +20,27 @@ public:
 	~KcpServer();
 	void InitKcp();
 	void Update();
-	void OnPlayerEnter(int playerIdx);//当玩家进入房间时，创建一个KCP对象处理该客户端消息
-	int						len[_NUM_OF_MAXPLAYER];
-	sockaddr_in				addr[_NUM_OF_MAXPLAYER];
-	ikcpcb*					kcp[_NUM_OF_MAXPLAYER];
-	CHAR *					kcpBuffer[_NUM_OF_MAXPLAYER];//每一个拥有4096字节的缓冲区，在帧同步协议中，包最大长度4096
-	int						kcpLen[_NUM_OF_MAXPLAYER];//每个kcp缓冲区有效数据长度.
+	void OnPlayerSpawn(CUserInfo * player, char * data, int size);//出现在战场时
+	void OnPlayerDestroy(CUserInfo * player, char * data, int size);//销毁在战场时
+	void OnPlayerEnter(CUserInfo * player);//当玩家进入房间时，创建一个KCP对象处理该客户端消息
+	void OnPlayerLeave(CUserInfo * player);//当玩家离开房间时，销毁该玩家对应的KCP对象.
 	SOCKADDR_IN local;//在一个端口上绑定，创建多个kcp对象，每个kcp对象拥有一个ID号，处理客户端输入
 	SOCKET sock;
 	int	port;
 	int millisec;
 	int fromlen;
 	INT	nOvFlag;
+	int				logicFrame;//逻辑帧编号
 	OVERLAPPED		Overlapped;
 	WSABUF			DataBuf;
 	CHAR			Buffer[MAXRECV];
+	
 	sockaddr		from;
+	CWHList<CUserInfo*> users;
+	CWHList<char*>	kcpCommand;//历史操作缓冲区，
+	CWHList<GameFrames*> frames;
+	GameFrames*		frame;//当前帧
+
 	int				srvIndex;//房间序号.
 	int  Recv()
 	{
@@ -51,5 +56,5 @@ public:
 	}
 
 	void OnRecv(int nRecvBytes);
-	void ExtractPacket(int i);
+	void OnNewTurn();
 };

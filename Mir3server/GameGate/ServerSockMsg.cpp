@@ -17,7 +17,7 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 
 	WSABUF		Buf;
 	DWORD		dwSendBytes;
-
+	vprint("send to game svr message:%d", nIdent);
 	msg.nSocket			= nSocket;
 	msg.wSessionIndex	= wIndex;
 	msg.wIdent			= nIdent;
@@ -30,9 +30,12 @@ void SendSocketMsgS (int nIdent, WORD wIndex, int nSocket, WORD wSrvIndex, int n
 	Buf.len = sizeof(_TMSGHEADER) + nLen;
 	Buf.buf = pszBuf;
 	int s = WSASend(g_csock, &Buf, 1, &dwSendBytes, 0, NULL, NULL);
-	if (s == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
+	vprint("WSASend return :%d", s);
+	if (s == SOCKET_ERROR)
 	{
-		print("send error in SendSocketMsgS");
+		int error = WSAGetLastError();
+		if (error != ERROR_IO_PENDING)
+			vprint("send error:%d in SendSocketMsgS", error);
 	}
 }
 
@@ -131,6 +134,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID CompletionPortID)
 				pSendData->sock				= pSessionInfo->sock;
 				pSendData->nSessionIndex	= pSessionInfo->nSessionIndex;
 				pSendData->nLength			= pSessionInfo->ExtractPacket(pSendData->szData, pSendData->nMessage);
+				vprint("recv message:%d", pSendData->nMessage);
 				if (pSendData->nLength < 0)
 				{
 					CloseSession(pSessionInfo);

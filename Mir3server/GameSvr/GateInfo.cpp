@@ -30,10 +30,6 @@ void CGateInfo::DisconnectClient(int client)
 		memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
 		m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
 	}
-	else
-	{
-		print("Not enough memory");
-	}
 }
 
 ///向网关发送保活回执.
@@ -72,34 +68,7 @@ void CGateInfo::OnLeaveRoom(CUserInfo * pUser)
 	pUser->m_pRoom->RemovePlayer(pUser);
 	if (pUser->m_pRoom->m_pUserList.GetCount() != 0)
 	{
-		/*PLISTNODE no = pUser->m_pRoom->m_pUserList.GetHead();
-		while (no != NULL)
-		{
-			CUserInfo * pRoomUser = pUser->m_pRoom->m_pUserList.GetData(no);
-			int k = g_memPool.GetAvailablePosition();
-			if (k < 0)
-			{
-				print("no more memory");
-			}
-			_LPTSENDBUFF lpSendBuff = g_memPool.GetEmptyElement(k);
-			OnLeaveRoomRsp pOnLeaveRoomRsp;
-			pOnLeaveRoomRsp.set_playerid(pUser->m_nUserServerIndex);
-			if (lpSendBuff)
-			{
-				lpSendBuff->nIndex = k;
-				_TMSGHEADER	MsgHdr;
-				MsgHdr.nSocket = pRoomUser->m_sock;
-				MsgHdr.wSessionIndex = pRoomUser->m_nUserGateIndex;
-				MsgHdr.wIdent = MeteorMsg_MsgType_OnLeaveRoomRsp;
-				MsgHdr.wUserListIndex = pRoomUser->m_nUserServerIndex;
-				MsgHdr.nLength = pOnLeaveRoomRsp.ByteSizeLong();
-				lpSendBuff->nLen = sizeof(_TMSGHEADER) + pOnLeaveRoomRsp.ByteSizeLong();
-				memmove(lpSendBuff->szData, (char *)&MsgHdr, sizeof(_TMSGHEADER));
-				pOnLeaveRoomRsp.SerializeToArray(lpSendBuff->szData + sizeof(_TMSGHEADER), DATA_BUFSIZE - sizeof(_TMSGHEADER));
-				m_xSendBuffQ.PushQ((BYTE *)lpSendBuff);
-			}
-			no = pUser->m_pRoom->m_pUserList.GetNext(no);
-		}*/
+
 	}
 	else
 	{
@@ -216,7 +185,7 @@ int CGateInfo::Recv()
 
 	OverlappedEx[0].nOvFlag		= OVERLAPPED_FLAG::OVERLAPPED_RECV;
 	OverlappedEx[0].DataBuf.len = DATA_GATE_SIZE - OverlappedEx[0].bufLen;
-	OverlappedEx[0].DataBuf.buf = OverlappedEx[0].Buffer + OverlappedEx[0].bufLen;
+	OverlappedEx[0].DataBuf.buf = (char*)&OverlappedEx[0].Buffer[OverlappedEx[0].bufLen];
 
 	memset( &OverlappedEx[0].Overlapped, 0, sizeof( OverlappedEx[0].Overlapped ) );
 
@@ -225,7 +194,7 @@ int CGateInfo::Recv()
 
 int CGateInfo::NextPacketOffset(int offset)
 {
-	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(OverlappedEx[0].Buffer + offset);
+	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(&OverlappedEx[0].Buffer[offset]);
 	return offset + p->nLength + sizeof(tag_TMSGHEADER);
 }
 
@@ -233,7 +202,7 @@ bool CGateInfo::HasCompletionPacket(int offset)
 {
 	if (OverlappedEx[0].bufLen < sizeof(tag_TMSGHEADER))
 		return false;
-	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(OverlappedEx[0].Buffer + offset);
+	_LPTMSGHEADER p = (_LPTMSGHEADER)(char*)(&OverlappedEx[0].Buffer[offset]);
 	if (OverlappedEx[0].bufLen < p->nLength + sizeof(tag_TMSGHEADER))
 		return FALSE;
 	return TRUE;

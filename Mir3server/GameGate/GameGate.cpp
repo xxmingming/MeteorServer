@@ -173,6 +173,7 @@ int main()
 		g_caddr.sin_addr.s_addr = inet_addr(g_strGameSvrIP.c_str());
 	}
 
+	vprint("connect srv ip:%s g_svrport:%d", g_strGameSvrIP.c_str(), g_GameSvrPort);
 	if (connect(g_csock, (const struct sockaddr FAR*)&g_caddr, sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
 	{
 		print("can not connect to svr");
