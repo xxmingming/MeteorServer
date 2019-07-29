@@ -37,7 +37,7 @@ namespace protobuf_protocol_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[27];
+  static const ::google::protobuf::internal::ParseTable schema[26];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -45,8 +45,6 @@ struct TableStruct {
 void AddDescriptors();
 void InitDefaultsMeteorMsgImpl();
 void InitDefaultsMeteorMsg();
-void InitDefaultsKeyDataImpl();
-void InitDefaultsKeyData();
 void InitDefaultsSyncInitDataImpl();
 void InitDefaultsSyncInitData();
 void InitDefaultsPlayerEventDataImpl();
@@ -99,7 +97,6 @@ void InitDefaultsAudioChatMsgImpl();
 void InitDefaultsAudioChatMsg();
 inline void InitDefaults() {
   InitDefaultsMeteorMsg();
-  InitDefaultsKeyData();
   InitDefaultsSyncInitData();
   InitDefaultsPlayerEventData();
   InitDefaultsEnterQueueRsp();
@@ -157,9 +154,6 @@ extern JoinRoomReqDefaultTypeInternal _JoinRoomReq_default_instance_;
 class JoinRoomRsp;
 class JoinRoomRspDefaultTypeInternal;
 extern JoinRoomRspDefaultTypeInternal _JoinRoomRsp_default_instance_;
-class KeyData;
-class KeyDataDefaultTypeInternal;
-extern KeyDataDefaultTypeInternal _KeyData_default_instance_;
 class MeteorMsg;
 class MeteorMsgDefaultTypeInternal;
 extern MeteorMsgDefaultTypeInternal _MeteorMsg_default_instance_;
@@ -268,14 +262,15 @@ enum MeteorMsg_Command {
   MeteorMsg_Command_SyncRandomSeed = 1,
   MeteorMsg_Command_KeyDown = 2,
   MeteorMsg_Command_KeyUp = 3,
-  MeteorMsg_Command_SpawnPlayer = 4,
-  MeteorMsg_Command_DestroyPlayer = 5,
-  MeteorMsg_Command_JoyStickMove = 6,
-  MeteorMsg_Command_MouseMove = 7,
-  MeteorMsg_Command_EquipWeapon = 101,
-  MeteorMsg_Command_DropWeapon = 102,
-  MeteorMsg_Command_SellItem = 200,
-  MeteorMsg_Command_BuyItem = 201
+  MeteorMsg_Command_KeyLast = 4,
+  MeteorMsg_Command_SpawnPlayer = 5,
+  MeteorMsg_Command_DestroyPlayer = 6,
+  MeteorMsg_Command_JoyStickMove = 7,
+  MeteorMsg_Command_MouseMove = 8,
+  MeteorMsg_Command_EquipWeapon = 9,
+  MeteorMsg_Command_DropWeapon = 10,
+  MeteorMsg_Command_SellItem = 11,
+  MeteorMsg_Command_BuyItem = 12
 };
 bool MeteorMsg_Command_IsValid(int value);
 const MeteorMsg_Command MeteorMsg_Command_Command_MIN = MeteorMsg_Command_SyncRandomSeed;
@@ -573,6 +568,8 @@ class MeteorMsg : public ::google::protobuf::Message /* @@protoc_insertion_point
     MeteorMsg_Command_KeyDown;
   static const Command KeyUp =
     MeteorMsg_Command_KeyUp;
+  static const Command KeyLast =
+    MeteorMsg_Command_KeyLast;
   static const Command SpawnPlayer =
     MeteorMsg_Command_SpawnPlayer;
   static const Command DestroyPlayer =
@@ -633,116 +630,6 @@ class MeteorMsg : public ::google::protobuf::Message /* @@protoc_insertion_point
 };
 // -------------------------------------------------------------------
 
-class KeyData : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:KeyData) */ {
- public:
-  KeyData();
-  virtual ~KeyData();
-
-  KeyData(const KeyData& from);
-
-  inline KeyData& operator=(const KeyData& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  KeyData(KeyData&& from) noexcept
-    : KeyData() {
-    *this = ::std::move(from);
-  }
-
-  inline KeyData& operator=(KeyData&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const KeyData& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const KeyData* internal_default_instance() {
-    return reinterpret_cast<const KeyData*>(
-               &_KeyData_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    1;
-
-  void Swap(KeyData* other);
-  friend void swap(KeyData& a, KeyData& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline KeyData* New() const PROTOBUF_FINAL { return New(NULL); }
-
-  KeyData* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const KeyData& from);
-  void MergeFrom(const KeyData& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
-
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(KeyData* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required uint32 key = 1;
-  bool has_key() const;
-  void clear_key();
-  static const int kKeyFieldNumber = 1;
-  ::google::protobuf::uint32 key() const;
-  void set_key(::google::protobuf::uint32 value);
-
-  // @@protoc_insertion_point(class_scope:KeyData)
- private:
-  void set_has_key();
-  void clear_has_key();
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 key_;
-  friend struct ::protobuf_protocol_2eproto::TableStruct;
-  friend void ::protobuf_protocol_2eproto::InitDefaultsKeyDataImpl();
-};
-// -------------------------------------------------------------------
-
 class SyncInitData : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:SyncInitData) */ {
  public:
   SyncInitData();
@@ -785,7 +672,7 @@ class SyncInitData : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_SyncInitData_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
+    1;
 
   void Swap(SyncInitData* other);
   friend void swap(SyncInitData& a, SyncInitData& b) {
@@ -895,7 +782,7 @@ class PlayerEventData : public ::google::protobuf::Message /* @@protoc_insertion
                &_PlayerEventData_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(PlayerEventData* other);
   friend void swap(PlayerEventData& a, PlayerEventData& b) {
@@ -1056,7 +943,7 @@ class EnterQueueRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_EnterQueueRsp_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    4;
+    3;
 
   void Swap(EnterQueueRsp* other);
   friend void swap(EnterQueueRsp& a, EnterQueueRsp& b) {
@@ -1189,7 +1076,7 @@ class OnBattleBegin : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_OnBattleBegin_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(OnBattleBegin* other);
   friend void swap(OnBattleBegin& a, OnBattleBegin& b) {
@@ -1361,7 +1248,7 @@ class UserSelectRole : public ::google::protobuf::Message /* @@protoc_insertion_
                &_UserSelectRole_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(UserSelectRole* other);
   friend void swap(UserSelectRole& a, UserSelectRole& b) {
@@ -1484,7 +1371,7 @@ class UserSelectSkill : public ::google::protobuf::Message /* @@protoc_insertion
                &_UserSelectSkill_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(UserSelectSkill* other);
   friend void swap(UserSelectSkill& a, UserSelectSkill& b) {
@@ -1607,7 +1494,7 @@ class UserSelectSkin : public ::google::protobuf::Message /* @@protoc_insertion_
                &_UserSelectSkin_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(UserSelectSkin* other);
   friend void swap(UserSelectSkin& a, UserSelectSkin& b) {
@@ -1730,7 +1617,7 @@ class OnBattleCanceled : public ::google::protobuf::Message /* @@protoc_insertio
                &_OnBattleCanceled_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(OnBattleCanceled* other);
   friend void swap(OnBattleCanceled& a, OnBattleCanceled& b) {
@@ -1840,7 +1727,7 @@ class OnBattleLoading : public ::google::protobuf::Message /* @@protoc_insertion
                &_OnBattleLoading_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(OnBattleLoading* other);
   friend void swap(OnBattleLoading& a, OnBattleLoading& b) {
@@ -1966,7 +1853,7 @@ class OnBattleResult : public ::google::protobuf::Message /* @@protoc_insertion_
                &_OnBattleResult_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(OnBattleResult* other);
   friend void swap(OnBattleResult& a, OnBattleResult& b) {
@@ -2076,7 +1963,7 @@ class PlayerSellItem : public ::google::protobuf::Message /* @@protoc_insertion_
                &_PlayerSellItem_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(PlayerSellItem* other);
   friend void swap(PlayerSellItem& a, PlayerSellItem& b) {
@@ -2199,7 +2086,7 @@ class PlayerBuyItem : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_PlayerBuyItem_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    13;
+    12;
 
   void Swap(PlayerBuyItem* other);
   friend void swap(PlayerBuyItem& a, PlayerBuyItem& b) {
@@ -2322,7 +2209,7 @@ class ProtocolVerifyReq : public ::google::protobuf::Message /* @@protoc_inserti
                &_ProtocolVerifyReq_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(ProtocolVerifyReq* other);
   friend void swap(ProtocolVerifyReq& a, ProtocolVerifyReq& b) {
@@ -2453,7 +2340,7 @@ class ProtocolVerifyRsp : public ::google::protobuf::Message /* @@protoc_inserti
                &_ProtocolVerifyRsp_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    15;
+    14;
 
   void Swap(ProtocolVerifyRsp* other);
   friend void swap(ProtocolVerifyRsp& a, ProtocolVerifyRsp& b) {
@@ -2584,7 +2471,7 @@ class RoomInfo : public ::google::protobuf::Message /* @@protoc_insertion_point(
                &_RoomInfo_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    16;
+    15;
 
   void Swap(RoomInfo* other);
   friend void swap(RoomInfo& a, RoomInfo& b) {
@@ -2941,7 +2828,7 @@ class GetRoomRsp : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_GetRoomRsp_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    17;
+    16;
 
   void Swap(GetRoomRsp* other);
   friend void swap(GetRoomRsp& a, GetRoomRsp& b) {
@@ -3054,7 +2941,7 @@ class CreateRoomReq : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CreateRoomReq_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    18;
+    17;
 
   void Swap(CreateRoomReq* other);
   friend void swap(CreateRoomReq& a, CreateRoomReq& b) {
@@ -3307,7 +3194,7 @@ class CreateRoomRsp : public ::google::protobuf::Message /* @@protoc_insertion_p
                &_CreateRoomRsp_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    19;
+    18;
 
   void Swap(CreateRoomRsp* other);
   friend void swap(CreateRoomRsp& a, CreateRoomRsp& b) {
@@ -3460,7 +3347,7 @@ class JoinRoomReq : public ::google::protobuf::Message /* @@protoc_insertion_poi
                &_JoinRoomReq_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    20;
+    19;
 
   void Swap(JoinRoomReq* other);
   friend void swap(JoinRoomReq& a, JoinRoomReq& b) {
@@ -3601,7 +3488,7 @@ class JoinRoomRsp : public ::google::protobuf::Message /* @@protoc_insertion_poi
                &_JoinRoomRsp_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    21;
+    20;
 
   void Swap(JoinRoomRsp* other);
   friend void swap(JoinRoomRsp& a, JoinRoomRsp& b) {
@@ -3790,7 +3677,7 @@ class Vector2_ : public ::google::protobuf::Message /* @@protoc_insertion_point(
                &_Vector2__default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    22;
+    21;
 
   void Swap(Vector2_* other);
   friend void swap(Vector2_& a, Vector2_& b) {
@@ -3913,7 +3800,7 @@ class FrameCommand : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_FrameCommand_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    23;
+    22;
 
   void Swap(FrameCommand* other);
   friend void swap(FrameCommand& a, FrameCommand& b) {
@@ -4064,7 +3951,7 @@ class GameFrames : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_GameFrames_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    24;
+    23;
 
   void Swap(GameFrames* other);
   friend void swap(GameFrames& a, GameFrames& b) {
@@ -4177,7 +4064,7 @@ class ChatMsg : public ::google::protobuf::Message /* @@protoc_insertion_point(c
                &_ChatMsg_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    25;
+    24;
 
   void Swap(ChatMsg* other);
   friend void swap(ChatMsg& a, ChatMsg& b) {
@@ -4318,7 +4205,7 @@ class AudioChatMsg : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_AudioChatMsg_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    26;
+    25;
 
   void Swap(AudioChatMsg* other);
   friend void swap(AudioChatMsg& a, AudioChatMsg& b) {
@@ -4449,34 +4336,6 @@ inline void MeteorMsg::set_cmd(::MeteorMsg_MsgType value) {
   set_has_cmd();
   cmd_ = value;
   // @@protoc_insertion_point(field_set:MeteorMsg.cmd)
-}
-
-// -------------------------------------------------------------------
-
-// KeyData
-
-// required uint32 key = 1;
-inline bool KeyData::has_key() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void KeyData::set_has_key() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void KeyData::clear_has_key() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void KeyData::clear_key() {
-  key_ = 0u;
-  clear_has_key();
-}
-inline ::google::protobuf::uint32 KeyData::key() const {
-  // @@protoc_insertion_point(field_get:KeyData.key)
-  return key_;
-}
-inline void KeyData::set_key(::google::protobuf::uint32 value) {
-  set_has_key();
-  key_ = value;
-  // @@protoc_insertion_point(field_set:KeyData.key)
 }
 
 // -------------------------------------------------------------------
@@ -7209,8 +7068,6 @@ inline void AudioChatMsg::set_allocated_audio_data(::std::string* audio_data) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

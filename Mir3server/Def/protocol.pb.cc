@@ -24,11 +24,6 @@ class MeteorMsgDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<MeteorMsg>
       _instance;
 } _MeteorMsg_default_instance_;
-class KeyDataDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<KeyData>
-      _instance;
-} _KeyData_default_instance_;
 class SyncInitDataDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<SyncInitData>
@@ -174,27 +169,6 @@ void InitDefaultsMeteorMsgImpl() {
 void InitDefaultsMeteorMsg() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsMeteorMsgImpl);
-}
-
-void InitDefaultsKeyDataImpl() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  {
-    void* ptr = &::_KeyData_default_instance_;
-    new (ptr) ::KeyData();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::KeyData::InitAsDefaultInstance();
-}
-
-void InitDefaultsKeyData() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsKeyDataImpl);
 }
 
 void InitDefaultsSyncInitDataImpl() {
@@ -724,7 +698,7 @@ void InitDefaultsAudioChatMsg() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAudioChatMsgImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[27];
+::google::protobuf::Metadata file_level_metadata[26];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[6];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -734,13 +708,6 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::MeteorMsg, cmd_),
-  0,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::KeyData, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::KeyData, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::KeyData, key_),
   0,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::SyncInitData, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::SyncInitData, _internal_metadata_),
@@ -1040,37 +1007,35 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 6, sizeof(::MeteorMsg)},
-  { 7, 13, sizeof(::KeyData)},
-  { 14, 20, sizeof(::SyncInitData)},
-  { 21, 31, sizeof(::PlayerEventData)},
-  { 36, 44, sizeof(::EnterQueueRsp)},
-  { 47, 56, sizeof(::OnBattleBegin)},
-  { 60, 67, sizeof(::UserSelectRole)},
-  { 69, 76, sizeof(::UserSelectSkill)},
-  { 78, 85, sizeof(::UserSelectSkin)},
-  { 87, 93, sizeof(::OnBattleCanceled)},
-  { 94, 101, sizeof(::OnBattleLoading)},
-  { 103, 109, sizeof(::OnBattleResult)},
-  { 110, 117, sizeof(::PlayerSellItem)},
-  { 119, 126, sizeof(::PlayerBuyItem)},
-  { 128, 135, sizeof(::ProtocolVerifyReq)},
-  { 137, 144, sizeof(::ProtocolVerifyRsp)},
-  { 146, 163, sizeof(::RoomInfo)},
-  { 175, 181, sizeof(::GetRoomRsp)},
-  { 182, 199, sizeof(::CreateRoomReq)},
-  { 211, 221, sizeof(::CreateRoomRsp)},
-  { 226, 234, sizeof(::JoinRoomReq)},
-  { 237, 250, sizeof(::JoinRoomRsp)},
-  { 258, 265, sizeof(::Vector2_)},
-  { 267, 276, sizeof(::FrameCommand)},
-  { 280, 286, sizeof(::GameFrames)},
-  { 287, 295, sizeof(::ChatMsg)},
-  { 298, 306, sizeof(::AudioChatMsg)},
+  { 7, 13, sizeof(::SyncInitData)},
+  { 14, 24, sizeof(::PlayerEventData)},
+  { 29, 37, sizeof(::EnterQueueRsp)},
+  { 40, 49, sizeof(::OnBattleBegin)},
+  { 53, 60, sizeof(::UserSelectRole)},
+  { 62, 69, sizeof(::UserSelectSkill)},
+  { 71, 78, sizeof(::UserSelectSkin)},
+  { 80, 86, sizeof(::OnBattleCanceled)},
+  { 87, 94, sizeof(::OnBattleLoading)},
+  { 96, 102, sizeof(::OnBattleResult)},
+  { 103, 110, sizeof(::PlayerSellItem)},
+  { 112, 119, sizeof(::PlayerBuyItem)},
+  { 121, 128, sizeof(::ProtocolVerifyReq)},
+  { 130, 137, sizeof(::ProtocolVerifyRsp)},
+  { 139, 156, sizeof(::RoomInfo)},
+  { 168, 174, sizeof(::GetRoomRsp)},
+  { 175, 192, sizeof(::CreateRoomReq)},
+  { 204, 214, sizeof(::CreateRoomRsp)},
+  { 219, 227, sizeof(::JoinRoomReq)},
+  { 230, 243, sizeof(::JoinRoomRsp)},
+  { 251, 258, sizeof(::Vector2_)},
+  { 260, 269, sizeof(::FrameCommand)},
+  { 273, 279, sizeof(::GameFrames)},
+  { 280, 288, sizeof(::ChatMsg)},
+  { 291, 299, sizeof(::AudioChatMsg)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::_MeteorMsg_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_KeyData_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_SyncInitData_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_PlayerEventData_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::_EnterQueueRsp_default_instance_),
@@ -1114,13 +1079,13 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 27);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 26);
 }
 
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\016protocol.proto\"\372\007\n\tMeteorMsg\022\037\n\003cmd\030\001 "
+      "\n\016protocol.proto\"\205\010\n\tMeteorMsg\022\037\n\003cmd\030\001 "
       "\002(\0162\022.MeteorMsg.MsgType\"\220\006\n\007MsgType\022\022\n\016P"
       "rotocolVerify\020\n\022\016\n\nGetRoomReq\020d\022\016\n\nGetRo"
       "omRsp\020e\022\021\n\rCreateRoomReq\020f\022\021\n\rCreateRoom"
@@ -1141,75 +1106,75 @@ void AddDescriptorsImpl() {
       "ail\020\220\001\022\021\n\014OnPlayerQuit\020\222\001\022\024\n\017OnPlayerReS"
       "tart\020\223\001\022\027\n\022OnPlayerFetchInput\020\224\001\022\026\n\021OnPl"
       "ayerReConnect\020\225\001\022\016\n\tAudioChat\020\226\001\022\020\n\013Sync"
-      "Command\020\370\006\"\270\001\n\007Command\022\022\n\016SyncRandomSeed"
-      "\020\001\022\013\n\007KeyDown\020\002\022\t\n\005KeyUp\020\003\022\017\n\013SpawnPlaye"
-      "r\020\004\022\021\n\rDestroyPlayer\020\005\022\020\n\014JoyStickMove\020\006"
-      "\022\r\n\tMouseMove\020\007\022\017\n\013EquipWeapon\020e\022\016\n\nDrop"
-      "Weapon\020f\022\r\n\010SellItem\020\310\001\022\014\n\007BuyItem\020\311\001\"\026\n"
-      "\007KeyData\022\013\n\003key\030\001 \002(\r\"\"\n\014SyncInitData\022\022\n"
-      "\nrandomSeed\030\001 \002(\r\"^\n\017PlayerEventData\022\020\n\010"
-      "playerId\030\001 \002(\r\022\014\n\004camp\030\002 \002(\r\022\r\n\005model\030\003 "
-      "\002(\r\022\016\n\006weapon\030\004 \002(\r\022\014\n\004name\030\005 \002(\t\"H\n\rEnt"
-      "erQueueRsp\022\016\n\006result\030\001 \002(\r\022\020\n\010playerId\030\002"
-      " \002(\r\022\025\n\rplayerInQueue\030\003 \002(\r\"g\n\rOnBattleB"
-      "egin\022\025\n\rTeamMemberAId\030\001 \003(\r\022\025\n\rTeamMembe"
-      "rBId\030\002 \003(\r\022\023\n\013TeamMemberA\030\003 \003(\t\022\023\n\013TeamM"
-      "emberB\030\004 \003(\t\"2\n\016UserSelectRole\022\020\n\010player"
-      "Id\030\001 \002(\r\022\016\n\006HeroId\030\002 \002(\r\"4\n\017UserSelectSk"
-      "ill\022\020\n\010playerId\030\001 \002(\r\022\017\n\007SkillId\030\002 \002(\r\"0"
-      "\n\016UserSelectSkin\022\020\n\010playerId\030\001 \002(\r\022\014\n\004Sk"
-      "in\030\002 \002(\r\"\"\n\020OnBattleCanceled\022\016\n\006reason\030\001"
-      " \002(\r\"4\n\017OnBattleLoading\022\020\n\010playerId\030\001 \003("
-      "\r\022\017\n\007percent\030\002 \003(\r\" \n\016OnBattleResult\022\016\n\006"
-      "result\030\001 \002(\r\"2\n\016PlayerSellItem\022\020\n\010player"
-      "Id\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"1\n\rPlayerBuyIte"
-      "m\022\020\n\010playerId\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"3\n\021P"
-      "rotocolVerifyReq\022\020\n\010protocol\030\001 \002(\r\022\014\n\004da"
-      "ta\030\002 \002(\t\"4\n\021ProtocolVerifyRsp\022\016\n\006result\030"
-      "\001 \002(\r\022\017\n\007message\030\002 \002(\t\"\341\004\n\010RoomInfo\022\016\n\006r"
-      "oomId\030\001 \002(\r\022\020\n\010roomName\030\002 \002(\t\022 \n\004rule\030\003 "
-      "\002(\0162\022.RoomInfo.RoomRule\022&\n\007pattern\030\004 \002(\016"
-      "2\025.RoomInfo.RoomPattern\022\020\n\010levelIdx\030\005 \002("
-      "\r\022\r\n\005hpMax\030\006 \002(\r\022\020\n\010password\030\007 \002(\r\022(\n\007ve"
-      "rsion\030\010 \002(\0162\027.RoomInfo.MeteorVersion\022\016\n\006"
-      "Group1\030\t \002(\r\022\016\n\006Group2\030\n \002(\r\022\023\n\013playerCo"
-      "unt\030\013 \002(\r\022\021\n\tmaxPlayer\030\014 \002(\r\"f\n\010RoomRule"
-      "\022\006\n\002MZ\020\001\022\007\n\003ROB\020\002\022\013\n\007Defence\020\003\022\016\n\nKillTa"
-      "rget\020\004\022\013\n\007Endless\020\005\022\n\n\006Normal\020\006\022\t\n\005Story"
-      "\020\007\022\010\n\004Moba\020\010\"4\n\013RoomPattern\022\013\n\007_Normal\020\001"
-      "\022\013\n\007_Record\020\002\022\013\n\007_Replay\020\003\"#\n\rMeteorVers"
-      "ion\022\010\n\004V107\020\001\022\010\n\004V907\020\002\"\200\001\n\tErrorCode\022\020\n"
-      "\014RoomNotExist\020\001\022\022\n\016RoomPlayerFull\020\002\022\024\n\020R"
-      "oomNeedPassword\020\003\022\022\n\016RoomVersionErr\020\004\022\025\n"
-      "\021UserInAnotherRoom\020\005\022\014\n\010RoomFull\020\006\",\n\nGe"
-      "tRoomRsp\022\036\n\013RoomInLobby\030\001 \003(\0132\t.RoomInfo"
-      "\"\242\002\n\rCreateRoomReq\022&\n\007pattern\030\001 \002(\0162\025.Ro"
-      "omInfo.RoomPattern\022\021\n\tmaxPlayer\030\002 \002(\r\022\020\n"
-      "\010levelIdx\030\003 \002(\r\022 \n\004rule\030\004 \002(\0162\022.RoomInfo"
-      ".RoomRule\022\020\n\010roomName\030\005 \002(\t\022\r\n\005hpMax\030\006 \002"
-      "(\r\022\021\n\troundTime\030\007 \002(\r\022(\n\007version\030\010 \002(\0162\027"
-      ".RoomInfo.MeteorVersion\022\016\n\006secret\030\t \001(\t\022"
-      "\023\n\013replay_data\030\n \001(\014\022\016\n\006models\030\013 \003(\r\022\017\n\007"
-      "weapons\030\014 \003(\r\"`\n\rCreateRoomRsp\022\016\n\006result"
-      "\030\001 \002(\r\022\016\n\006roomId\030\002 \002(\r\022\017\n\007levelId\030\003 \002(\r\022"
-      "\020\n\010playerId\030\004 \002(\r\022\014\n\004port\030\005 \002(\r\"Y\n\013JoinR"
-      "oomReq\022\016\n\006roomId\030\001 \002(\r\022(\n\007version\030\002 \002(\0162"
-      "\027.RoomInfo.MeteorVersion\022\020\n\010password\030\003 \001"
-      "(\t\"\220\001\n\013JoinRoomRsp\022\016\n\006result\030\001 \002(\r\022\016\n\006re"
-      "ason\030\002 \002(\r\022\020\n\010levelIdx\030\003 \002(\r\022\016\n\006roomId\030\004"
-      " \002(\r\022\020\n\010playerId\030\005 \002(\r\022\014\n\004port\030\006 \002(\r\022\016\n\006"
-      "models\030\007 \003(\r\022\017\n\007weapons\030\010 \003(\r\" \n\010Vector2"
-      "_\022\t\n\001x\030\001 \002(\005\022\t\n\001y\030\002 \002(\005\"g\n\014FrameCommand\022"
-      "\022\n\nLogicFrame\030\001 \002(\r\022\020\n\010playerId\030\002 \001(\r\022#\n"
-      "\007command\030\003 \002(\0162\022.MeteorMsg.Command\022\014\n\004da"
-      "ta\030\004 \002(\014\"-\n\nGameFrames\022\037\n\010commands\030\001 \003(\013"
-      "2\r.FrameCommand\"E\n\007ChatMsg\022\020\n\010playerId\030\001"
-      " \002(\r\022\023\n\013channelType\030\002 \002(\r\022\023\n\013chatMessage"
-      "\030\003 \002(\t\"B\n\014AudioChatMsg\022\020\n\010playerId\030\001 \002(\r"
-      "\022\014\n\004type\030\002 \002(\r\022\022\n\naudio_data\030\003 \002(\014"
+      "Command\020\370\006\"\303\001\n\007Command\022\022\n\016SyncRandomSeed"
+      "\020\001\022\013\n\007KeyDown\020\002\022\t\n\005KeyUp\020\003\022\013\n\007KeyLast\020\004\022"
+      "\017\n\013SpawnPlayer\020\005\022\021\n\rDestroyPlayer\020\006\022\020\n\014J"
+      "oyStickMove\020\007\022\r\n\tMouseMove\020\010\022\017\n\013EquipWea"
+      "pon\020\t\022\016\n\nDropWeapon\020\n\022\014\n\010SellItem\020\013\022\013\n\007B"
+      "uyItem\020\014\"\"\n\014SyncInitData\022\022\n\nrandomSeed\030\001"
+      " \002(\r\"^\n\017PlayerEventData\022\020\n\010playerId\030\001 \002("
+      "\r\022\014\n\004camp\030\002 \002(\r\022\r\n\005model\030\003 \002(\r\022\016\n\006weapon"
+      "\030\004 \002(\r\022\014\n\004name\030\005 \002(\t\"H\n\rEnterQueueRsp\022\016\n"
+      "\006result\030\001 \002(\r\022\020\n\010playerId\030\002 \002(\r\022\025\n\rplaye"
+      "rInQueue\030\003 \002(\r\"g\n\rOnBattleBegin\022\025\n\rTeamM"
+      "emberAId\030\001 \003(\r\022\025\n\rTeamMemberBId\030\002 \003(\r\022\023\n"
+      "\013TeamMemberA\030\003 \003(\t\022\023\n\013TeamMemberB\030\004 \003(\t\""
+      "2\n\016UserSelectRole\022\020\n\010playerId\030\001 \002(\r\022\016\n\006H"
+      "eroId\030\002 \002(\r\"4\n\017UserSelectSkill\022\020\n\010player"
+      "Id\030\001 \002(\r\022\017\n\007SkillId\030\002 \002(\r\"0\n\016UserSelectS"
+      "kin\022\020\n\010playerId\030\001 \002(\r\022\014\n\004Skin\030\002 \002(\r\"\"\n\020O"
+      "nBattleCanceled\022\016\n\006reason\030\001 \002(\r\"4\n\017OnBat"
+      "tleLoading\022\020\n\010playerId\030\001 \003(\r\022\017\n\007percent\030"
+      "\002 \003(\r\" \n\016OnBattleResult\022\016\n\006result\030\001 \002(\r\""
+      "2\n\016PlayerSellItem\022\020\n\010playerId\030\001 \002(\r\022\016\n\006i"
+      "temId\030\002 \002(\r\"1\n\rPlayerBuyItem\022\020\n\010playerId"
+      "\030\001 \002(\r\022\016\n\006itemId\030\002 \002(\r\"3\n\021ProtocolVerify"
+      "Req\022\020\n\010protocol\030\001 \002(\r\022\014\n\004data\030\002 \002(\t\"4\n\021P"
+      "rotocolVerifyRsp\022\016\n\006result\030\001 \002(\r\022\017\n\007mess"
+      "age\030\002 \002(\t\"\341\004\n\010RoomInfo\022\016\n\006roomId\030\001 \002(\r\022\020"
+      "\n\010roomName\030\002 \002(\t\022 \n\004rule\030\003 \002(\0162\022.RoomInf"
+      "o.RoomRule\022&\n\007pattern\030\004 \002(\0162\025.RoomInfo.R"
+      "oomPattern\022\020\n\010levelIdx\030\005 \002(\r\022\r\n\005hpMax\030\006 "
+      "\002(\r\022\020\n\010password\030\007 \002(\r\022(\n\007version\030\010 \002(\0162\027"
+      ".RoomInfo.MeteorVersion\022\016\n\006Group1\030\t \002(\r\022"
+      "\016\n\006Group2\030\n \002(\r\022\023\n\013playerCount\030\013 \002(\r\022\021\n\t"
+      "maxPlayer\030\014 \002(\r\"f\n\010RoomRule\022\006\n\002MZ\020\001\022\007\n\003R"
+      "OB\020\002\022\013\n\007Defence\020\003\022\016\n\nKillTarget\020\004\022\013\n\007End"
+      "less\020\005\022\n\n\006Normal\020\006\022\t\n\005Story\020\007\022\010\n\004Moba\020\010\""
+      "4\n\013RoomPattern\022\013\n\007_Normal\020\001\022\013\n\007_Record\020\002"
+      "\022\013\n\007_Replay\020\003\"#\n\rMeteorVersion\022\010\n\004V107\020\001"
+      "\022\010\n\004V907\020\002\"\200\001\n\tErrorCode\022\020\n\014RoomNotExist"
+      "\020\001\022\022\n\016RoomPlayerFull\020\002\022\024\n\020RoomNeedPasswo"
+      "rd\020\003\022\022\n\016RoomVersionErr\020\004\022\025\n\021UserInAnothe"
+      "rRoom\020\005\022\014\n\010RoomFull\020\006\",\n\nGetRoomRsp\022\036\n\013R"
+      "oomInLobby\030\001 \003(\0132\t.RoomInfo\"\242\002\n\rCreateRo"
+      "omReq\022&\n\007pattern\030\001 \002(\0162\025.RoomInfo.RoomPa"
+      "ttern\022\021\n\tmaxPlayer\030\002 \002(\r\022\020\n\010levelIdx\030\003 \002"
+      "(\r\022 \n\004rule\030\004 \002(\0162\022.RoomInfo.RoomRule\022\020\n\010"
+      "roomName\030\005 \002(\t\022\r\n\005hpMax\030\006 \002(\r\022\021\n\troundTi"
+      "me\030\007 \002(\r\022(\n\007version\030\010 \002(\0162\027.RoomInfo.Met"
+      "eorVersion\022\016\n\006secret\030\t \001(\t\022\023\n\013replay_dat"
+      "a\030\n \001(\014\022\016\n\006models\030\013 \003(\r\022\017\n\007weapons\030\014 \003(\r"
+      "\"`\n\rCreateRoomRsp\022\016\n\006result\030\001 \002(\r\022\016\n\006roo"
+      "mId\030\002 \002(\r\022\017\n\007levelId\030\003 \002(\r\022\020\n\010playerId\030\004"
+      " \002(\r\022\014\n\004port\030\005 \002(\r\"Y\n\013JoinRoomReq\022\016\n\006roo"
+      "mId\030\001 \002(\r\022(\n\007version\030\002 \002(\0162\027.RoomInfo.Me"
+      "teorVersion\022\020\n\010password\030\003 \001(\t\"\220\001\n\013JoinRo"
+      "omRsp\022\016\n\006result\030\001 \002(\r\022\016\n\006reason\030\002 \002(\r\022\020\n"
+      "\010levelIdx\030\003 \002(\r\022\016\n\006roomId\030\004 \002(\r\022\020\n\010playe"
+      "rId\030\005 \002(\r\022\014\n\004port\030\006 \002(\r\022\016\n\006models\030\007 \003(\r\022"
+      "\017\n\007weapons\030\010 \003(\r\" \n\010Vector2_\022\t\n\001x\030\001 \002(\005\022"
+      "\t\n\001y\030\002 \002(\005\"g\n\014FrameCommand\022\022\n\nLogicFrame"
+      "\030\001 \002(\r\022\020\n\010playerId\030\002 \001(\r\022#\n\007command\030\003 \002("
+      "\0162\022.MeteorMsg.Command\022\014\n\004data\030\004 \002(\014\"-\n\nG"
+      "ameFrames\022\037\n\010commands\030\001 \003(\0132\r.FrameComma"
+      "nd\"E\n\007ChatMsg\022\020\n\010playerId\030\001 \002(\r\022\023\n\013chann"
+      "elType\030\002 \002(\r\022\023\n\013chatMessage\030\003 \002(\t\"B\n\014Aud"
+      "ioChatMsg\022\020\n\010playerId\030\001 \002(\r\022\014\n\004type\030\002 \002("
+      "\r\022\022\n\naudio_data\030\003 \002(\014"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 3474);
+      descriptor, 3461);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "protocol.proto", &protobuf_RegisterTypes);
 }
@@ -1331,10 +1296,11 @@ bool MeteorMsg_Command_IsValid(int value) {
     case 5:
     case 6:
     case 7:
-    case 101:
-    case 102:
-    case 200:
-    case 201:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
       return true;
     default:
       return false;
@@ -1345,6 +1311,7 @@ bool MeteorMsg_Command_IsValid(int value) {
 const MeteorMsg_Command MeteorMsg::SyncRandomSeed;
 const MeteorMsg_Command MeteorMsg::KeyDown;
 const MeteorMsg_Command MeteorMsg::KeyUp;
+const MeteorMsg_Command MeteorMsg::KeyLast;
 const MeteorMsg_Command MeteorMsg::SpawnPlayer;
 const MeteorMsg_Command MeteorMsg::DestroyPlayer;
 const MeteorMsg_Command MeteorMsg::JoyStickMove;
@@ -1709,249 +1676,6 @@ void MeteorMsg::InternalSwap(MeteorMsg* other) {
 }
 
 ::google::protobuf::Metadata MeteorMsg::GetMetadata() const {
-  protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void KeyData::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int KeyData::kKeyFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-KeyData::KeyData()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_protocol_2eproto::InitDefaultsKeyData();
-  }
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:KeyData)
-}
-KeyData::KeyData(const KeyData& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_),
-      _cached_size_(0) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  key_ = from.key_;
-  // @@protoc_insertion_point(copy_constructor:KeyData)
-}
-
-void KeyData::SharedCtor() {
-  _cached_size_ = 0;
-  key_ = 0u;
-}
-
-KeyData::~KeyData() {
-  // @@protoc_insertion_point(destructor:KeyData)
-  SharedDtor();
-}
-
-void KeyData::SharedDtor() {
-}
-
-void KeyData::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* KeyData::descriptor() {
-  ::protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const KeyData& KeyData::default_instance() {
-  ::protobuf_protocol_2eproto::InitDefaultsKeyData();
-  return *internal_default_instance();
-}
-
-KeyData* KeyData::New(::google::protobuf::Arena* arena) const {
-  KeyData* n = new KeyData;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
-
-void KeyData::Clear() {
-// @@protoc_insertion_point(message_clear_start:KeyData)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  key_ = 0u;
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-bool KeyData::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:KeyData)
-  for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required uint32 key = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          set_has_key();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &key_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:KeyData)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:KeyData)
-  return false;
-#undef DO_
-}
-
-void KeyData::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:KeyData)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 key = 1;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->key(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:KeyData)
-}
-
-::google::protobuf::uint8* KeyData::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:KeyData)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required uint32 key = 1;
-  if (cached_has_bits & 0x00000001u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->key(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:KeyData)
-  return target;
-}
-
-size_t KeyData::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:KeyData)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  // required uint32 key = 1;
-  if (has_key()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->key());
-  }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void KeyData::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:KeyData)
-  GOOGLE_DCHECK_NE(&from, this);
-  const KeyData* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const KeyData>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:KeyData)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:KeyData)
-    MergeFrom(*source);
-  }
-}
-
-void KeyData::MergeFrom(const KeyData& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:KeyData)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.has_key()) {
-    set_key(from.key());
-  }
-}
-
-void KeyData::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:KeyData)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void KeyData::CopyFrom(const KeyData& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:KeyData)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool KeyData::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
-  return true;
-}
-
-void KeyData::Swap(KeyData* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void KeyData::InternalSwap(KeyData* other) {
-  using std::swap;
-  swap(key_, other->key_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
-}
-
-::google::protobuf::Metadata KeyData::GetMetadata() const {
   protobuf_protocol_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_protocol_2eproto::file_level_metadata[kIndexInFileMessages];
 }
