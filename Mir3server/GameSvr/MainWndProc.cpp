@@ -72,6 +72,49 @@ void InitRoom()
 		if (RoomIdx >= 0)
 		{
 			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+			pRoom->CreateRoom(pMap, 2, 2000, 30 * 60 * 1000, RoomIdx);
+			g_xRoomList.AddNewNode(pRoom);
+		}
+		p = g_xMirMapList.GetNext(p);
+	}
+	p = g_xMirMapList.GetHead();
+	while (p != NULL)
+	{
+		CMirMap * pMap = g_xMirMapList.GetData(p);
+		int RoomIdx = g_xRoom.GetFreeKey();
+		//房间数量受数组限制，可能返回RoomIdx重复
+		if (RoomIdx >= 0)
+		{
+			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+			pRoom->CreateRoom(pMap, 4, 2000, 30 * 60 * 1000, RoomIdx);
+			g_xRoomList.AddNewNode(pRoom);
+		}
+		p = g_xMirMapList.GetNext(p);
+	}
+
+	p = g_xMirMapList.GetHead();
+	while (p != NULL)
+	{
+		CMirMap * pMap = g_xMirMapList.GetData(p);
+		int RoomIdx = g_xRoom.GetFreeKey();
+		//房间数量受数组限制，可能返回RoomIdx重复
+		if (RoomIdx >= 0)
+		{
+			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
+			pRoom->CreateRoom(pMap, 8, 2000, 30 * 60 * 1000, RoomIdx);
+			g_xRoomList.AddNewNode(pRoom);
+		}
+		p = g_xMirMapList.GetNext(p);
+	}
+	p = g_xMirMapList.GetHead();
+	while (p != NULL)
+	{
+		CMirMap * pMap = g_xMirMapList.GetData(p);
+		int RoomIdx = g_xRoom.GetFreeKey();
+		//房间数量受数组限制，可能返回RoomIdx重复
+		if (RoomIdx >= 0)
+		{
+			CRoomInfo * pRoom = &g_xRoom[RoomIdx];
 			pRoom->CreateRoom(pMap, 16, 2000, 30 * 60 * 1000, RoomIdx);
 			g_xRoomList.AddNewNode(pRoom);
 		}

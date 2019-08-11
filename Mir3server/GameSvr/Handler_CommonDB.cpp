@@ -6,7 +6,7 @@ void SendRDBSocket(int nCertification, char *pszData1, char *pszData2, int nData
 CMapInfo* InitMapInfo()
 {
 	//string s = "sn";
-	g_nNumOfMapInfo = 30;
+	g_nNumOfMapInfo = 24;
 	CMapInfo* pMapInfo = new CMapInfo[g_nNumOfMapInfo];
 	char * s = (char*)malloc(14);
 	strcpy(s, "01");
