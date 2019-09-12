@@ -7,7 +7,6 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
-
 #ifndef _M_IX86
 #error "The following code only works for x86!"
 #endif
@@ -185,7 +184,7 @@ void LogInit()
 	main_log->setPriority(log4cpp::Priority::DEBUG);
 }
 #endif
-
+INT CreateKcpWorkerThread();
 int main()
 {
 	//初始化日志系统
@@ -208,7 +207,7 @@ int main()
 	unsigned long	hThreadForMsg = 0;
 	vprint("accept in port:%d", g_nLocalPort);
 	InitServerSocket(g_ssock, &g_saddr, g_nLocalPort);
-
+	CreateKcpWorkerThread();
 	//ProcessRooms
 	PLISTNODE pListNode = NULL;
 	while (TRUE)

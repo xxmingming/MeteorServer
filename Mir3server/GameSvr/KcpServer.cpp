@@ -1,7 +1,7 @@
 #include "KcpServer.h"
 int udp_output(const char *buf, int len, ikcpcb *kcp, void *user);
 DWORD WINAPI KcpWorkerThread(LPVOID CompletionPortID);
-INT CreateKcpWorkerThread(int nThread);
+INT CreateKcpWorkerThread();
 void CloseServer(KcpServer * pServer);
 HANDLE g_KcpIOCP = NULL;
 
@@ -38,7 +38,7 @@ void KcpServer::Update()
 		CUserInfo * pUser = users.GetData(p);
 		if (pUser != NULL)
 		{
-			pUser->KcpUpdate(millisec, frame);
+			pUser->KcpUpdate(millisec);
 		}
 		p = users.GetNext(p);
 	}
@@ -72,7 +72,7 @@ void KcpServer::OnNewTurn()
 		phead = frames.GetNext(phead);
 	}
 	frames.Clear();
-	PLISTNODE phead = kcpCommand.GetHead();
+	phead = kcpCommand.GetHead();
 	while (phead != NULL)
 	{
 		char * pMemory = kcpCommand.GetData(phead);
@@ -86,7 +86,7 @@ void KcpServer::OnNewTurn()
 		frame = NULL;
 	}
 	frame = new GameFrames();
-	FrameCommand * cmd = frame.add_commands();
+	FrameCommand * cmd = frame->add_commands();
 	cmd->set_command(MeteorMsg_Command_SyncRandomSeed);
 	cmd->set_logicframe(1);
 	cmd->set_playerid(0);//id为0时消息为广播.
@@ -101,7 +101,7 @@ void KcpServer::OnNewTurn()
 //角色在关卡内销毁.-角色主动离开地图时.
 void KcpServer::OnPlayerDestroy(CUserInfo * player, char * data, int size)
 {
-	FrameCommand * cmd = frame.add_commands();
+	FrameCommand * cmd = frame->add_commands();
 	cmd->set_command(MeteorMsg_Command_DestroyPlayer);
 	cmd->set_logicframe(logicFrame + 1);
 	cmd->set_playerid(player->m_nUserServerIndex);
@@ -116,7 +116,7 @@ void KcpServer::OnPlayerDestroy(CUserInfo * player, char * data, int size)
 //角色进入关卡-当角色加载地图完成时，在服务器当前帧出生
 void KcpServer::OnPlayerSpawn(CUserInfo * player, char * data, int size)
 {
-	FrameCommand * cmd = frame.add_commands();
+	FrameCommand * cmd = frame->add_commands();
 	cmd->set_command(MeteorMsg_Command_SpawnPlayer);
 	cmd->set_logicframe(logicFrame + 1);
 	cmd->set_playerid(player->m_nUserServerIndex);
@@ -137,6 +137,7 @@ void KcpServer::OnPlayerEnter(CUserInfo * player)
 
 void KcpServer::OnRecv(int nRecvBytes)
 {
+	//一个房间对应一个KcpServer，收到该房间对应的UDP消息时，轮询每个用户的kcp内部，这个消息该谁处理
 	PLISTNODE p = users.GetHead();
 	while (p != NULL)
 	{
@@ -177,65 +178,10 @@ void KcpServer::InitKcp()
 		print("WSARecv() failed");
 		CloseServer(this);
 	}
-	//绑定到完成端口上
-
-	//
-
-	//IUINT32 current = iclock();
-	//IUINT32 slap = current + 20;
-	//IUINT32 index = 0;
-	//IUINT32 next = 0;
-	//IINT64 sumrtt = 0;
-	//int count = 0;
-	//int maxrtt = 0;
-
-	//// 配置窗口大小：平均延迟200ms，每20ms发送一个包，
-	//// 而考虑到丢包重发，设置最大收发窗口为128
-	//
-
-
-	//char buffer[2000];
-	//char buffer2[2000];
-	//int hr;
-
-	//IUINT32 ts1 = iclock();
-
-	//while (1) {
-	//	isleep(1);
-	//	current = iclock();
-	//	
-	//	sockaddr_in addr_from;
-	//	addr_from.sin_family = AF_INET;
-	//	int len = sizeof(addr_from);
-	//	while (1) {
-	//		KcpContext * ctx = (KcpContext*)kcp1->user;
-	//		//if (ctx->len == 0)
-	//		{
-	//			int k = recvfrom(ctx->socket, buffer, 2000, 0, (sockaddr*)&addr_from, &len);
-	//			if (k <= 0)
-	//				break;
-	//			hr = 
-	//			if (hr < 0)
-	//				break;
-	//			hr = ikcp_recv(kcp1, buffer2, 2000);
-
-	//			memcpy(&ctx->addr, &addr_from, len);
-	//			ctx->len = len;
-	//			// 没有收到包就退出
-	//			if (hr < 0) break;
-	//		}
-	//		ikcp_send(kcp1, buffer2, hr);
-	//		printf("%s", buffer2);
-	//		break;
-	//	}
-	//}
-
-	//ts1 = iclock() - ts1;
-	
 }
 
 //kcp线程，处理所有kcpserver套接口上的udp消息接收
-INT CreateKcpWorkerThread(int nThread)
+INT CreateKcpWorkerThread()
 {
 	DWORD	dwThreadID;
 

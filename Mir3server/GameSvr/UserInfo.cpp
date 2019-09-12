@@ -93,7 +93,6 @@ void CUserInfo::ExtractPacket()
 	while (m_nKcpReveivedBytes > 8)
 	{
 		CMsg * pMsg = (CMsg*)(&m_pKcpBuffer[offset]);
-
 		//整个包大小，小于当前已存在数据大小
 		if (pMsg->Size < m_nKcpReveivedBytes)
 		{
@@ -101,10 +100,10 @@ void CUserInfo::ExtractPacket()
 			//处理包内容
 			switch (pMsg->Message)
 			{
-				//初始化。得到对端UDP
+				
 				case MeteorMsg_MsgType_SyncCommand:
 				break;
-				//角色
+				//角色初始化,得到对端UDP
 				case MeteorMsg_Command_SpawnPlayer:
 					OnEnterLevel(pData, pMsg->Size);
 					m_pKcpSvr->OnPlayerSpawn(this, pData, pMsg->Size);
@@ -131,10 +130,10 @@ void CUserInfo::OnEnterLevel(char * pData, int size)
 	{
 		m_pxPlayerObject = &g_xPlayerObjectArr[nIndex];
 		m_pxPlayerObject->Lock();
-		m_pxPlayerObject->Reset(pUser);
+		m_pxPlayerObject->Reset(this);
 		m_pxPlayerObject->m_bEmpty = false;
 		m_pxPlayerObject->m_nArrIndex = nIndex;
-		m_pxPlayerObject->SetCharName(pUser->m_szCharName);
+		m_pxPlayerObject->SetCharName(m_szCharName);
 		m_pxPlayerObject->m_Ability.Camp = evt.camp();
 		m_pxPlayerObject->m_Ability.Model = evt.model();
 		m_pxPlayerObject->m_Ability.Weapon = evt.weapon();
